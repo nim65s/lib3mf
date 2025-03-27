@@ -29,8 +29,10 @@ set(SRCS_PLATFORM
   Source/Common/Platform/NMR_Platform.cpp
   Source/Common/Platform/NMR_ImportStream_Native.cpp
   Source/Common/Platform/NMR_ExportStream_Native.cpp
-    Source/Common/Platform/NMR_ExportStream_ZIP.cpp
+  Source/Common/Platform/NMR_ExportStream_ZIP.cpp
 )
+
+file(GLOB_RECURSE SOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS Source/*.cpp) # Recursively get all .cpp files, the false is to not follow symlinks
 
 set(SRCS_COMMON
 ${SRCS_PLATFORM}
@@ -40,7 +42,9 @@ ${ZSTD_FILES_COMMON}
 ${ZSTD_FILES_COMPRESS}
 ${ZSTD_FILES_DECOMPRESS}
 ${CPPBASE64_FILES}
+${SOURCES}
 Source/API/lib3mf.cpp
+
 Source/API/lib3mf_attachment.cpp
 Source/API/lib3mf_base.cpp
 Source/API/lib3mf_basematerialgroup.cpp
