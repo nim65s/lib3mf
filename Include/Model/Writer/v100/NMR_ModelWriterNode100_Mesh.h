@@ -132,7 +132,7 @@ namespace NMR {
 	public:
 		CModelWriterNode100_Mesh() = delete;
 		CModelWriterNode100_Mesh(_In_ CModelMeshObject * pModelMeshObject, _In_ CXmlWriter * pXMLWriter, _In_ PProgressMonitor pProgressMonitor,
-			_In_ PMeshInformation_PropertyIndexMapping pPropertyIndexMapping, _In_ int nPosAfterDecPoint, _In_ nfBool bWriteMaterialExtension, _In_ nfBool m_bWriteBeamLatticeExtension,
+			_In_ PMeshInformation_PropertyIndexMapping pPropertyIndexMapping, _In_ int nPosAfterDecPoint, _In_ nfBool bWriteMaterialExtension, _In_ nfBool bWriteBeamLatticeExtension,
 			_In_ nfBool bWriteVolumetricExtension, _In_ nfBool bWriteTriangleSetExtension, CChunkedBinaryStreamWriter* pBinaryStreamWriter);
 		virtual void writeToXML();
 	};

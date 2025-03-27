@@ -5130,13 +5130,12 @@
 			description="creates a resource iterator instance with all slice stack resources.">
 			<param name="ResourceIterator" type="handle" class="SliceStackIterator" pass="return"
 				description="returns the iterator instance." />
+		</method>		
+		
 		<method name="GetToolpaths" description="creates a Toolpath instance with all toolpath resources.">
 			<param name="ResourceIterator" type="handle" class="ToolpathIterator" pass="return" description="returns the iterator instance." />
 		</method>		
-		
-		<method name="GetSliceStacks" description="creates a resource iterator instance with all slice stack resources.">
-			<param name="ResourceIterator" type="handle" class="SliceStackIterator" pass="return" description="returns the iterator instance."/>
-		</method>
+
 		<method name="GetImage3Ds"
 			description="creates a resource iterator instance with all image3d resources.">
 			<param name="ResourceIterator" type="handle" class="Image3DIterator" pass="return"
@@ -5233,11 +5232,7 @@
 			<param name="BuildItemInstance" type="handle" class="BuildItem" pass="in"
 				description="Build item to remove." />
 		</method>
-		<method name="GetMetaDataGroup"
-			description="Returns the metadata of the model as MetaDataGroup">
-			<param name="TheMetaDataGroup" type="handle" class="MetaDataGroup" pass="return"
-				description="returns an Instance of the metadatagroup of the model" />
-		</method>
+
 		<method name="AddToolpath" description = "adds an empty Toolpath resource to the model. Bottom Z will be 0 in this case.">
 			<param name="UnitFactor" type="double" pass="in" description="A factor that transforms document units into toolpath units." />
 			<param name="ToolpathInstance" type="handle" class="Toolpath" pass="return" description="The toolpath instance of the created Toolpath." />

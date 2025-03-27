@@ -50,9 +50,9 @@ This is the class for exporting the 3mf mesh node.
 
 namespace NMR {
 
-	CModelWriterNode100_Mesh::CModelWriterNode100_Mesh(_In_ CModelMeshObject * pModelMeshObject, _In_ CXmlWriter * pXMLWriter, _In_ PProgressMonitor pProgressMonitor,
+	CModelWriterNode100_Mesh::CModelWriterNode100_Mesh(_In_ CModelMeshObject* pModelMeshObject, _In_ CXmlWriter* pXMLWriter, _In_ PProgressMonitor pProgressMonitor,
 		_In_ PMeshInformation_PropertyIndexMapping pPropertyIndexMapping, _In_ int nPosAfterDecPoint, _In_ nfBool bWriteMaterialExtension, _In_ nfBool bWriteBeamLatticeExtension,
-		CChunkedBinaryStreamWriter* pBinaryStreamWriter)
+		_In_ nfBool bWriteVolumetricExtension, _In_ nfBool bWriteTriangleSetExtension, CChunkedBinaryStreamWriter* pBinaryStreamWriter)
 		:CModelWriterNode_ModelBase(pModelMeshObject->getModel(), pXMLWriter, pProgressMonitor), m_nPosAfterDecPoint(nPosAfterDecPoint), m_nPutDoubleFactor((nfInt64)(pow(10, CModelWriterNode100_Mesh::m_nPosAfterDecPoint))),
 		m_pBinaryStreamWriter (pBinaryStreamWriter)
 	{

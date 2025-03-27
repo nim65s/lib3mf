@@ -1834,7 +1834,7 @@ namespace NMR {
 
 		throw CNMRException(NMR_ERROR_RESOURCENOTFOUND);
 	}
-}  // namespace NMR
+
 
 	PImportStream CModel::readPathFromPersistentDataSource(_In_ std::string sPath)
 	{
@@ -1863,6 +1863,6 @@ namespace NMR {
 
 	}
 
-}
+}  // namespace NMR
 
 

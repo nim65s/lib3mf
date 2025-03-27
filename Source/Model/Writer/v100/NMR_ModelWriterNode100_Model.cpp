@@ -635,7 +635,7 @@ namespace NMR {
 				}
 
 				CModelWriterNode100_Mesh ModelWriter_Mesh(pMeshObject, m_pXMLWriter, m_pProgressMonitor,
-					m_pPropertyIndexMapping, m_nDecimalPrecision, m_bWriteMaterialExtension, m_bWriteBeamLatticeExtension, pMeshBinaryWriter);
+					m_pPropertyIndexMapping, m_nDecimalPrecision, m_bWriteMaterialExtension, m_bWriteBeamLatticeExtension, m_bWriteVolumetricExtension, m_bWriteTriangleSetExtension, pMeshBinaryWriter);
 
 			ModelWriter_Mesh.writeToXML();
 		}
@@ -1077,6 +1077,8 @@ namespace NMR {
 			if (m_bWriteSliceExtension) {
 				writeSliceStacks();
 			}
+			if (m_bWriteToolpaths)
+				writeToolpaths();
 
 			// Create topological order of resources
 			CResourceDependencySorter sorter(m_pModel);
@@ -1099,11 +1101,7 @@ namespace NMR {
 				}
 				writeResource(pResource.get());
 			}
-        }
-			if (m_bWriteToolpaths)
-				writeToolpaths();
-			if (m_bWriteObjects)
-				writeObjects();
+
 		}
 		else {
 			if (m_bWriteSliceExtension) {
@@ -1112,6 +1110,8 @@ namespace NMR {
 			if (m_bWriteObjects) {
 				writeObjects();
 			}
+			if (m_bWriteToolpaths)
+				writeToolpaths();
 		}
 		
 		writeFullEndElement();

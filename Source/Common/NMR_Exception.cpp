@@ -492,7 +492,6 @@ namespace NMR {
 		case NMR_ERROR_KEYSTOREOPCCOULDNOTGETSTREAM: return "Could not get KeyStore stream";
 		case NMR_ERROR_KEYSTOREUNSUPPORTEDALGORITHM: return "The algorithm attribute is unsupported";
 		case NMR_ERROR_KEYSTORETOOMANYELEMENTS: return "Too many elements added to a keystore tree";
-<<<<<<< HEAD
 		case NMR_ERROR_INVALIDMESHBINARYPATH: return "Invalid Mesh Binary Path";
 		case NMR_ERROR_DUPLICATEMESHBINARYPATH: return "Duplicate Mesh Binary Path";
 		case NMR_ERROR_INVALIDBINARYELEMENTID: return "Invalid XML attribute in namespace";
@@ -511,10 +510,7 @@ namespace NMR {
 		case NMR_ERROR_INVALIDTYPEATTRIBUTE: return "Invalid Type Attribute";
 		case NMR_ERROR_MISSINGTYPEATTRIBUTE: return "Missing Type Attribute";
 		case NMR_ERROR_MISSINGCOORDINATE: return "Missing Coordinate";
-		case NMR_ERROR_DATASOURCEISINVALIDATED: return "Data source is invalidated";
-			
-=======
-
+		case NMR_ERROR_DATASOURCEISINVALIDATED: return "Data source is invalidated";			
 		case NMR_ERROR_INVALIDIMAGE3DSIZE: return "Invalid Image3D Size";
 		case NMR_ERROR_TOOMANYCHANNELSELECTORS: return "Too many channel selectors";
 		case NMR_ERROR_TOOMANYVOLUMETRICCHANNELS: return "Too many volumetric channels";
@@ -591,7 +587,6 @@ namespace NMR {
 		case NMR_ERROR_DUPLICATE_BOUNDARY_SHAPE_FALLBACK_VALUE: return "Duplicate attribute fallbackvalue in levelset element";
 		case NMR_ERROR_DUPLICATE_BOUNDARY_SHAPE_VOLUME_ID: return "Duplicate attribute volumeid in levelset element";
 
->>>>>>> develop
 		// XML Parser Error Constants(0x9XXX)
 		case NMR_ERROR_XMLPARSER_INVALIDATTRIBVALUE: return "Invalid XML attribute value";
 		case NMR_ERROR_XMLPARSER_INVALIDPARSERESULT: return "Invalid XML parse result";
