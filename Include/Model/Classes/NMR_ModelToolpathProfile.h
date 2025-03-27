@@ -75,12 +75,13 @@ namespace NMR {
 	class CModelToolpathProfileModifier {
 	private:
 		PModelToolpathProfileValue m_pValue;
-		double m_dDeltaValue;
+		double m_dDeltaValue0;
+		double m_dDeltaValue1;
 		eModelToolpathProfileOverrideFactor m_OverrideFactor;
 
 	public:
 
-		CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue, eModelToolpathProfileOverrideFactor overrideFactor);
+		CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue0, double dDeltaValue1, eModelToolpathProfileOverrideFactor overrideFactor);
 
 		virtual ~CModelToolpathProfileModifier();
 
@@ -92,7 +93,9 @@ namespace NMR {
 
 		std::string getNameSpace();
 
-		double getDeltaValue();
+		double getDeltaValue0();
+
+		double getDeltaValue1();
 
 		eModelToolpathProfileOverrideFactor getOverrideFactor ();
 	};
@@ -130,7 +133,7 @@ namespace NMR {
 		void removeParameter(const std::string& sNameSpace, const std::string& sValueName);
 		PModelToolpathProfileValue findParameter (const std::string& sNameSpace, const std::string& sValueName, bool bMustExist);
 
-		void addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta, eModelToolpathProfileOverrideFactor overrideFactor);
+		void addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta0, double dDelta1, eModelToolpathProfileOverrideFactor overrideFactor);
 
 		uint32_t getModifierCount();
 		std::string getModifierName(const uint32_t nIndex);

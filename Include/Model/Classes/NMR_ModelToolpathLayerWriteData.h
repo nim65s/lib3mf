@@ -38,6 +38,7 @@ NMR_ModelToolpath.h defines the Model Toolpath Layer Data.
 #include "Model/Classes/NMR_ModelToolpath.h" 
 #include "Model/Writer/NMR_ModelWriter.h" 
 #include "Model/Writer/NMR_ModelWriter_3MF.h" 
+#include "lib3mf_interfaces.hpp" 
 
 #include "Common/Platform/NMR_XmlWriter.h" 
 #include "Common/Platform/NMR_ExportStream_Memory.h" 
@@ -88,8 +89,6 @@ namespace NMR {
 		std::map<std::string, std::string> m_NameSpaceToPrefixMap;
 		std::map<std::string, std::string> m_PrefixToNameSpaceMap;
 
-		double m_dUnits;
-
 		NMR::CChunkedBinaryStreamWriter * getStreamWriter(std::string & sPath);
 
 		NMR::PImportStream createStream();
@@ -110,11 +109,11 @@ namespace NMR {
 
 		nfUint32 RegisterPart(PModelBuildItem pBuildItem);
 
-		void WriteHatchData(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nHatchCount, const nfInt32* pX1Buffer, const nfInt32* pY1Buffer, const nfInt32* pX2Buffer, const nfInt32* pY2Buffer, const nfInt32* pTagBuffer, const int32_t* pScalingDataF1Buffer, const int32_t* pScalingDataF2Buffer, const int32_t* pScalingDataG1Buffer, const int32_t* pScalingDataG2Buffer, const int32_t* pScalingDataH1Buffer, const int32_t* pScalingDataH2Buffer);
+		void WriteHatchData(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nHatchCount, const nfInt32* pX1Buffer, const nfInt32* pY1Buffer, const nfInt32* pX2Buffer, const nfInt32* pY2Buffer, const nfInt32* pTagBuffer, const double* pScalingDataF1Buffer, const double* pScalingDataF2Buffer, const uint32_t * pSubinterpolationCountBuffer, uint64_t nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer);
 
-		void WriteLoop(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nPointCount, const nfInt32 * pXBuffer, const nfInt32 * pYBuffer, const int32_t* pTagDataBuffer, const int32_t* pScalingFDataBuffer, const int32_t* pScalingGDataBuffer, const int32_t* pScalingHDataBuffer);
+		void WriteLoop(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nPointCount, const nfInt32 * pXBuffer, const nfInt32 * pYBuffer, const int32_t* pTagDataBuffer, const double* pScalingFDataBuffer, const double* pScalingGDataBuffer, const double* pScalingHDataBuffer);
 
-		void WritePolyline(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nPointCount, const nfInt32 * pXBuffer, const nfInt32 * pYBuffer, const int32_t* pTagDataBuffer, const int32_t* pScalingFDataBuffer, const int32_t* pScalingGDataBuffer, const int32_t* pScalingHDataBuffer);
+		void WritePolyline(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nPointCount, const nfInt32 * pXBuffer, const nfInt32 * pYBuffer, const int32_t* pTagDataBuffer, const double* pScalingFDataBuffer, const double* pScalingGDataBuffer, const double* pScalingHDataBuffer);
 
 		void finishHeader();
 

@@ -91,6 +91,7 @@ namespace NMR {
 
 		nfUint32 addIntArray (const nfInt32 * pData, nfUint32 nLength, eChunkedBinaryPredictionType predictionType);
 		nfUint32 addFloatArray(const nfFloat * pData, nfUint32 nLength, eChunkedBinaryPredictionType predictionType, nfFloat fDiscretizationUnits);
+		nfUint32 addDoubleArray(const nfDouble* pData, nfUint32 nLength, eChunkedBinaryPredictionType predictionType, nfDouble dDiscretizationUnits);
 		nfUint32 addRawFloatArray(const nfFloat* pData, nfUint32 nLength);
 
 		void copyBinaryToStream (PExportStream pStream);

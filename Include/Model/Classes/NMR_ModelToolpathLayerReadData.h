@@ -75,7 +75,7 @@ namespace NMR {
 		nfUint32 m_nPartID;
 		nfUint32 m_nStartPoint;
 		nfUint32 m_nPointCount;
-		nfUint32 m_nOverrideFraction;
+		nfUint32 m_nOverrideInterpolationCount;
 		nfInt64* m_pAttributeData;
 	} TOOLPATHREADSEGMENT;
 
@@ -83,10 +83,20 @@ namespace NMR {
 		nfInt32 m_nX;
 		nfInt32 m_nY;
 		nfInt32 m_nTag;
-		nfInt32 m_nFactorF;
-		nfInt32 m_nFactorG;
-		nfInt32 m_nFactorH;
+		nfDouble m_nFactorF;
+		nfDouble m_nFactorG;
+		nfDouble m_nFactorH;
+		uint32_t m_nOverrideStart;
+		uint32_t m_nOverrideCount;
 	} TOOLPATHREADPOINT;
+
+	typedef struct {
+		nfDouble m_dParameter;
+		nfDouble m_dFactorF;
+		nfDouble m_dFactorG;
+		nfDouble m_dFactorH;
+	} TOOLPATHREADOVERRIDE;
+
 
 	typedef std::vector<int64_t> CToolpathLayerAttributePage;
 
@@ -110,6 +120,7 @@ namespace NMR {
 		int64_t* allocAttributeBuffer(uint32_t nEntryCount);
 
 		CPagedVector<TOOLPATHREADPOINT> m_Points;
+		CPagedVector<TOOLPATHREADOVERRIDE> m_OverrideInterpolations;
 		TOOLPATHREADSEGMENT * m_pCurrentSegment;
 
 		std::map<uint32_t, std::string> m_UUIDMap;
@@ -126,14 +137,20 @@ namespace NMR {
 
 		std::string getUUID();
 
-		void beginSegment(eModelToolpathSegmentType eType, nfUint32 nProfileID, nfUint32 nPartID, nfUint32 nOverrideFraction);
+		void beginSegment(eModelToolpathSegmentType eType, nfUint32 nProfileID, nfUint32 nPartID);
 		void endSegment();
-		void addDiscretePoint (nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfInt32 nFactorF, nfInt32 nFactorG, nfInt32 nFactorH);
+		void addDiscretePoint (nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfDouble nFactorF, nfDouble nFactorG, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount);
+
+		TOOLPATHREADOVERRIDE& getOverrideInterpolationData(uint32_t nGlobalIndex);
+		uint32_t getGlobalOverrideInterpolationCount();
+		void addOverrideInterpolation (double dParameter, double dFactorF, double dFactorG, double dFactorH);
 
 		nfUint32 getSegmentCount();
 		void getSegmentInfo (nfUint32 nSegmentIndex, eModelToolpathSegmentType & eType, nfUint32 & nProfileID, nfUint32 & nPartID, nfUint32 & nPointCount);
-		uint32_t getSegmentOverrideDenominator (nfUint32 nSegmentIndex);
+		eModelToolpathSegmentType getSegmentType(nfUint32 nSegmentIndex);
 		TOOLPATHREADPOINT & getSegmentPoint (nfUint32 nSegmentIndex, nfUint32 nPointIndex);
+		void getSegmentHatchOverrideInterpolationIndices(nfUint32 nSegmentIndex, nfUint32 nHatchIndex, nfUint32 & nOverrideStartIndex, nfUint32 & nOverrideCount);
+		uint32_t getSegmentOverrideInterpolationCount(uint32_t nSegmentIndex);
 
 		uint32_t getPartCount();
 

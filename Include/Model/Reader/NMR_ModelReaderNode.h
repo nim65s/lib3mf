@@ -48,6 +48,7 @@ namespace NMR {
 		nfBool m_bParsedContent;
 		nfBool m_bIsEmptyElement;
 
+
 	protected:
 		PProgressMonitor m_pProgressMonitor;
 		PModelWarnings m_pWarnings;

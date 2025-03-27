@@ -85,7 +85,9 @@ namespace NMR {
 			{
 				if (e.getErrorCode() == NMR_ERROR_SLICES_REFS_Z_NOTINCREASING)
 				{
-					getWarnings()->addException(e, mrwInvalidMandatoryValue);
+					auto pWarnings = getWarnings();
+					if (pWarnings.get () != nullptr)
+						pWarnings->addException(e, mrwInvalidMandatoryValue);
 					m_pSliceStackResource->AddSliceRef(pSliceStackResource, false);
 				}
 				else

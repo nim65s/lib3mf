@@ -1028,7 +1028,8 @@ namespace NMR {
 							}
 						}
 
-						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA, (float) modifier->getDeltaValue ());
+						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA0, (float) modifier->getDeltaValue0 ());
+						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA1, (float)modifier->getDeltaValue1());
 						switch (modifier->getOverrideFactor()) {
 							case NMR::eModelToolpathProfileOverrideFactor::pfFactorF:
 								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "f");
@@ -1037,7 +1038,7 @@ namespace NMR {
 								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "g");
 								break;
 							case NMR::eModelToolpathProfileOverrideFactor::pfFactorH:
-								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "");
+								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "h");
 								break;
 
 							// For unknown, do not write the factor attribute

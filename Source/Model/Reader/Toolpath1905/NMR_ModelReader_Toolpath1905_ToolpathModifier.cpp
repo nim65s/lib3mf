@@ -45,8 +45,10 @@ namespace NMR {
 	CModelReaderNode_Toolpath1905_ToolpathModifier::CModelReaderNode_Toolpath1905_ToolpathModifier(_In_ CModel * pModel, _In_ PModelWarnings pWarnings)
 		: CModelReaderNode(pWarnings), 
 		m_bHasAttribute(false),
-		m_bHasDelta(false),
-		m_dDelta (0.0),
+		m_bHasDelta0 (false),
+		m_dDelta0 (0.0),
+		m_bHasDelta1 (false),
+		m_dDelta1 (0.0),
 		m_OverrideFactor (NMR::eModelToolpathProfileOverrideFactor::pfNone),
 		m_pModel(pModel)
 
@@ -84,17 +86,17 @@ namespace NMR {
 			m_bHasAttribute = true;
 		}
 
-		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA) == 0) {
-			if (m_bHasDelta)
+		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA0) == 0) {
+			if (m_bHasDelta0)
 				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERDELTA);
 
-			m_dDelta = fnStringToFloat(pAttributeValue);
-			if (std::isnan(m_dDelta))
+			m_dDelta0 = fnStringToFloat(pAttributeValue);
+			if (std::isnan(m_dDelta0))
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
-			if (fabs(m_dDelta) > XML_3MF_MAXIMUMPROFILEDELTA)
+			if (fabs(m_dDelta0) > XML_3MF_MAXIMUMPROFILEDELTA)
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
 
-			m_bHasDelta = true;
+			m_bHasDelta0 = true;
 		}
 
 		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR) == 0) {
@@ -112,6 +114,20 @@ namespace NMR {
 				throw CNMRException(NMR_ERROR_INVALIDOVERRIDEFACTOR);
 
 		}
+
+		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA1) == 0) {
+			if (m_bHasDelta1)
+				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERDELTA);
+
+			m_dDelta1 = fnStringToFloat(pAttributeValue);
+			if (std::isnan(m_dDelta1))
+				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
+			if (fabs(m_dDelta1) > XML_3MF_MAXIMUMPROFILEDELTA)
+				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
+
+			m_bHasDelta1 = true;
+		}
+
 
 	}
 	
@@ -135,15 +151,12 @@ namespace NMR {
 		if (!m_bHasAttribute)
 			throw CNMRException(NMR_ERROR_MISSINGMODIFIERPROFILEATTRIBUTE);
 
-		if (!m_bHasDelta)
-			throw CNMRException(NMR_ERROR_MISSINGMODIFIERPROFILEDELTA);
-
 		if (m_sAttribute.empty())
 			throw CNMRException(NMR_ERROR_EMPTYMODIFIERPROFILEATTRIBUTE);
 
 		size_t nPos = m_sAttribute.find(":");
 		if (nPos == std::string::npos) {
-			pProfile->addModifier("", m_sAttribute, m_dDelta, m_OverrideFactor);
+			pProfile->addModifier("", m_sAttribute, m_dDelta0, m_dDelta1, m_OverrideFactor);
 		}
 		else {
 			std::string sNameSpacePrefix = m_sAttribute.substr(0, nPos);
@@ -152,7 +165,7 @@ namespace NMR {
 			if (!pXMLReader->GetNamespaceURI(sNameSpacePrefix, sNameSpace))
 				throw CNMRException(NMR_ERROR_INVALIDPROFILEMODIFIERNAMESPACE);
 
-			pProfile->addModifier(sNameSpace, sValueName, m_dDelta, m_OverrideFactor);
+			pProfile->addModifier(sNameSpace, sValueName, m_dDelta0, m_dDelta1, m_OverrideFactor);
 		}
 
 		

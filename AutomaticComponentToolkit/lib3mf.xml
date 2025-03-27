@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" libraryname="the 3MF Library" namespace="Lib3MF" copyright="3MF Consortium (Original Author)" year="2019" basename="lib3mf" version="2.3.2">
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" libraryname="the 3MF Library" namespace="Lib3MF" copyright="3MF Consortium (Original Author)" year="2019" basename="lib3mf" version="2.5.0">
 
 
 	<license>
@@ -109,6 +109,8 @@
 		<error name="TOOLPATH_INVALIDHATCHCOUNT" code="4012" description="Invalid hatch count" />
 		<error name="TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA" code="4013" description="Scaling data needs to match hatch data" />
 		<error name="TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA" code="4014" description="Scaling data needs to match point data" />
+		<error name="TOOLPATH_SEGMENTISNOTOFTYPEHATCH" code="4015" description="Segment is not of type hatch" />
+		
 		
 		
 		
@@ -285,7 +287,17 @@
 		<member name="Point1Override" type="double" />
 		<member name="Point2Override" type="double" />
 	</struct>	
+	
+	<struct name="HatchOverrideInterpolationIndices">
+		<member name="StartIndex" type="uint32" description="Start index of the interpolation values for a specific hatch." />
+		<member name="ValueCount" type="uint32" description="Number of interpolation values for a specific hatch." />
+	</struct>	
 
+	<struct name="HatchOverrideInterpolationData">
+		<member name="Parameter" type="double" description="0-1 based parameter value determining the position on the hatch." />
+		<member name="Override" type="double" decscription="Override value at this position." />
+	</struct>	
+	
 	<struct name="DiscreteHatch2D">
 		<member name="Point1Coordinates" type="int32" rows="2"/>
 		<member name="Point2Coordinates" type="int32" rows="2"/>
@@ -1703,21 +1715,24 @@
 			<param name="NameSpaceName" type="string" pass="out" description="Name of the Parameter Namespace." />
 			<param name="ValueName" type="string" pass="out" description="Parameter key string." />
 			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="out" description="which type of override factor to use." />
-			<param name="DeltaValue" type="double" pass="out" description="delta value." />
+			<param name="DeltaValue0" type="double" pass="out" description="Delta value if Factor is equal 0." />
+			<param name="DeltaValue1" type="double" pass="out" description="Delta value if Factor is equal 1." />
 		</method>
 
 		<method name="GetModifierInformationByName" description="Returns modifier by name.">
 			<param name="NameSpaceName" type="string" pass="in" description="Name of the Parameter Namespace." />
 			<param name="ValueName" type="string" pass="in" description="Parameter key string." />
 			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="out" description="which type of override factor to use." />
-			<param name="DeltaValue" type="double" pass="out" description="delta value." />
+			<param name="DeltaValue0" type="double" pass="out" description="Delta value if Factor is equal 0." />
+			<param name="DeltaValue1" type="double" pass="out" description="Delta value if Factor is equal 1." />
 		</method>	
 
 		<method name="SetModifier" description="Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.">
 			<param name="NameSpaceName" type="string" pass="in" description="Name of the Parameter Namespace." />
 			<param name="ValueName" type="string" pass="in" description="Parameter key string." />
 			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="which type of override factor to use." />
-			<param name="DeltaValue" type="double" pass="in" description="delta value." />
+			<param name="DeltaValue0" type="double" pass="in" description="Delta value if Factor is equal 0." />
+			<param name="DeltaValue1" type="double" pass="in" description="Delta value if Factor is equal 1." />
 		</method>
 
 		<method name="RemoveModifier" description="Removes a modifier, if it exists.">
@@ -1920,12 +1935,31 @@
 	    <param name="HatchData" type="structarray" class="DiscreteHatch2D" pass="out" description="The hatch data array. The point coordinates are in toolpath units." />
 	</method>
 
-	<method name="GetSegmentHatchOverrideFactors" description="Retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.">
+	<method name="GetLinearSegmentHatchOverrideFactors" description="Retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.">
 		<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and SegmentCount - 1." />
 		<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given." />		
 	    <param name="FactorValues" type="structarray" class="Hatch2DOverrides" pass="out" description="An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline." />
 	</method>
+
+	<method name="SegmentHasNonlinearHatchOverrideInterpolation" description="Checks if the segment has any sub-hatch override interpolation values. Returns false, if segment type is not hatch.">
+		<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and SegmentCount - 1." />
+		<param name="HasOverrideInterpolation" type="bool" pass="return" description="Returns true, if the segment has non-linear interpolation overrides." />		
+	</method>
 	
+	<method name="GetSegmentNonlinearHatchOverrideInterpolation" description="Retrieves the sub-hatch override interpolation values for a single hatch. Fails if segment type is not hatch.">
+		<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and SegmentCount - 1." />
+		<param name="HatchIndex" type="uint32" pass="in" description="Hatch Index in Segment. Must be between 0 and HatchCount - 1." />
+		<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given." />		
+	    <param name="FactorValues" type="structarray" class="HatchOverrideInterpolationData" pass="out" description="Array of interpolation data for the hatch." />
+	</method>
+
+	<method name="GetSegmentAllNonlinearHatchesOverrideInterpolation" description="Retrieves the sub-hatch override interpolation values for all hatches of a segment. Fails if segment type is not hatch.">
+		<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and SegmentCount - 1." />
+		<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given." />		
+	    <param name="CountArray" type="basicarray" class="uint32" pass="out" description="Array how many Interpolation values exist for each hatch. Will contain number of hatches elements." />
+	    <param name="FactorValues" type="structarray" class="HatchOverrideInterpolationData" pass="out" description="Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements." />
+	</method>
+
   </class>
 	
 	
@@ -1980,27 +2014,25 @@
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="HatchData" type="structarray" class="Hatch2D" pass="in" description="The hatch data in model units. Array MUST NOT be empty." />      
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f). MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors (f). MUST have the same cardinality as HatchData." /> 
     </method>
 
-    <method name="WriteHatchDataInModelUnitsWithRampedOverrides" description="writes hatch data to the layer in model units with ramped profile overrides per hatch.">
+    <method name="WriteHatchDataInModelUnitsWithLinearOverrides" description="writes hatch data to the layer in model units with linearly ramped profile overrides per hatch.">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="HatchData" type="structarray" class="Hatch2D" pass="in" description="The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment." />      
-      <param name="ScalingData1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingData2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData1" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData2" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
     </method>
 
-    <method name="WriteHatchDataInModelUnitsWithMultipleOverrides" description="writes hatch data to the layer in model units with ramped profile overrides per hatch.">
+    <method name="WriteHatchDataInModelUnitsWithNonlinearOverrides" description="writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
-      <param name="HatchData" type="structarray" class="Hatch2D" pass="in" description="The hatch data in model units. Array MUST NOT be empty." />      
-      <param name="ScalingDataF1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataF2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataG1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (g) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataG2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (g) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataH1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (h) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataH2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (h) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="HatchData" type="structarray" class="Hatch2D" pass="in" description="The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment." />      
+      <param name="ScalingData1" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData2" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="SubInterpolationCounts" type="basicarray" class="uint32" pass="in" description="Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="OverrideInterpolationData" type="structarray" class="HatchOverrideInterpolationData" pass="in" description="Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1." /> 
     </method>
 
     <method name="WriteHatchDataDiscrete" description="writes hatch data to the layer in toolpath units.">
@@ -2013,28 +2045,27 @@
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="HatchData" type="structarray" class="DiscreteHatch2D" pass="in" description="The hatch data in toolpath units. Array MUST NOT be empty." />      
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f). MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors (f). MUST have the same cardinality as HatchData." /> 
     </method>
 
-    <method name="WriteHatchDataDiscreteWithRampedOverrides" description="writes hatch data to the layer in toolpath units with ramped profile overrides per hatch.">
+    <method name="WriteHatchDataDiscreteWithLinearOverrides" description="writes hatch data to the layer in toolpath units with linearly ramped profile overrides per hatch.">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="HatchData" type="structarray" class="DiscreteHatch2D" pass="in" description="The hatch data in toolpath units. Array MUST NOT be empty." />      
-      <param name="ScalingData1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingData2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData1" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData2" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
     </method>
 
-    <method name="WriteHatchDataDiscreteWithMultipleOverrides" description="writes hatch data to the layer in toolpath units with ramped profile overrides per hatch.">
+    <method name="WriteHatchDataDiscreteWithNonlinearOverrides" description="writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use" />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="HatchData" type="structarray" class="DiscreteHatch2D" pass="in" description="The hatch data in toolpath units. Array MUST NOT be empty." />      
-      <param name="ScalingDataF1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the start point of each hatch. If empty, no factors are written. MUST otherwise have the same cardinality as HatchData." /> 
-      <param name="ScalingDataF2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (f) for the end point of each hatch. Defaults to ScalingDataF1, if empty. MUST be empty, if ScalingDataF1 is empty. MUST otherwise have the same cardinality as HatchData." /> 
-      <param name="ScalingDataG1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (g) for the start point of each hatch. If empty, no factors are written. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataG2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (g) for the end point of each hatch. Defaults to ScalingDataG1, if empty. MUST be empty, if ScalingDataG1 is empty. MUST otherwise have the same cardinality as HatchData." /> 
-      <param name="ScalingDataH1" type="basicarray" class="int32" pass="in" description="The profile override scale factors (h) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
-      <param name="ScalingDataH2" type="basicarray" class="int32" pass="in" description="The profile override scale factors (h) for the end point of each hatch. Defaults to ScalingDataH1, if empty. MUST be empty, if ScalingDataH1 is empty. MUST otherwise have the same cardinality as HatchData." /> 
+      <param name="ScalingData1" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="ScalingData2" type="basicarray" class="double" pass="in" description="The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="SubInterpolationCounts" type="basicarray" class="uint32" pass="in" description="Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData." /> 
+      <param name="OverrideInterpolationData" type="structarray" class="HatchOverrideInterpolationData" pass="in" description="Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1." /> 
     </method>
+
 
     <method name="WriteLoopInModelUnits" description="writes loop data to the layer in model units.">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Loop Profiles can not be overridden by point." />
@@ -2052,32 +2083,14 @@
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Loop Profiles can not be overridden by point." />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="PointData" type="structarray" class="Position2D" pass="in" description="The point data in model units. Array MUST NOT be empty." />
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-    </method>
-
-    <method name="WriteLoopInModelUnitsWithMultipleOverrides" description="writes loop data to the layer in model units with profile overrides.">
-      <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Loop Profiles can not be overridden by point." />
-      <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
-      <param name="PointData" type="structarray" class="Position2D" pass="in" description="The point data in model units. Array MUST NOT be empty." />
-      <param name="ScalingDataF" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataG" type="basicarray" class="int32" pass="in" description="The profile override scale factors for G. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataH" type="basicarray" class="int32" pass="in" description="The profile override scale factors for H. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
     </method>
 
     <method name="WriteLoopDiscreteWithOverrides" description="writes loop data to the layer in toolpath units with profile overrides..">
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Loop Profiles can not be overridden by point." />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="PointData" type="structarray" class="DiscretePosition2D" pass="in" description="The point data in toolpath units. Array MUST NOT be empty." />
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-    </method>
-
-    <method name="WriteLoopDiscreteWithMultipleOverrides" description="writes loop data to the layer in toolpath units with profile overrides..">
-      <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Loop Profiles can not be overridden by point." />
-      <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
-      <param name="PointData" type="structarray" class="DiscretePosition2D" pass="in" description="The point data in toolpath units. Array MUST NOT be empty." />
-      <param name="ScalingDataF" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataG" type="basicarray" class="int32" pass="in" description="The profile override scale factors for G. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataH" type="basicarray" class="int32" pass="in" description="The profile override scale factors for H. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
     </method>
 
     <method name="WritePolylineInModelUnits" description="writes polyline data to the layer.">
@@ -2090,16 +2103,7 @@
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Polyline Profiles can not be overridden by point." />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="PointData" type="structarray" class="Position2D" pass="in" description="The point data in model units. Array MUST NOT be empty." />
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment." /> 
-    </method>	
-
-    <method name="WritePolylineInModelUnitsWithMultipleOverrides" description="writes polyline data to the layer with profile overrides.">
-      <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Polyline Profiles can not be overridden by point." />
-      <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
-      <param name="PointData" type="structarray" class="Position2D" pass="in" description="The point data in model units. Array MUST NOT be empty." />
-      <param name="ScalingDataF" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataG" type="basicarray" class="int32" pass="in" description="The profile override scale factors for G. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataH" type="basicarray" class="int32" pass="in" description="The profile override scale factors for H. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment." /> 
     </method>	
 
     <method name="WritePolylineDiscrete" description="writes polyline data to the layer.">
@@ -2112,16 +2116,7 @@
       <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Polyline Profiles can not be overridden by point." />
       <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
       <param name="PointData" type="structarray" class="DiscretePosition2D" pass="in" description="The point data in toolpath units. Array MUST NOT be empty." />
-      <param name="ScalingData" type="basicarray" class="int32" pass="in" description="The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment." /> 
-    </method>	
-
-    <method name="WritePolylineDiscreteWithMultipleOverrides" description="writes polyline data to the layer with profile overrides.">
-      <param name="ProfileID" type="uint32" pass="in" description="The toolpath profile to use. Polyline Profiles can not be overridden by point." />
-      <param name="PartID" type="uint32" pass="in" description="The toolpath part to use" />
-      <param name="PointData" type="structarray" class="DiscretePosition2D" pass="in" description="The point data in toolpath units. Array MUST NOT be empty." />
-      <param name="ScalingDataF" type="basicarray" class="int32" pass="in" description="The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-      <param name="ScalingDataG" type="basicarray" class="int32" pass="in" description="The profile override scale factors for G. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
-			<param name="ScalingDataH" type="basicarray" class="int32" pass="in" description="The profile override scale factors for H. If empty, no factors are written. MUST otherwise have the same cardinality as PointData." /> 
+      <param name="ScalingData" type="basicarray" class="double" pass="in" description="The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment." /> 
     </method>	
 	
 	<method name="AddCustomData" description="Adds a custom data DOM tree to the layer. Layer MUST not be finished when changing the DOM tree.">

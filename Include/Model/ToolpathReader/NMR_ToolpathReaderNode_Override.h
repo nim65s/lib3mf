@@ -24,11 +24,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 --*/
 
-#ifndef __NMR_TOOLPATHREADERNODE_POINT
-#define __NMR_TOOLPATHREADERNODE_POINT
+#ifndef __NMR_TOOLPATHREADERNODE_OVERRIDE
+#define __NMR_TOOLPATHREADERNODE_OVERRIDE
 
 #include "Model/Reader/NMR_ModelReaderNode.h"
 #include "Model/Classes/NMR_ModelToolpathLayerReadData.h"
@@ -36,42 +35,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace NMR {
 
-	class CToolpathReaderNode_Point : public CModelReaderNode {
+	class CToolpathReaderNode_Override : public CModelReaderNode {
 	protected:
 
-		nfInt32 m_nX;
-		nfInt32 m_nY;
-		nfInt32 m_nTag;
-		nfDouble m_nFactorF;
-		nfDouble m_nFactorG;
-		nfDouble m_nFactorH;
+		nfBool m_bHasParameter;
+		nfBool m_bHasValueF;
+		nfBool m_bHasValueG;
+		nfBool m_bHasValueH;
 
-		nfBool m_bHasX;
-		nfBool m_bHasY;
+		nfDouble m_dParameter;
+		nfDouble m_dValueF;
+		nfDouble m_dValueG;
+		nfDouble m_dValueH;
 
 		CModelToolpathLayerReadData * m_pReadData;
 
 		virtual void OnNSChildElement(_In_z_ const nfChar * pChildName, _In_z_ const nfChar * pNameSpace, _In_ CXmlReader * pXMLReader);
 		virtual void OnAttribute(_In_z_ const nfChar * pAttributeName, _In_z_ const nfChar * pAttributeValue);
 		virtual void OnNSAttribute(_In_z_ const nfChar * pAttributeName, _In_z_ const nfChar * pAttributeValue, _In_z_ const nfChar * pNameSpace);
+
 	public:
-		CToolpathReaderNode_Point() = delete;
-		CToolpathReaderNode_Point(_In_ PModelWarnings pWarnings, _In_ PProgressMonitor pProgressMonitor, CModelToolpathLayerReadData * pReadData);
+		CToolpathReaderNode_Override() = delete;
+		CToolpathReaderNode_Override(_In_ PModelWarnings pWarnings, _In_ PProgressMonitor pProgressMonitor, CModelToolpathLayerReadData * pReadData);
 
 		virtual void parseXML(_In_ CXmlReader * pXMLReader);
 
-		nfInt32 getX();
-		nfInt32 getY();
-		nfInt32 getTag();
-		nfDouble getFactorF();
-		nfDouble getFactorG();
-		nfDouble getFactorH();
-
-
+		nfDouble getParameter();
+		nfDouble getValueF(bool bMustExist);
+		nfDouble getValueG(bool bMustExist);
+		nfDouble getValueH(bool bMustExist);
 	};
 
-	typedef std::shared_ptr <CToolpathReaderNode_Point> PToolpathReaderNode_Point;
+	typedef std::shared_ptr <CToolpathReaderNode_Override> PToolpathReaderNode_Override;
 
 }
 
-#endif // __NMR_TOOLPATHREADERNODE_POINT
+#endif // __NMR_TOOLPATHREADERNODE_OVERRIDE
+

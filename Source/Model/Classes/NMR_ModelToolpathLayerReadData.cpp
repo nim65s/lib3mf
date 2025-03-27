@@ -62,7 +62,7 @@ namespace NMR {
 		return m_sUUID;
 	}
 
-	void CModelToolpathLayerReadData::beginSegment(eModelToolpathSegmentType eType, nfUint32 nProfileID, nfUint32 nPartID, nfUint32 nOverrideFraction)
+	void CModelToolpathLayerReadData::beginSegment(eModelToolpathSegmentType eType, nfUint32 nProfileID, nfUint32 nPartID)
 	{
 		if (m_pCurrentSegment != nullptr)
 			throw CNMRException(NMR_ERROR_LAYERSEGMENTALREADYOPEN);
@@ -73,7 +73,7 @@ namespace NMR {
 		m_pCurrentSegment->m_nProfileID = nProfileID;
 		m_pCurrentSegment->m_nStartPoint = m_Points.getCount ();
 		m_pCurrentSegment->m_nPointCount = 0;
-		m_pCurrentSegment->m_nOverrideFraction = nOverrideFraction;
+		m_pCurrentSegment->m_nOverrideInterpolationCount = 0;
 
 		size_t nNumberOfAttributes = m_SegmentAttributeDefinitions.size();
 
@@ -98,7 +98,7 @@ namespace NMR {
 		m_pCurrentSegment = nullptr;
 	}
 
-	void CModelToolpathLayerReadData::addDiscretePoint(nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfInt32 nFactorF, nfInt32 nFactorG, nfInt32 nFactorH)
+	void CModelToolpathLayerReadData::addDiscretePoint(nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfDouble nFactorF, nfDouble nFactorG, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount)
 	{
 		if (m_pCurrentSegment == nullptr)
 			throw CNMRException(NMR_ERROR_LAYERSEGMENTNOTOPEN);
@@ -110,7 +110,34 @@ namespace NMR {
 		pVec->m_nFactorF = nFactorF;
 		pVec->m_nFactorG = nFactorG;
 		pVec->m_nFactorH = nFactorH;
+		pVec->m_nOverrideStart = nOverrideStart;
+		pVec->m_nOverrideCount = nOverrideCount;
 	}
+
+	uint32_t CModelToolpathLayerReadData::getGlobalOverrideInterpolationCount()
+	{
+		return m_OverrideInterpolations.getCount();
+	}
+
+	TOOLPATHREADOVERRIDE& CModelToolpathLayerReadData::getOverrideInterpolationData(uint32_t nGlobalIndex)
+	{
+		return m_OverrideInterpolations.getDataRef(nGlobalIndex);
+	}
+
+	void CModelToolpathLayerReadData::addOverrideInterpolation(double dParameter, double dFactorF, double dFactorG, double dFactorH)
+	{
+		if (m_pCurrentSegment == nullptr)
+			throw CNMRException(NMR_ERROR_LAYERSEGMENTNOTOPEN);
+
+		TOOLPATHREADOVERRIDE* pOverride = m_OverrideInterpolations.allocData();
+		pOverride->m_dParameter = dParameter;
+		pOverride->m_dFactorF = dFactorF;
+		pOverride->m_dFactorG = dFactorG;
+		pOverride->m_dFactorH = dFactorH;
+
+		m_pCurrentSegment->m_nOverrideInterpolationCount++;
+	}
+
 
 	nfUint32 CModelToolpathLayerReadData::getSegmentCount()
 	{
@@ -127,11 +154,36 @@ namespace NMR {
 		nPointCount = pSegment->m_nPointCount;
 	}
 
-	uint32_t CModelToolpathLayerReadData::getSegmentOverrideDenominator(nfUint32 nSegmentIndex)
+	eModelToolpathSegmentType CModelToolpathLayerReadData::getSegmentType(nfUint32 nSegmentIndex)
 	{
 		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
 		__NMRASSERT(pSegment != nullptr);
-		return pSegment->m_nOverrideFraction;
+		return pSegment->m_eType;
+
+	}
+
+	void CModelToolpathLayerReadData::getSegmentHatchOverrideInterpolationIndices(nfUint32 nSegmentIndex, nfUint32 nHatchIndex, nfUint32& nOverrideStartIndex, nfUint32& nOverrideCount)
+	{
+
+		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
+		__NMRASSERT(pSegment != nullptr);
+		if (((uint64_t)nHatchIndex * 2) >= pSegment->m_nPointCount)
+			throw CNMRException(NMR_ERROR_INVALIDINDEX);
+
+		auto & dataRef = m_Points.getDataRef(pSegment->m_nStartPoint + nHatchIndex * 2);
+
+		nOverrideStartIndex = dataRef.m_nOverrideStart;
+		nOverrideCount = dataRef.m_nOverrideCount;
+
+	}
+
+	uint32_t CModelToolpathLayerReadData::getSegmentOverrideInterpolationCount(uint32_t nSegmentIndex)
+	{
+		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
+		__NMRASSERT(pSegment != nullptr);
+
+		return pSegment->m_nOverrideInterpolationCount;
+
 	}
 
 

@@ -593,6 +593,17 @@ namespace NMR {
 		case NMR_ERROR_EMPTYMODIFIERPROFILEATTRIBUTE: return "Empty modifier profile attribute";
 		case NMR_ERROR_INVALIDPROFILEMODIFIERNAMESPACE: return "Invalid profile modifier namespace";
 		case NMR_ERROR_TOOLPATHPROFILENOTCREATED: return "Toolpath profile not created";
+		case NMR_ERROR_TOOLPATH_NOSUBINTERPOLATIONINFORMATION: return "No subinterpolation information";
+		case NMR_ERROR_TOOLPATH_SUBINTERPOLATIONBUFFEROVERFLOW: return "Subinterpolation buffer overflow";
+		case NMR_ERROR_DUPLICATEOVERRIDEPARAMETERVALUE: return "Duplicate override parameter value";
+		case NMR_ERROR_DUPLICATEOVERRIDEFACTORF: return "Duplicate override factor F";
+		case NMR_ERROR_DUPLICATEOVERRIDEFACTORG: return "Duplicate override factor G";
+		case NMR_ERROR_DUPLICATEOVERRIDEFACTORH: return "Duplicate override factor H";
+		case NMR_ERROR_MISSINGOVERRIDEPARAMETERVALUE: return "Missing override parameter value";
+		case NMR_ERROR_MISSINGOVERRIDEFACTORF: return "Missing override factor F";
+		case NMR_ERROR_MISSINGOVERRIDEFACTORG: return "Missing override factor G";
+		case NMR_ERROR_MISSINGOVERRIDEFACTORH: return "Missing override factor H";
+		case NMR_ERROR_OVERRIDEINTERPOLATIONOVERFLOW: return "Override interpolation overflow";
 
 		default:
 			return "unknown error";

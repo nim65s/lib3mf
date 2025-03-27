@@ -93,13 +93,13 @@ namespace NMR {
 			m_bHasY = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF) == 0) {
-			m_nFactorF = fnStringToInt32(pAttributeValue);
+			m_nFactorF = fnStringToDouble(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG) == 0) {
-			m_nFactorG = fnStringToInt32(pAttributeValue);
+			m_nFactorG = fnStringToDouble(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORH) == 0) {
-			m_nFactorH = fnStringToInt32(pAttributeValue);
+			m_nFactorH = fnStringToDouble(pAttributeValue);
 		}
 		else
 			m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
@@ -135,17 +135,17 @@ namespace NMR {
 	}
 
 
-	nfInt32 CToolpathReaderNode_Point::getFactorF()
+	nfDouble CToolpathReaderNode_Point::getFactorF()
 	{
 		return m_nFactorF;
 	}
 
-	nfInt32 CToolpathReaderNode_Point::getFactorG()
+	nfDouble CToolpathReaderNode_Point::getFactorG()
 	{
 		return m_nFactorG;
 	}
 
-	nfInt32 CToolpathReaderNode_Point::getFactorH()
+	nfDouble CToolpathReaderNode_Point::getFactorH()
 	{
 		return m_nFactorH;
 	}

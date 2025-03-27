@@ -50,8 +50,11 @@ namespace NMR {
 		nfBool m_bHasAttribute;
 		std::string m_sAttribute;
 
-		nfBool m_bHasDelta;
-		double m_dDelta;
+		nfBool m_bHasDelta0;
+		double m_dDelta0;
+
+		nfBool m_bHasDelta1;
+		double m_dDelta1;
 
 		NMR::eModelToolpathProfileOverrideFactor m_OverrideFactor;
 

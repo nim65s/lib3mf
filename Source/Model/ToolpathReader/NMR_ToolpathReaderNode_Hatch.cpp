@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --*/
 
 #include "Model/ToolpathReader/NMR_ToolpathReaderNode_Hatch.h" 
+#include "Model/ToolpathReader/NMR_ToolpathReaderNode_Override.h" 
 
 #include "Model/Classes/NMR_ModelConstants.h" 
 #include "Common/3MF_ProgressMonitor.h"
@@ -53,17 +54,18 @@ namespace NMR {
 			m_bHasX2 (false),
 			m_bHasY2 (false),
 		m_nTag(0),
-		m_nFactorF1(0),
-		m_nFactorG1(0),
-		m_nFactorH1(0),
-		m_nFactorF2(0),
-		m_nFactorG2(0),
-		m_nFactorH2(0)
+		m_nFactorF1(0.0),
+		m_nFactorG1(0.0),
+		m_nFactorH1(0.0),
+		m_nFactorF2(0.0),
+		m_nFactorG2(0.0),
+		m_nFactorH2(0.0)
 
 
 	{
 		if (pReadData == nullptr)
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
+
 	}
 
 
@@ -114,24 +116,24 @@ namespace NMR {
 			m_nTag = fnStringToInt32(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF) == 0) {
-			m_nFactorF1 = fnStringToInt32(pAttributeValue);
+			m_nFactorF1 = fnStringToDouble(pAttributeValue);
 			m_nFactorF2 = m_nFactorF1;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF1) == 0) {
-			m_nFactorF1 = fnStringToInt32(pAttributeValue);
+			m_nFactorF1 = fnStringToDouble(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF2) == 0) {
-			m_nFactorF2 = fnStringToInt32(pAttributeValue);
+			m_nFactorF2 = fnStringToDouble(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG) == 0) {
-			m_nFactorG1 = fnStringToInt32(pAttributeValue);
+			m_nFactorG1 = fnStringToDouble(pAttributeValue);
 			m_nFactorG2 = m_nFactorF1;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG1) == 0) {
-			m_nFactorG1 = fnStringToInt32(pAttributeValue);
+			m_nFactorG1 = fnStringToDouble(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG2) == 0) {
-			m_nFactorG2 = fnStringToInt32(pAttributeValue);
+			m_nFactorG2 = fnStringToDouble(pAttributeValue);
 		}
 		else
 			m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
@@ -144,6 +146,17 @@ namespace NMR {
 
 	void CToolpathReaderNode_Hatch::OnNSChildElement(_In_z_ const nfChar * pChildName, _In_z_ const nfChar * pNameSpace, _In_ CXmlReader * pXMLReader)
 	{
+		if (strcmp(pNameSpace, XML_3MF_NAMESPACE_TOOLPATHSPEC) == 0) {
+			if (strcmp(pChildName, XML_3MF_TOOLPATHELEMENT_OVERRIDEINTERPOLATION) == 0) {
+				CToolpathReaderNode_Override xmlNode(m_pWarnings, m_pProgressMonitor, m_pReadData);
+
+				xmlNode.parseXML(pXMLReader);
+
+				m_pReadData->addOverrideInterpolation(xmlNode.getParameter (), xmlNode.getValueF (false), xmlNode.getValueG(false), xmlNode.getValueH(false));
+
+			}
+		}
+
 	}
 
 	nfInt32 CToolpathReaderNode_Hatch::getX1()
@@ -180,32 +193,32 @@ namespace NMR {
 	}
 
 	
-	nfInt32 CToolpathReaderNode_Hatch::getFactorF1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorF1()
 	{
 		return m_nFactorF1;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getFactorG1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorG1()
 	{
 		return m_nFactorG1;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getFactorH1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorH1()
 	{
 		return m_nFactorH1;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getFactorF2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorF2()
 	{
 		return m_nFactorF2;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getFactorG2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorG2()
 	{
 		return m_nFactorG2;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getFactorH2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorH2()
 	{
 		return m_nFactorH2;
 	}

@@ -49,12 +49,12 @@ namespace NMR {
 		nfBool m_bHasY2;
 
 		nfInt32 m_nTag;
-		nfInt32 m_nFactorF1;
-		nfInt32 m_nFactorG1;
-		nfInt32 m_nFactorH1;
-		nfInt32 m_nFactorF2;
-		nfInt32 m_nFactorG2;
-		nfInt32 m_nFactorH2;
+		nfDouble m_nFactorF1;
+		nfDouble m_nFactorG1;
+		nfDouble m_nFactorH1;
+		nfDouble m_nFactorF2;
+		nfDouble m_nFactorG2;
+		nfDouble m_nFactorH2;
 
 		CModelToolpathLayerReadData * m_pReadData;
 
@@ -74,12 +74,12 @@ namespace NMR {
 		nfInt32 getY2();
 
 		nfInt32 getTag();
-		nfInt32 getFactorF1();
-		nfInt32 getFactorG1();
-		nfInt32 getFactorH1();
-		nfInt32 getFactorF2();
-		nfInt32 getFactorG2();
-		nfInt32 getFactorH2();
+		nfDouble getFactorF1();
+		nfDouble getFactorG1();
+		nfDouble getFactorH1();
+		nfDouble getFactorF2();
+		nfDouble getFactorG2();
+		nfDouble getFactorH2();
 	};
 
 	typedef std::shared_ptr <CToolpathReaderNode_Hatch> PToolpathReaderNode_Hatch;

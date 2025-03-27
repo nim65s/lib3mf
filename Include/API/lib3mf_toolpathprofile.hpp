@@ -115,11 +115,11 @@ public:
 
 	bool HasModifier(const std::string& sNameSpaceName, const std::string& sValueName) override;
 
-	void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string& sNameSpaceName, std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue) override;
+	void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string& sNameSpaceName, std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue0, Lib3MF_double& dDeltaValue1) override;
 
-	void GetModifierInformationByName(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue) override;
+	void GetModifierInformationByName(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue0, Lib3MF_double& dDeltaValue1) override;
 
-	void SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_double dDeltaValue) override;
+	void SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_double dDeltaValue0, const Lib3MF_double dDeltaValue1) override;
 
 	void RemoveModifier(const std::string& sNameSpaceName, const std::string& sValueName) override;
 

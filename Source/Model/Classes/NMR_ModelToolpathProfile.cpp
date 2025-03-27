@@ -79,8 +79,8 @@ namespace NMR {
 
 
 
-	CModelToolpathProfileModifier::CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue, eModelToolpathProfileOverrideFactor overrideFactor)
-		: m_pValue (pValue), m_dDeltaValue (dDeltaValue), m_OverrideFactor (overrideFactor)
+	CModelToolpathProfileModifier::CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue0, double dDeltaValue1, eModelToolpathProfileOverrideFactor overrideFactor)
+		: m_pValue (pValue), m_dDeltaValue0 (dDeltaValue0), m_dDeltaValue1(dDeltaValue1), m_OverrideFactor (overrideFactor)
 	{
 		if (pValue.get() == nullptr)
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
@@ -103,12 +103,26 @@ namespace NMR {
 		double dBaseValue = m_pValue->getBaseDoubleValue();
 
 		switch (m_OverrideFactor) {
-			case eModelToolpathProfileOverrideFactor::pfFactorF:
-				return dBaseValue + m_dDeltaValue * dFactorF;
+			case eModelToolpathProfileOverrideFactor::pfFactorF: 
+				if (dFactorF <= 0.0)
+					dFactorF = 0.0;
+				if (dFactorF >= 1.0)
+					dFactorF = 1.0;
+				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorF)) + m_dDeltaValue1 * dFactorF;
+			
 			case eModelToolpathProfileOverrideFactor::pfFactorG:
-				return dBaseValue + m_dDeltaValue * dFactorG;
+				if (dFactorG <= 0.0)
+					dFactorG = 0.0;
+				if (dFactorG >= 1.0)
+					dFactorG = 1.0;
+				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorG)) + m_dDeltaValue1 * dFactorG;
+
 			case eModelToolpathProfileOverrideFactor::pfFactorH:
-				return dBaseValue + m_dDeltaValue * dFactorH;
+				if (dFactorH <= 0.0)
+					dFactorH = 0.0;
+				if (dFactorH >= 1.0)
+					dFactorH = 1.0;
+				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorH)) + m_dDeltaValue1 * dFactorH;
 
 			default:
 				return dBaseValue;
@@ -125,9 +139,14 @@ namespace NMR {
 		return m_pValue->getNameSpace();
 	}
 
-	double CModelToolpathProfileModifier::getDeltaValue()
+	double CModelToolpathProfileModifier::getDeltaValue0()
 	{
-		return m_dDeltaValue;
+		return m_dDeltaValue0;
+	}
+
+	double CModelToolpathProfileModifier::getDeltaValue1()
+	{
+		return m_dDeltaValue1;
 	}
 
 	eModelToolpathProfileOverrideFactor CModelToolpathProfileModifier::getOverrideFactor()
@@ -316,7 +335,7 @@ namespace NMR {
 		return iIter->second;
 	}
 
-	void CModelToolpathProfile::addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta, eModelToolpathProfileOverrideFactor overrideFactor)
+	void CModelToolpathProfile::addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta0, double dDelta1, eModelToolpathProfileOverrideFactor overrideFactor)
 	{
 		auto key = std::make_pair(sNameSpace, sValueName);
 		auto iValueIter = m_ValueMap.find(key);
@@ -329,7 +348,7 @@ namespace NMR {
 		if (iModifierIter != m_ModifierMap.end())
 			throw CNMRException(NMR_ERROR_DUPLICATEPROFILEMODIFIER);
 
-		auto pModifier = std::make_shared<CModelToolpathProfileModifier>(pValue, dDelta, overrideFactor);
+		auto pModifier = std::make_shared<CModelToolpathProfileModifier>(pValue, dDelta0, dDelta1, overrideFactor);
 
 		m_ModifierMap.insert (std::make_pair (key, pModifier));
 		m_ModifierList.push_back (pModifier);

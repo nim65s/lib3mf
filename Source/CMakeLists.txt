@@ -278,6 +278,7 @@ Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Data.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_DataNode.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Hatch.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Layer.cpp
+Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Override.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Part.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Parts.cpp
 Source/Model/ToolpathReader/NMR_ToolpathReaderNode_Point.cpp

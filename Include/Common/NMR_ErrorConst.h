@@ -1699,4 +1699,37 @@ Toolpath errors (0xBXXX)
 // Toolpath profile not created
 #define NMR_ERROR_TOOLPATHPROFILENOTCREATED 0xB02B
 
+// No subinterpolationinformation
+#define NMR_ERROR_TOOLPATH_NOSUBINTERPOLATIONINFORMATION 0xB02C
+
+// Subinterpolation buffer overflow
+#define NMR_ERROR_TOOLPATH_SUBINTERPOLATIONBUFFEROVERFLOW 0xB02D
+
+// Duplicate override parameter value
+#define NMR_ERROR_DUPLICATEOVERRIDEPARAMETERVALUE 0xB02E
+
+// Duplicate override factor F
+#define NMR_ERROR_DUPLICATEOVERRIDEFACTORF 0xB02F
+
+// Duplicate override factor G
+#define NMR_ERROR_DUPLICATEOVERRIDEFACTORG 0xB030
+
+// Duplicate override factor H
+#define NMR_ERROR_DUPLICATEOVERRIDEFACTORH 0xB031
+
+// Missing override parameter value
+#define NMR_ERROR_MISSINGOVERRIDEPARAMETERVALUE 0xB032
+
+// Missing override factor F
+#define NMR_ERROR_MISSINGOVERRIDEFACTORF 0xB033
+
+// Missing override factor G
+#define NMR_ERROR_MISSINGOVERRIDEFACTORG 0xB034
+
+// Missing override factor H
+#define NMR_ERROR_MISSINGOVERRIDEFACTORH 0xB035
+
+// Override interpolation overflow
+#define NMR_ERROR_OVERRIDEINTERPOLATIONOVERFLOW 0xB036
+
 #endif // __NMR_ERRORCONST
