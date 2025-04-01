@@ -167,8 +167,8 @@ namespace NMR {
 
 				uint32_t nOverrideInterpolationCount = nOverrideInterpolationEnd - nOverrideInterpolationStart;
 
-				m_pReadData->addDiscretePoint(xmlNode.getX1(), xmlNode.getY1(), xmlNode.getTag (), xmlNode.getFactorF1 (), xmlNode.getFactorG1(), xmlNode.getFactorH1(), nOverrideInterpolationStart, nOverrideInterpolationCount);
-				m_pReadData->addDiscretePoint(xmlNode.getX2(), xmlNode.getY2(), xmlNode.getTag(), xmlNode.getFactorF2(), xmlNode.getFactorG2(), xmlNode.getFactorH2(), nOverrideInterpolationStart, nOverrideInterpolationCount);
+				m_pReadData->addDiscretePoint(xmlNode.getX1(), xmlNode.getY1(), xmlNode.getTag(), xmlNode.hasFactorF1(), xmlNode.getFactorF1(), xmlNode.hasFactorG1(), xmlNode.getFactorG1(), xmlNode.hasFactorH1(), xmlNode.getFactorH1(), nOverrideInterpolationStart, nOverrideInterpolationCount);
+				m_pReadData->addDiscretePoint(xmlNode.getX2(), xmlNode.getY2(), xmlNode.getTag(), xmlNode.hasFactorF2(), xmlNode.getFactorF2(), xmlNode.hasFactorG2(), xmlNode.getFactorG2(), xmlNode.hasFactorH1(), xmlNode.getFactorH2(), nOverrideInterpolationStart, nOverrideInterpolationCount);
 
 			}
 			else if (strcmp(pChildName, XML_3MF_TOOLPATHELEMENT_POINT) == 0) {
@@ -176,10 +176,18 @@ namespace NMR {
 				if ((m_eSegmentType != eModelToolpathSegmentType::LoopSegment) && (m_eSegmentType != eModelToolpathSegmentType::PolylineSegment))
 					throw CNMRException(NMR_ERROR_INVALIDTYPEATTRIBUTE);
 
+				uint32_t nOverrideInterpolationStart = m_pReadData->getGlobalOverrideInterpolationCount();
+
 				CToolpathReaderNode_Point xmlNode (m_pWarnings, m_pProgressMonitor, m_pReadData);
 				xmlNode.parseXML(pXMLReader);
 
-				m_pReadData->addDiscretePoint(xmlNode.getX(), xmlNode.getY(), xmlNode.getTag(), xmlNode.getFactorF (), xmlNode.getFactorG (), xmlNode.getFactorH (), 0, 0);
+				uint32_t nOverrideInterpolationEnd = m_pReadData->getGlobalOverrideInterpolationCount();
+				if (nOverrideInterpolationEnd < nOverrideInterpolationStart)
+					throw CNMRException(NMR_ERROR_OVERRIDEINTERPOLATIONOVERFLOW);
+
+				uint32_t nOverrideInterpolationCount = nOverrideInterpolationEnd - nOverrideInterpolationStart;
+
+				m_pReadData->addDiscretePoint(xmlNode.getX(), xmlNode.getY(), xmlNode.getTag(), xmlNode.hasFactorF (), xmlNode.getFactorF (), xmlNode.hasFactorG(), xmlNode.getFactorG (), xmlNode.hasFactorH(), xmlNode.getFactorH (), nOverrideInterpolationStart, nOverrideInterpolationCount);
 
 			}
 			else

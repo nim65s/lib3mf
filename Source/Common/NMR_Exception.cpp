@@ -682,6 +682,24 @@ namespace NMR {
 		case NMR_ERROR_MISSINGOVERRIDEFACTORG: return "Missing override factor G";
 		case NMR_ERROR_MISSINGOVERRIDEFACTORH: return "Missing override factor H";
 		case NMR_ERROR_OVERRIDEINTERPOLATIONOVERFLOW: return "Override interpolation overflow";
+        case NMR_ERROR_MISSINGPROFILEMODIFIERMINIMUM: return "Missing profile modifier minimum";
+		case NMR_ERROR_MISSINGPROFILEMODIFIERMAXIMUM: return "Missing profile modifier maximum";
+		case NMR_ERROR_MISSINGPROFILEMODIFIERTYPE: return "Missing profile modifier type";
+		case NMR_ERROR_TOOLPATH_INVALIDPROFILEMODIFIERTYPE: return "Invalid profile modifier type";
+		case NMR_ERROR_DUPLICATEMODIFIERTYPE: return "Duplicate profile modifier type";
+		case NMR_ERROR_INVALIDMODIFIERTYPE: return "Invalid profile modifier type";
+		case NMR_ERROR_DUPLICATESCALEFACTORF1: return "Duplicate profile scale factor f1";
+		case NMR_ERROR_DUPLICATESCALEFACTORF2: return "Duplicate profile scale factor f2";
+		case NMR_ERROR_DUPLICATESCALEFACTORG1: return "Duplicate profile scale factor g1";
+		case NMR_ERROR_DUPLICATESCALEFACTORG2: return "Duplicate profile scale factor g2";
+		case NMR_ERROR_DUPLICATESCALEFACTORH1: return "Duplicate profile scale factor h1";
+		case NMR_ERROR_DUPLICATESCALEFACTORH2: return "Duplicate profile scale factor h2";
+		case NMR_ERROR_MISSINGSCALEFACTORF1: return "Missing profile scale factor f1";
+		case NMR_ERROR_MISSINGSCALEFACTORF2: return "Missing profile scale factor f2";
+		case NMR_ERROR_MISSINGSCALEFACTORG1: return "Missing profile scale factor g1";
+		case NMR_ERROR_MISSINGSCALEFACTORG2: return "Missing profile scale factor g2";
+		case NMR_ERROR_MISSINGSCALEFACTORH1: return "Missing profile scale factor h1";
+		case NMR_ERROR_MISSINGSCALEFACTORH2: return "Missing profile scale factor h2";
 
 		default:
 			return "unknown error";

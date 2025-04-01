@@ -54,12 +54,18 @@ namespace NMR {
 			m_bHasX2 (false),
 			m_bHasY2 (false),
 		m_nTag(0),
-		m_nFactorF1(0.0),
-		m_nFactorG1(0.0),
-		m_nFactorH1(0.0),
-		m_nFactorF2(0.0),
-		m_nFactorG2(0.0),
-		m_nFactorH2(0.0)
+		m_dFactorF1(0.0),
+		m_dFactorG1(0.0),
+		m_dFactorH1(0.0),
+		m_dFactorF2(0.0),
+		m_dFactorG2(0.0),
+		m_dFactorH2(0.0),
+		m_bHasFactorF1(false),
+		m_bHasFactorF2(false),
+		m_bHasFactorG1(false),
+		m_bHasFactorG2(false),
+		m_bHasFactorH1(false),
+		m_bHasFactorH2(false)
 
 
 	{
@@ -116,24 +122,79 @@ namespace NMR {
 			m_nTag = fnStringToInt32(pAttributeValue);
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF) == 0) {
-			m_nFactorF1 = fnStringToDouble(pAttributeValue);
-			m_nFactorF2 = m_nFactorF1;
+			if (m_bHasFactorF1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORF1);
+			if (m_bHasFactorF2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORF2);
+
+			m_dFactorF1 = fnStringToDouble(pAttributeValue);
+			m_dFactorF2 = m_dFactorF1;
+			m_bHasFactorF1 = true;
+			m_bHasFactorF2 = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF1) == 0) {
-			m_nFactorF1 = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorF1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORF1);
+
+			m_dFactorF1 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorF1 = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF2) == 0) {
-			m_nFactorF2 = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorF2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORF2);
+
+			m_dFactorF2 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorF2 = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG) == 0) {
-			m_nFactorG1 = fnStringToDouble(pAttributeValue);
-			m_nFactorG2 = m_nFactorF1;
+			if (m_bHasFactorG1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORG1);
+			if (m_bHasFactorG2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORG2);
+
+			m_dFactorG1 = fnStringToDouble(pAttributeValue);
+			m_dFactorG2 = m_dFactorG1;
+			m_bHasFactorG1 = true;
+			m_bHasFactorG2 = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG1) == 0) {
-			m_nFactorG1 = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorG1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORG1);
+
+			m_dFactorG1 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorG1 = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG2) == 0) {
-			m_nFactorG2 = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorG2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORG2);
+
+			m_dFactorG2 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorG2 = true;
+		}
+		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORH) == 0) {
+			if (m_bHasFactorH1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORH1);
+			if (m_bHasFactorH2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORH2);
+
+			m_dFactorH1 = fnStringToDouble(pAttributeValue);
+			m_dFactorH2 = m_dFactorH1;
+			m_bHasFactorH1 = true;
+			m_bHasFactorH2 = true;
+		}
+		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORH1) == 0) {
+			if (m_bHasFactorH1)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORH1);
+
+			m_dFactorH1 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorH1 = true;
+		}
+		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORH2) == 0) {
+			if (m_bHasFactorH2)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORH2);
+
+			m_dFactorH2 = fnStringToDouble(pAttributeValue);
+			m_bHasFactorH2 = true;
 		}
 		else
 			m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
@@ -159,68 +220,99 @@ namespace NMR {
 
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getX1()
+	nfInt32 CToolpathReaderNode_Hatch::getX1() const
 	{
 		if (!m_bHasX1)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nX1;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getY1()
+	nfInt32 CToolpathReaderNode_Hatch::getY1() const
 	{
 		if (!m_bHasY1)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nY1;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getX2()
+	nfInt32 CToolpathReaderNode_Hatch::getX2() const
 	{
 		if (!m_bHasX2)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nX2;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getY2()
+	nfInt32 CToolpathReaderNode_Hatch::getY2() const
 	{
 		if (!m_bHasY2)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nY2;
 	}
 
-	nfInt32 CToolpathReaderNode_Hatch::getTag()
+	nfInt32 CToolpathReaderNode_Hatch::getTag() const
 	{
 		return m_nTag;
 	}
 
 	
-	nfDouble CToolpathReaderNode_Hatch::getFactorF1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorF1() const
 	{
-		return m_nFactorF1;
+		return m_dFactorF1;
 	}
 
-	nfDouble CToolpathReaderNode_Hatch::getFactorG1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorG1() const
 	{
-		return m_nFactorG1;
+		return m_dFactorG1;
 	}
 
-	nfDouble CToolpathReaderNode_Hatch::getFactorH1()
+	nfDouble CToolpathReaderNode_Hatch::getFactorH1() const
 	{
-		return m_nFactorH1;
+		return m_dFactorH1;
 	}
 
-	nfDouble CToolpathReaderNode_Hatch::getFactorF2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorF2() const
 	{
-		return m_nFactorF2;
+		return m_dFactorF2;
 	}
 
-	nfDouble CToolpathReaderNode_Hatch::getFactorG2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorG2() const
 	{
-		return m_nFactorG2;
+		return m_dFactorG2;
 	}
 
-	nfDouble CToolpathReaderNode_Hatch::getFactorH2()
+	nfDouble CToolpathReaderNode_Hatch::getFactorH2() const
 	{
-		return m_nFactorH2;
+		return m_dFactorH2;
 	}
+
+	bool CToolpathReaderNode_Hatch::hasFactorF1() const
+	{
+		return m_bHasFactorF1;
+	}
+
+	bool CToolpathReaderNode_Hatch::hasFactorF2() const
+	{
+		return m_bHasFactorF2;
+	}
+
+	bool CToolpathReaderNode_Hatch::hasFactorG1() const
+	{
+		return m_bHasFactorG1;
+	}
+
+	bool CToolpathReaderNode_Hatch::hasFactorG2() const
+	{
+		return m_bHasFactorG2;
+	}
+	
+	bool CToolpathReaderNode_Hatch::hasFactorH1() const
+	{
+		return m_bHasFactorH1;
+	}
+
+	bool CToolpathReaderNode_Hatch::hasFactorH2() const
+	{
+		return m_bHasFactorH2;
+	}
+
 
 }

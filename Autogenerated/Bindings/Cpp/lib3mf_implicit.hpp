@@ -3487,13 +3487,13 @@ public:
 	inline void RemoveParameter(const std::string & sNameSpaceName, const std::string & sValueName);
 	inline Lib3MF_uint32 GetModifierCount();
 	inline std::string GetModifierNameByIndex(const Lib3MF_uint32 nIndex);
+	inline eToolpathProfileModificationType GetModifierTypeByIndex(const Lib3MF_uint32 nIndex);
 	inline std::string GetModifierNameSpaceByIndex(const Lib3MF_uint32 nIndex);
 	inline bool HasModifier(const std::string & sNameSpaceName, const std::string & sValueName);
-	inline void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1);
-	inline void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1);
-	inline void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_double dDeltaValue0, const Lib3MF_double dDeltaValue1);
+	inline void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue);
+	inline void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue);
+	inline void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue);
 	inline void RemoveModifier(const std::string & sNameSpaceName, const std::string & sValueName);
-	inline Lib3MF_double EvaluateDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dFactorF, const Lib3MF_double dFactorG, const Lib3MF_double dFactorH);
 };
 	
 /*************************************************************************************************************************
@@ -3534,17 +3534,16 @@ public:
 	inline std::string GetSegmentDefaultProfileUUID(const Lib3MF_uint32 nSegmentIndex);
 	inline Lib3MF_uint32 GetSegmentDefaultProfileID(const Lib3MF_uint32 nSegmentIndex);
 	inline std::string GetProfileUUIDByLocalProfileID(const Lib3MF_uint32 nLocalProfileID);
-	inline bool SegmentHasOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor);
-	inline bool SegmentHasUniformProfile(const Lib3MF_uint32 nSegmentIndex);
+	inline bool SegmentHasModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor);
 	inline void GetSegmentPointDataInModelUnits(const Lib3MF_uint32 nSegmentIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline void GetSegmentPointDataDiscrete(const Lib3MF_uint32 nSegmentIndex, std::vector<sDiscretePosition2D> & PointDataBuffer);
-	inline void GetSegmentPointOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<Lib3MF_double> & FactorValuesBuffer);
+	inline void GetSegmentPointModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<Lib3MF_double> & FactorValuesBuffer);
 	inline void GetSegmentHatchDataInModelUnits(const Lib3MF_uint32 nSegmentIndex, std::vector<sHatch2D> & HatchDataBuffer);
 	inline void GetSegmentHatchDataDiscrete(const Lib3MF_uint32 nSegmentIndex, std::vector<sDiscreteHatch2D> & HatchDataBuffer);
-	inline void GetLinearSegmentHatchOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & FactorValuesBuffer);
-	inline bool SegmentHasNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex);
-	inline void GetSegmentNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatchOverrideInterpolationData> & FactorValuesBuffer);
-	inline void GetSegmentAllNonlinearHatchesOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<Lib3MF_uint32> & CountArrayBuffer, std::vector<sHatchOverrideInterpolationData> & FactorValuesBuffer);
+	inline void GetLinearSegmentHatchModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<sHatch2DFactors> & FactorValuesBuffer);
+	inline bool SegmentHasNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex);
+	inline void GetSegmentNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<sHatchModificationInterpolationData> & FactorValuesBuffer);
+	inline void GetSegmentAllNonlinearHatchesModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<Lib3MF_uint32> & CountArrayBuffer, std::vector<sHatchModificationInterpolationData> & FactorValuesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -3568,24 +3567,22 @@ public:
 	inline void ClearSegmentAttributes();
 	inline void SetLaserIndex(const Lib3MF_uint32 nValue);
 	inline void ClearLaserIndex();
-	inline void SetOverrideFraction(const Lib3MF_uint32 nValue);
-	inline Lib3MF_uint32 GetOverrideFraction();
 	inline void WriteHatchDataInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer);
-	inline void WriteHatchDataInModelUnitsWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
-	inline void WriteHatchDataInModelUnitsWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer);
-	inline void WriteHatchDataInModelUnitsWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchOverrideInterpolationData> & OverrideInterpolationDataBuffer);
+	inline void WriteHatchDataInModelUnitsWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
+	inline void WriteHatchDataInModelUnitsWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer);
+	inline void WriteHatchDataInModelUnitsWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchModificationInterpolationData> & ModificationInterpolationDataBuffer);
 	inline void WriteHatchDataDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer);
-	inline void WriteHatchDataDiscreteWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
-	inline void WriteHatchDataDiscreteWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer);
-	inline void WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchOverrideInterpolationData> & OverrideInterpolationDataBuffer);
+	inline void WriteHatchDataDiscreteWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
+	inline void WriteHatchDataDiscreteWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer);
+	inline void WriteHatchDataDiscreteWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchModificationInterpolationData> & ModificationInterpolationDataBuffer);
 	inline void WriteLoopInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
 	inline void WriteLoopDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer);
-	inline void WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
-	inline void WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
+	inline void WriteLoopInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
+	inline void WriteLoopDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
 	inline void WritePolylineInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
-	inline void WritePolylineInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
+	inline void WritePolylineInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
 	inline void WritePolylineDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer);
-	inline void WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer);
+	inline void WritePolylineDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer);
 	inline PCustomDOMTree AddCustomData(const std::string & sNameSpace, const std::string & sDataName);
 	inline void Finish();
 };
@@ -12177,6 +12174,19 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
+	* CToolpathProfile::GetModifierTypeByIndex - Returns the type of a modifier by its index.
+	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
+	* @return Returns the type of the modifier.
+	*/
+	eToolpathProfileModificationType CToolpathProfile::GetModifierTypeByIndex(const Lib3MF_uint32 nIndex)
+	{
+		eToolpathProfileModificationType resultModifierType = (eToolpathProfileModificationType) 0;
+		CheckError(lib3mf_toolpathprofile_getmodifiertypebyindex(m_pHandle, nIndex, &resultModifierType));
+		
+		return resultModifierType;
+	}
+	
+	/**
 	* CToolpathProfile::GetModifierNameSpaceByIndex - Returns the NameSpace of a modifier by its index.
 	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
 	* @return Returns the namespace of the modifier.
@@ -12211,20 +12221,21 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
 	* @param[out] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[out] sValueName - Parameter key string.
-	* @param[out] eOverrideFactor - which type of override factor to use.
-	* @param[out] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] eModifierType - Returns the type of the modifier.
+	* @param[out] eModificationFactor - which type of modification factor to use.
+	* @param[out] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	void CToolpathProfile::GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1)
+	void CToolpathProfile::GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue)
 	{
 		Lib3MF_uint32 bytesNeededNameSpaceName = 0;
 		Lib3MF_uint32 bytesWrittenNameSpaceName = 0;
 		Lib3MF_uint32 bytesNeededValueName = 0;
 		Lib3MF_uint32 bytesWrittenValueName = 0;
-		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyindex(m_pHandle, nIndex, 0, &bytesNeededNameSpaceName, nullptr, 0, &bytesNeededValueName, nullptr, &eOverrideFactor, &dDeltaValue0, &dDeltaValue1));
+		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyindex(m_pHandle, nIndex, 0, &bytesNeededNameSpaceName, nullptr, 0, &bytesNeededValueName, nullptr, &eModifierType, &eModificationFactor, &dMinValue, &dMaxValue));
 		std::vector<char> bufferNameSpaceName(bytesNeededNameSpaceName);
 		std::vector<char> bufferValueName(bytesNeededValueName);
-		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyindex(m_pHandle, nIndex, bytesNeededNameSpaceName, &bytesWrittenNameSpaceName, &bufferNameSpaceName[0], bytesNeededValueName, &bytesWrittenValueName, &bufferValueName[0], &eOverrideFactor, &dDeltaValue0, &dDeltaValue1));
+		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyindex(m_pHandle, nIndex, bytesNeededNameSpaceName, &bytesWrittenNameSpaceName, &bufferNameSpaceName[0], bytesNeededValueName, &bytesWrittenValueName, &bufferValueName[0], &eModifierType, &eModificationFactor, &dMinValue, &dMaxValue));
 		sNameSpaceName = std::string(&bufferNameSpaceName[0]);
 		sValueName = std::string(&bufferValueName[0]);
 	}
@@ -12233,26 +12244,28 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	* CToolpathProfile::GetModifierInformationByName - Returns modifier by name.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
-	* @param[out] eOverrideFactor - which type of override factor to use.
-	* @param[out] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] eModifierType - Returns the type of the modifier.
+	* @param[out] eModificationFactor - which type of modification factor to use.
+	* @param[out] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	void CToolpathProfile::GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1)
+	void CToolpathProfile::GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue)
 	{
-		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyname(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), &eOverrideFactor, &dDeltaValue0, &dDeltaValue1));
+		CheckError(lib3mf_toolpathprofile_getmodifierinformationbyname(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), &eModifierType, &eModificationFactor, &dMinValue, &dMaxValue));
 	}
 	
 	/**
 	* CToolpathProfile::SetModifier - Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
-	* @param[in] eOverrideFactor - which type of override factor to use.
-	* @param[in] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[in] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	void CToolpathProfile::SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_double dDeltaValue0, const Lib3MF_double dDeltaValue1)
+	void CToolpathProfile::SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
 	{
-		CheckError(lib3mf_toolpathprofile_setmodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), eOverrideFactor, dDeltaValue0, dDeltaValue1));
+		CheckError(lib3mf_toolpathprofile_setmodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), eModifierType, eModificationFactor, dMinValue, dMaxValue));
 	}
 	
 	/**
@@ -12263,23 +12276,6 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	void CToolpathProfile::RemoveModifier(const std::string & sNameSpaceName, const std::string & sValueName)
 	{
 		CheckError(lib3mf_toolpathprofile_removemodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str()));
-	}
-	
-	/**
-	* CToolpathProfile::EvaluateDoubleValue - Evaluates a double parameter, taking an optional modifier into account. Fails if neither a parameter nor a modifier exists with this name/namespace.
-	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
-	* @param[in] sValueName - Parameter key string.
-	* @param[in] dFactorF - F Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorG - G Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorH - H Factor value (will be clipped between 0.0 and 1.0)
-	* @return Evaluation result.
-	*/
-	Lib3MF_double CToolpathProfile::EvaluateDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dFactorF, const Lib3MF_double dFactorG, const Lib3MF_double dFactorH)
-	{
-		Lib3MF_double resultEvaluationResult = 0;
-		CheckError(lib3mf_toolpathprofile_evaluatedoublevalue(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), dFactorF, dFactorG, dFactorH, &resultEvaluationResult));
-		
-		return resultEvaluationResult;
 	}
 	
 	/**
@@ -12637,30 +12633,17 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerReader::SegmentHasOverrideFactors - Retrieves if the segment has specific override factors attached.
+	* CToolpathLayerReader::SegmentHasModificationFactors - Retrieves if the segment has specific modification factors attached.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
-	* @return Returns true, if the segment has attached any override factors of the given type, false otherwise.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
+	* @return Returns true, if the segment has attached any modification factors of the given type, false otherwise.
 	*/
-	bool CToolpathLayerReader::SegmentHasOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor)
+	bool CToolpathLayerReader::SegmentHasModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor)
 	{
-		bool resultHasOverrides = 0;
-		CheckError(lib3mf_toolpathlayerreader_segmenthasoverridefactors(m_pHandle, nSegmentIndex, eOverrideFactor, &resultHasOverrides));
+		bool resultHasModificationFactors = 0;
+		CheckError(lib3mf_toolpathlayerreader_segmenthasmodificationfactors(m_pHandle, nSegmentIndex, eModificationFactor, &resultHasModificationFactors));
 		
-		return resultHasOverrides;
-	}
-	
-	/**
-	* CToolpathLayerReader::SegmentHasUniformProfile - Returns if the segment has a uniform profile. If it is uniform, then the default profile applies to the whole segment. If it is not uniform, the type specific retrieval functions have to be used (or the file has to be rejected). Returns false for delay and sync segments. The call is equivalent to SegmentHasOverrideFactors returning false with any possible type (F, G, H).
-	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
-	* @return If true, the segment has a uniform profile ID.
-	*/
-	bool CToolpathLayerReader::SegmentHasUniformProfile(const Lib3MF_uint32 nSegmentIndex)
-	{
-		bool resultHasUniformProfile = 0;
-		CheckError(lib3mf_toolpathlayerreader_segmenthasuniformprofile(m_pHandle, nSegmentIndex, &resultHasUniformProfile));
-		
-		return resultHasUniformProfile;
+		return resultHasModificationFactors;
 	}
 	
 	/**
@@ -12692,18 +12675,18 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerReader::GetSegmentPointOverrideFactors - Retrieves the assigned segment override factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
+	* CToolpathLayerReader::GetSegmentPointModificationFactors - Retrieves the assigned segment modification factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
-	* @param[out] FactorValuesBuffer - An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
+	* @param[out] FactorValuesBuffer - An target modification factor for each point of the segment. In case of Polyline, the first array value describes the modification for the initial jump. In case of Loop, the first array value describes the modification for the inital jump and the last closing mark movement of the polyline.
 	*/
-	void CToolpathLayerReader::GetSegmentPointOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<Lib3MF_double> & FactorValuesBuffer)
+	void CToolpathLayerReader::GetSegmentPointModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<Lib3MF_double> & FactorValuesBuffer)
 	{
 		Lib3MF_uint64 elementsNeededFactorValues = 0;
 		Lib3MF_uint64 elementsWrittenFactorValues = 0;
-		CheckError(lib3mf_toolpathlayerreader_getsegmentpointoverridefactors(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededFactorValues, nullptr));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors(m_pHandle, nSegmentIndex, eModificationFactor, 0, &elementsNeededFactorValues, nullptr));
 		FactorValuesBuffer.resize((size_t) elementsNeededFactorValues);
-		CheckError(lib3mf_toolpathlayerreader_getsegmentpointoverridefactors(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors(m_pHandle, nSegmentIndex, eModificationFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
 	}
 	
 	/**
@@ -12735,66 +12718,66 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerReader::GetLinearSegmentHatchOverrideFactors - Retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
+	* CToolpathLayerReader::GetLinearSegmentHatchModificationFactors - Retrieves the assigned segment modification factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
-	* @param[out] FactorValuesBuffer - An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
+	* @param[out] FactorValuesBuffer - Two modification factors for each hatch of the segment. 
 	*/
-	void CToolpathLayerReader::GetLinearSegmentHatchOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & FactorValuesBuffer)
+	void CToolpathLayerReader::GetLinearSegmentHatchModificationFactors(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<sHatch2DFactors> & FactorValuesBuffer)
 	{
 		Lib3MF_uint64 elementsNeededFactorValues = 0;
 		Lib3MF_uint64 elementsWrittenFactorValues = 0;
-		CheckError(lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededFactorValues, nullptr));
+		CheckError(lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors(m_pHandle, nSegmentIndex, eModificationFactor, 0, &elementsNeededFactorValues, nullptr));
 		FactorValuesBuffer.resize((size_t) elementsNeededFactorValues);
-		CheckError(lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
+		CheckError(lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors(m_pHandle, nSegmentIndex, eModificationFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation - Checks if the segment has any sub-hatch override interpolation values. Returns false, if segment type is not hatch.
+	* CToolpathLayerReader::SegmentHasNonlinearHatchModificationInterpolation - Checks if the segment has any sub-hatch modification interpolation values. Returns false, if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @return Returns true, if the segment has non-linear interpolation overrides.
+	* @return Returns true, if the segment has non-linear interpolation modifications.
 	*/
-	bool CToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex)
+	bool CToolpathLayerReader::SegmentHasNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex)
 	{
-		bool resultHasOverrideInterpolation = 0;
-		CheckError(lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation(m_pHandle, nSegmentIndex, &resultHasOverrideInterpolation));
+		bool resultHasModificationInterpolation = 0;
+		CheckError(lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation(m_pHandle, nSegmentIndex, &resultHasModificationInterpolation));
 		
-		return resultHasOverrideInterpolation;
+		return resultHasModificationInterpolation;
 	}
 	
 	/**
-	* CToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation - Retrieves the sub-hatch override interpolation values for a single hatch. Fails if segment type is not hatch.
+	* CToolpathLayerReader::GetSegmentNonlinearHatchModificationInterpolation - Retrieves the sub-hatch modification interpolation values for a single hatch. Fails if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
 	* @param[in] nHatchIndex - Hatch Index in Segment. Must be between 0 and HatchCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[out] FactorValuesBuffer - Array of interpolation data for the hatch.
 	*/
-	void CToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatchOverrideInterpolationData> & FactorValuesBuffer)
+	void CToolpathLayerReader::GetSegmentNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<sHatchModificationInterpolationData> & FactorValuesBuffer)
 	{
 		Lib3MF_uint64 elementsNeededFactorValues = 0;
 		Lib3MF_uint64 elementsWrittenFactorValues = 0;
-		CheckError(lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation(m_pHandle, nSegmentIndex, nHatchIndex, eOverrideFactor, 0, &elementsNeededFactorValues, nullptr));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation(m_pHandle, nSegmentIndex, nHatchIndex, eModificationFactor, 0, &elementsNeededFactorValues, nullptr));
 		FactorValuesBuffer.resize((size_t) elementsNeededFactorValues);
-		CheckError(lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation(m_pHandle, nSegmentIndex, nHatchIndex, eOverrideFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation(m_pHandle, nSegmentIndex, nHatchIndex, eModificationFactor, elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolation - Retrieves the sub-hatch override interpolation values for all hatches of a segment. Fails if segment type is not hatch.
+	* CToolpathLayerReader::GetSegmentAllNonlinearHatchesModificationInterpolation - Retrieves the sub-hatch modification interpolation values for all hatches of a segment. Fails if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[out] CountArrayBuffer - Array how many Interpolation values exist for each hatch. Will contain number of hatches elements.
 	* @param[out] FactorValuesBuffer - Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements.
 	*/
-	void CToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<Lib3MF_uint32> & CountArrayBuffer, std::vector<sHatchOverrideInterpolationData> & FactorValuesBuffer)
+	void CToolpathLayerReader::GetSegmentAllNonlinearHatchesModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const eToolpathProfileModificationFactor eModificationFactor, std::vector<Lib3MF_uint32> & CountArrayBuffer, std::vector<sHatchModificationInterpolationData> & FactorValuesBuffer)
 	{
 		Lib3MF_uint64 elementsNeededCountArray = 0;
 		Lib3MF_uint64 elementsWrittenCountArray = 0;
 		Lib3MF_uint64 elementsNeededFactorValues = 0;
 		Lib3MF_uint64 elementsWrittenFactorValues = 0;
-		CheckError(lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededCountArray, nullptr, 0, &elementsNeededFactorValues, nullptr));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation(m_pHandle, nSegmentIndex, eModificationFactor, 0, &elementsNeededCountArray, nullptr, 0, &elementsNeededFactorValues, nullptr));
 		CountArrayBuffer.resize((size_t) elementsNeededCountArray);
 		FactorValuesBuffer.resize((size_t) elementsNeededFactorValues);
-		CheckError(lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededCountArray, &elementsWrittenCountArray, CountArrayBuffer.data(), elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
+		CheckError(lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation(m_pHandle, nSegmentIndex, eModificationFactor, elementsNeededCountArray, &elementsWrittenCountArray, CountArrayBuffer.data(), elementsNeededFactorValues, &elementsWrittenFactorValues, FactorValuesBuffer.data()));
 	}
 	
 	/**
@@ -12881,27 +12864,6 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::SetOverrideFraction - Sets the denominator for the scaling factor all subsequent segments. Default is 1000.
-	* @param[in] nValue - The value of factor denominator. MUST a positive integer.
-	*/
-	void CToolpathLayerData::SetOverrideFraction(const Lib3MF_uint32 nValue)
-	{
-		CheckError(lib3mf_toolpathlayerdata_setoverridefraction(m_pHandle, nValue));
-	}
-	
-	/**
-	* CToolpathLayerData::GetOverrideFraction - Returns the current denominator for the scaling factor all subsequent segments. Default is 1000.
-	* @return The value of factor denominator.
-	*/
-	Lib3MF_uint32 CToolpathLayerData::GetOverrideFraction()
-	{
-		Lib3MF_uint32 resultValue = 0;
-		CheckError(lib3mf_toolpathlayerdata_getoverridefraction(m_pHandle, &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
 	* CToolpathLayerData::WriteHatchDataInModelUnits - writes hatch data to the layer in model units.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
@@ -12914,53 +12876,53 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides - writes hatch data to the layer in model units with constant profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors - writes hatch data to the layer in model units with constant profile modification factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] HatchDataBuffer - The hatch data in model units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] FactorDataBuffer - The profile modification scale factors (f). MUST have the same cardinality as HatchData.
 	*/
-	void CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides - writes hatch data to the layer in model units with linearly ramped profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors - writes hatch data to the layer in model units with linearly ramped profile modification fators per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
-	* @param[in] HatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] ScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] ScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] HatchDataBuffer - The hatch data in model units. Array MUST NOT be empty.
+	* @param[in] FactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] FactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	*/
-	void CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer)
+	void CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
-		Lib3MF_uint64 nScalingData1Size = ScalingData1Buffer.size();
-		Lib3MF_uint64 nScalingData2Size = ScalingData2Buffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingData1Size, ScalingData1Buffer.data(), nScalingData2Size, ScalingData2Buffer.data()));
+		Lib3MF_uint64 nFactorData1Size = FactorData1Buffer.size();
+		Lib3MF_uint64 nFactorData2Size = FactorData2Buffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nFactorData1Size, FactorData1Buffer.data(), nFactorData2Size, FactorData2Buffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides - writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors - writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
-	* @param[in] HatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] ScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] ScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] HatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. 
+	* @param[in] FactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] FactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] SubInterpolationCountsBuffer - Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] OverrideInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] ModificationInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	*/
-	void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchOverrideInterpolationData> & OverrideInterpolationDataBuffer)
+	void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchModificationInterpolationData> & ModificationInterpolationDataBuffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
-		Lib3MF_uint64 nScalingData1Size = ScalingData1Buffer.size();
-		Lib3MF_uint64 nScalingData2Size = ScalingData2Buffer.size();
+		Lib3MF_uint64 nFactorData1Size = FactorData1Buffer.size();
+		Lib3MF_uint64 nFactorData2Size = FactorData2Buffer.size();
 		Lib3MF_uint64 nSubInterpolationCountsSize = SubInterpolationCountsBuffer.size();
-		Lib3MF_uint64 nOverrideInterpolationDataSize = OverrideInterpolationDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingData1Size, ScalingData1Buffer.data(), nScalingData2Size, ScalingData2Buffer.data(), nSubInterpolationCountsSize, SubInterpolationCountsBuffer.data(), nOverrideInterpolationDataSize, OverrideInterpolationDataBuffer.data()));
+		Lib3MF_uint64 nModificationInterpolationDataSize = ModificationInterpolationDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nFactorData1Size, FactorData1Buffer.data(), nFactorData2Size, FactorData2Buffer.data(), nSubInterpolationCountsSize, SubInterpolationCountsBuffer.data(), nModificationInterpolationDataSize, ModificationInterpolationDataBuffer.data()));
 	}
 	
 	/**
@@ -12976,53 +12938,53 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides - writes hatch data to the layer in toolpath units with constant profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors - writes hatch data to the layer in toolpath units with constant profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] HatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] FactorDataBuffer - The profile factors scale factors (f). MUST have the same cardinality as HatchData.
 	*/
-	void CToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides - writes hatch data to the layer in toolpath units with linearly ramped profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors - writes hatch data to the layer in toolpath units with linearly ramped profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] HatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] ScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] ScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] FactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] FactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	*/
-	void CToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer)
+	void CToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & FactorData1Buffer, const CInputVector<Lib3MF_double> & FactorData2Buffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
-		Lib3MF_uint64 nScalingData1Size = ScalingData1Buffer.size();
-		Lib3MF_uint64 nScalingData2Size = ScalingData2Buffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingData1Size, ScalingData1Buffer.data(), nScalingData2Size, ScalingData2Buffer.data()));
+		Lib3MF_uint64 nFactorData1Size = FactorData1Buffer.size();
+		Lib3MF_uint64 nFactorData2Size = FactorData2Buffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nFactorData1Size, FactorData1Buffer.data(), nFactorData2Size, FactorData2Buffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides - writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
+	* CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors - writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] HatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] ScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] ScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] ScalingData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] ScalingData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] SubInterpolationCountsBuffer - Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] OverrideInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] ModificationInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	*/
-	void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchOverrideInterpolationData> & OverrideInterpolationDataBuffer)
+	void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscreteHatch2D> & HatchDataBuffer, const CInputVector<Lib3MF_double> & ScalingData1Buffer, const CInputVector<Lib3MF_double> & ScalingData2Buffer, const CInputVector<Lib3MF_uint32> & SubInterpolationCountsBuffer, const CInputVector<sHatchModificationInterpolationData> & ModificationInterpolationDataBuffer)
 	{
 		Lib3MF_uint64 nHatchDataSize = HatchDataBuffer.size();
 		Lib3MF_uint64 nScalingData1Size = ScalingData1Buffer.size();
 		Lib3MF_uint64 nScalingData2Size = ScalingData2Buffer.size();
 		Lib3MF_uint64 nSubInterpolationCountsSize = SubInterpolationCountsBuffer.size();
-		Lib3MF_uint64 nOverrideInterpolationDataSize = OverrideInterpolationDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingData1Size, ScalingData1Buffer.data(), nScalingData2Size, ScalingData2Buffer.data(), nSubInterpolationCountsSize, SubInterpolationCountsBuffer.data(), nOverrideInterpolationDataSize, OverrideInterpolationDataBuffer.data()));
+		Lib3MF_uint64 nModificationInterpolationDataSize = ModificationInterpolationDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors(m_pHandle, nProfileID, nPartID, nHatchDataSize, HatchDataBuffer.data(), nScalingData1Size, ScalingData1Buffer.data(), nScalingData2Size, ScalingData2Buffer.data(), nSubInterpolationCountsSize, SubInterpolationCountsBuffer.data(), nModificationInterpolationDataSize, ModificationInterpolationDataBuffer.data()));
 	}
 	
 	/**
@@ -13050,31 +13012,31 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::WriteLoopInModelUnitsWithOverrides - writes loop data to the layer in model units with profile overrides.
+	* CToolpathLayerData::WriteLoopInModelUnitsWithFactors - writes loop data to the layer in model units with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] PointDataBuffer - The point data in model units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] FactorDataBuffer - The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	void CToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WriteLoopInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nPointDataSize = PointDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**
-	* CToolpathLayerData::WriteLoopDiscreteWithOverrides - writes loop data to the layer in toolpath units with profile overrides..
+	* CToolpathLayerData::WriteLoopDiscreteWithFactors - writes loop data to the layer in toolpath units with profile modification factors..
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] PointDataBuffer - The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] FactorDataBuffer - The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	void CToolpathLayerData::WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WriteLoopDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nPointDataSize = PointDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writeloopdiscretewithfactors(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**
@@ -13090,17 +13052,17 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::WritePolylineInModelUnitsWithOverrides - writes polyline data to the layer with profile overrides.
+	* CToolpathLayerData::WritePolylineInModelUnitsWithFactors - writes polyline data to the layer with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] PointDataBuffer - The point data in model units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] FactorDataBuffer - The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	void CToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WritePolylineInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nPointDataSize = PointDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**
@@ -13116,17 +13078,17 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathLayerData::WritePolylineDiscreteWithOverrides - writes polyline data to the layer with profile overrides.
+	* CToolpathLayerData::WritePolylineDiscreteWithFactors - writes polyline data to the layer with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] PointDataBuffer - The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] ScalingDataBuffer - The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] FactorDataBuffer - The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	void CToolpathLayerData::WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & ScalingDataBuffer)
+	void CToolpathLayerData::WritePolylineDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sDiscretePosition2D> & PointDataBuffer, const CInputVector<Lib3MF_double> & FactorDataBuffer)
 	{
 		Lib3MF_uint64 nPointDataSize = PointDataBuffer.size();
-		Lib3MF_uint64 nScalingDataSize = ScalingDataBuffer.size();
-		CheckError(lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nScalingDataSize, ScalingDataBuffer.data()));
+		Lib3MF_uint64 nFactorDataSize = FactorDataBuffer.size();
+		CheckError(lib3mf_toolpathlayerdata_writepolylinediscretewithfactors(m_pHandle, nProfileID, nPartID, nPointDataSize, PointDataBuffer.data(), nFactorDataSize, FactorDataBuffer.data()));
 	}
 	
 	/**

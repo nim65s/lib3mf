@@ -49,9 +49,12 @@ namespace NMR {
 		m_nX (0),
 		m_nY (0),
 		m_nTag (0),
-		m_nFactorF (0),
-		m_nFactorG (0),
-		m_nFactorH (0)
+		m_dFactorF (0),
+		m_dFactorG (0),
+		m_dFactorH (0),
+		m_bHasFactorF (false),
+		m_bHasFactorG (false),
+		m_bHasFactorH (false)
 	{
 		if (pReadData == nullptr)
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
@@ -93,13 +96,25 @@ namespace NMR {
 			m_bHasY = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORF) == 0) {
-			m_nFactorF = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorF)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORF);
+
+			m_dFactorF = fnStringToDouble(pAttributeValue);
+			m_bHasFactorF = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORG) == 0) {
-			m_nFactorG = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorG)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORG);
+
+			m_dFactorG = fnStringToDouble(pAttributeValue);
+			m_bHasFactorG = true;
 		}
 		else if (strcmp(pAttributeName, XML_3MF_TOOLPATHATTRIBUTE_SCALEFACTORH) == 0) {
-			m_nFactorH = fnStringToDouble(pAttributeValue);
+			if (m_bHasFactorH)
+				throw CNMRException(NMR_ERROR_DUPLICATESCALEFACTORH);
+
+			m_dFactorH = fnStringToDouble(pAttributeValue);
+			m_bHasFactorH = true;
 		}
 		else
 			m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
@@ -115,39 +130,54 @@ namespace NMR {
 	{
 	}
 
-	nfInt32 CToolpathReaderNode_Point::getX()
+	nfInt32 CToolpathReaderNode_Point::getX() const
 	{
 		if (!m_bHasX)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nX;
 	}
 
-	nfInt32 CToolpathReaderNode_Point::getY()
+	nfInt32 CToolpathReaderNode_Point::getY() const
 	{
 		if (!m_bHasY)
 			throw CNMRException(NMR_ERROR_MISSINGCOORDINATE);
 		return m_nY;
 	}
 
-	nfInt32 CToolpathReaderNode_Point::getTag()
+	nfInt32 CToolpathReaderNode_Point::getTag() const
 	{
 		return m_nTag;
 	}
 
 
-	nfDouble CToolpathReaderNode_Point::getFactorF()
+	nfDouble CToolpathReaderNode_Point::getFactorF() const
 	{
-		return m_nFactorF;
+		return m_dFactorF;
 	}
 
-	nfDouble CToolpathReaderNode_Point::getFactorG()
+	nfDouble CToolpathReaderNode_Point::getFactorG() const
 	{
-		return m_nFactorG;
+		return m_dFactorG;
 	}
 
-	nfDouble CToolpathReaderNode_Point::getFactorH()
+	nfDouble CToolpathReaderNode_Point::getFactorH() const
 	{
-		return m_nFactorH;
+		return m_dFactorH;
+	}
+
+	bool CToolpathReaderNode_Point::hasFactorF() const
+	{
+		return m_bHasFactorF;
+	}
+
+	bool CToolpathReaderNode_Point::hasFactorG() const
+	{
+		return m_bHasFactorG;
+	}
+
+	bool CToolpathReaderNode_Point::hasFactorH() const
+	{
+		return m_bHasFactorH;
 	}
 
 }

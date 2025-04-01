@@ -42,9 +42,12 @@ namespace NMR {
 		nfInt32 m_nX;
 		nfInt32 m_nY;
 		nfInt32 m_nTag;
-		nfDouble m_nFactorF;
-		nfDouble m_nFactorG;
-		nfDouble m_nFactorH;
+		nfDouble m_dFactorF;
+		nfDouble m_dFactorG;
+		nfDouble m_dFactorH;
+		bool m_bHasFactorF;
+		bool m_bHasFactorG;
+		bool m_bHasFactorH;
 
 		nfBool m_bHasX;
 		nfBool m_bHasY;
@@ -60,12 +63,16 @@ namespace NMR {
 
 		virtual void parseXML(_In_ CXmlReader * pXMLReader);
 
-		nfInt32 getX();
-		nfInt32 getY();
-		nfInt32 getTag();
-		nfDouble getFactorF();
-		nfDouble getFactorG();
-		nfDouble getFactorH();
+		nfInt32 getX() const;
+		nfInt32 getY() const;
+		nfInt32 getTag() const;
+		nfDouble getFactorF() const;
+		nfDouble getFactorG() const;
+		nfDouble getFactorH() const;
+
+		bool hasFactorF() const;
+		bool hasFactorG() const;
+		bool hasFactorH() const;
 
 
 	};

@@ -663,15 +663,15 @@ Local<Object> convertLib3MFHatch2DToObject(Isolate* isolate, sLib3MFHatch2D sHat
 }
 
 /*************************************************************************************************************************
- Class sLib3MFHatch2DOverrides Conversion
+ Class sLib3MFHatch2DFactors Conversion
 **************************************************************************************************************************/
-sLib3MFHatch2DOverrides convertObjectToLib3MFHatch2DOverrides(Isolate* isolate, const Local<Value> & pParamValue)
+sLib3MFHatch2DFactors convertObjectToLib3MFHatch2DFactors(Isolate* isolate, const Local<Value> & pParamValue)
 {
-	sLib3MFHatch2DOverrides sHatch2DOverrides;
+	sLib3MFHatch2DFactors sHatch2DFactors;
 	Local<Context> context = isolate->GetCurrentContext();
 
-	sHatch2DOverrides.m_Point1Override = 0.0;
-	sHatch2DOverrides.m_Point2Override = 0.0;
+	sHatch2DFactors.m_Point1Factor = 0.0;
+	sHatch2DFactors.m_Point2Factor = 0.0;
 
 	if (pParamValue->IsObject()) {
 		MaybeLocal<Object> maybeObject = pParamValue->ToObject(context);
@@ -679,32 +679,32 @@ sLib3MFHatch2DOverrides convertObjectToLib3MFHatch2DOverrides(Isolate* isolate, 
 		if (!maybeObject.IsEmpty()) {
 			Local<Object> obj = maybeObject.ToLocalChecked();
 
-			// Point1Override Member
-			MaybeLocal<Value> maybeValPoint1Override = obj->Get(context, String::NewFromUtf8(isolate, "Point1Override"));
-			if (!maybeValPoint1Override.IsEmpty()) {
-				Local<Value> valPoint1Override = maybeValPoint1Override.ToLocalChecked();
-				if (valPoint1Override->IsNumber()) {
-					MaybeLocal<Number> localValPoint1Override = valPoint1Override->ToNumber(context);
-					sHatch2DOverrides.m_Point1Override = localValPoint1Override.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
+			// Point1Factor Member
+			MaybeLocal<Value> maybeValPoint1Factor = obj->Get(context, String::NewFromUtf8(isolate, "Point1Factor"));
+			if (!maybeValPoint1Factor.IsEmpty()) {
+				Local<Value> valPoint1Factor = maybeValPoint1Factor.ToLocalChecked();
+				if (valPoint1Factor->IsNumber()) {
+					MaybeLocal<Number> localValPoint1Factor = valPoint1Factor->ToNumber(context);
+					sHatch2DFactors.m_Point1Factor = localValPoint1Factor.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
 				} else {
-					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point1Override member is not a number" )));
+					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point1Factor member is not a number" )));
 				}
 			} else {
-				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point1Override member not found in object" )));
+				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point1Factor member not found in object" )));
 			}
 
-			// Point2Override Member
-			MaybeLocal<Value> maybeValPoint2Override = obj->Get(context, String::NewFromUtf8(isolate, "Point2Override"));
-			if (!maybeValPoint2Override.IsEmpty()) {
-				Local<Value> valPoint2Override = maybeValPoint2Override.ToLocalChecked();
-				if (valPoint2Override->IsNumber()) {
-					MaybeLocal<Number> localValPoint2Override = valPoint2Override->ToNumber(context);
-					sHatch2DOverrides.m_Point2Override = localValPoint2Override.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
+			// Point2Factor Member
+			MaybeLocal<Value> maybeValPoint2Factor = obj->Get(context, String::NewFromUtf8(isolate, "Point2Factor"));
+			if (!maybeValPoint2Factor.IsEmpty()) {
+				Local<Value> valPoint2Factor = maybeValPoint2Factor.ToLocalChecked();
+				if (valPoint2Factor->IsNumber()) {
+					MaybeLocal<Number> localValPoint2Factor = valPoint2Factor->ToNumber(context);
+					sHatch2DFactors.m_Point2Factor = localValPoint2Factor.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
 				} else {
-					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point2Override member is not a number" )));
+					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point2Factor member is not a number" )));
 				}
 			} else {
-				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point2Override member not found in object" )));
+				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Point2Factor member not found in object" )));
 			}
 
 
@@ -715,97 +715,30 @@ sLib3MFHatch2DOverrides convertObjectToLib3MFHatch2DOverrides(Isolate* isolate, 
 		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "expected object parameter." )));
 	}
 
-	return sHatch2DOverrides;
+	return sHatch2DFactors;
 }
 
 
 
-Local<Object> convertLib3MFHatch2DOverridesToObject(Isolate* isolate, sLib3MFHatch2DOverrides sHatch2DOverrides)
+Local<Object> convertLib3MFHatch2DFactorsToObject(Isolate* isolate, sLib3MFHatch2DFactors sHatch2DFactors)
 {
 	Local<Object> returnInstance = Object::New(isolate);
-	returnInstance->Set(String::NewFromUtf8(isolate, "Point1Override"), Number::New (isolate, sHatch2DOverrides.m_Point1Override));
-	returnInstance->Set(String::NewFromUtf8(isolate, "Point2Override"), Number::New (isolate, sHatch2DOverrides.m_Point2Override));
+	returnInstance->Set(String::NewFromUtf8(isolate, "Point1Factor"), Number::New (isolate, sHatch2DFactors.m_Point1Factor));
+	returnInstance->Set(String::NewFromUtf8(isolate, "Point2Factor"), Number::New (isolate, sHatch2DFactors.m_Point2Factor));
 
 	return returnInstance;
 }
 
 /*************************************************************************************************************************
- Class sLib3MFHatchOverrideInterpolationIndices Conversion
+ Class sLib3MFHatchModificationInterpolationData Conversion
 **************************************************************************************************************************/
-sLib3MFHatchOverrideInterpolationIndices convertObjectToLib3MFHatchOverrideInterpolationIndices(Isolate* isolate, const Local<Value> & pParamValue)
+sLib3MFHatchModificationInterpolationData convertObjectToLib3MFHatchModificationInterpolationData(Isolate* isolate, const Local<Value> & pParamValue)
 {
-	sLib3MFHatchOverrideInterpolationIndices sHatchOverrideInterpolationIndices;
+	sLib3MFHatchModificationInterpolationData sHatchModificationInterpolationData;
 	Local<Context> context = isolate->GetCurrentContext();
 
-	sHatchOverrideInterpolationIndices.m_StartIndex = 0;
-	sHatchOverrideInterpolationIndices.m_ValueCount = 0;
-
-	if (pParamValue->IsObject()) {
-		MaybeLocal<Object> maybeObject = pParamValue->ToObject(context);
-
-		if (!maybeObject.IsEmpty()) {
-			Local<Object> obj = maybeObject.ToLocalChecked();
-
-			// StartIndex Member
-			MaybeLocal<Value> maybeValStartIndex = obj->Get(context, String::NewFromUtf8(isolate, "StartIndex"));
-			if (!maybeValStartIndex.IsEmpty()) {
-				Local<Value> valStartIndex = maybeValStartIndex.ToLocalChecked();
-				if (valStartIndex->IsNumber()) {
-					MaybeLocal<Number> localValStartIndex = valStartIndex->ToNumber(context);
-					sHatchOverrideInterpolationIndices.m_StartIndex = localValStartIndex.ToLocalChecked()->Uint32Value(isolate->GetCurrentContext()).ToChecked();
-				} else {
-					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "StartIndex member is not a number" )));
-				}
-			} else {
-				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "StartIndex member not found in object" )));
-			}
-
-			// ValueCount Member
-			MaybeLocal<Value> maybeValValueCount = obj->Get(context, String::NewFromUtf8(isolate, "ValueCount"));
-			if (!maybeValValueCount.IsEmpty()) {
-				Local<Value> valValueCount = maybeValValueCount.ToLocalChecked();
-				if (valValueCount->IsNumber()) {
-					MaybeLocal<Number> localValValueCount = valValueCount->ToNumber(context);
-					sHatchOverrideInterpolationIndices.m_ValueCount = localValValueCount.ToLocalChecked()->Uint32Value(isolate->GetCurrentContext()).ToChecked();
-				} else {
-					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "ValueCount member is not a number" )));
-				}
-			} else {
-				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "ValueCount member not found in object" )));
-			}
-
-
-		} else {
-			isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "invalid object passed." )));
-		}
-	} else {
-		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "expected object parameter." )));
-	}
-
-	return sHatchOverrideInterpolationIndices;
-}
-
-
-
-Local<Object> convertLib3MFHatchOverrideInterpolationIndicesToObject(Isolate* isolate, sLib3MFHatchOverrideInterpolationIndices sHatchOverrideInterpolationIndices)
-{
-	Local<Object> returnInstance = Object::New(isolate);
-	returnInstance->Set(String::NewFromUtf8(isolate, "StartIndex"), Integer::NewFromUnsigned (isolate, sHatchOverrideInterpolationIndices.m_StartIndex));
-	returnInstance->Set(String::NewFromUtf8(isolate, "ValueCount"), Integer::NewFromUnsigned (isolate, sHatchOverrideInterpolationIndices.m_ValueCount));
-
-	return returnInstance;
-}
-
-/*************************************************************************************************************************
- Class sLib3MFHatchOverrideInterpolationData Conversion
-**************************************************************************************************************************/
-sLib3MFHatchOverrideInterpolationData convertObjectToLib3MFHatchOverrideInterpolationData(Isolate* isolate, const Local<Value> & pParamValue)
-{
-	sLib3MFHatchOverrideInterpolationData sHatchOverrideInterpolationData;
-	Local<Context> context = isolate->GetCurrentContext();
-
-	sHatchOverrideInterpolationData.m_Parameter = 0.0;
-	sHatchOverrideInterpolationData.m_Override = 0.0;
+	sHatchModificationInterpolationData.m_Parameter = 0.0;
+	sHatchModificationInterpolationData.m_Factor = 0.0;
 
 	if (pParamValue->IsObject()) {
 		MaybeLocal<Object> maybeObject = pParamValue->ToObject(context);
@@ -819,7 +752,7 @@ sLib3MFHatchOverrideInterpolationData convertObjectToLib3MFHatchOverrideInterpol
 				Local<Value> valParameter = maybeValParameter.ToLocalChecked();
 				if (valParameter->IsNumber()) {
 					MaybeLocal<Number> localValParameter = valParameter->ToNumber(context);
-					sHatchOverrideInterpolationData.m_Parameter = localValParameter.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
+					sHatchModificationInterpolationData.m_Parameter = localValParameter.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
 				} else {
 					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Parameter member is not a number" )));
 				}
@@ -827,18 +760,18 @@ sLib3MFHatchOverrideInterpolationData convertObjectToLib3MFHatchOverrideInterpol
 				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Parameter member not found in object" )));
 			}
 
-			// Override Member
-			MaybeLocal<Value> maybeValOverride = obj->Get(context, String::NewFromUtf8(isolate, "Override"));
-			if (!maybeValOverride.IsEmpty()) {
-				Local<Value> valOverride = maybeValOverride.ToLocalChecked();
-				if (valOverride->IsNumber()) {
-					MaybeLocal<Number> localValOverride = valOverride->ToNumber(context);
-					sHatchOverrideInterpolationData.m_Override = localValOverride.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
+			// Factor Member
+			MaybeLocal<Value> maybeValFactor = obj->Get(context, String::NewFromUtf8(isolate, "Factor"));
+			if (!maybeValFactor.IsEmpty()) {
+				Local<Value> valFactor = maybeValFactor.ToLocalChecked();
+				if (valFactor->IsNumber()) {
+					MaybeLocal<Number> localValFactor = valFactor->ToNumber(context);
+					sHatchModificationInterpolationData.m_Factor = localValFactor.ToLocalChecked()->NumberValue(isolate->GetCurrentContext()).ToChecked();
 				} else {
-					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Override member is not a number" )));
+					isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Factor member is not a number" )));
 				}
 			} else {
-				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Override member not found in object" )));
+				isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Factor member not found in object" )));
 			}
 
 
@@ -849,16 +782,16 @@ sLib3MFHatchOverrideInterpolationData convertObjectToLib3MFHatchOverrideInterpol
 		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "expected object parameter." )));
 	}
 
-	return sHatchOverrideInterpolationData;
+	return sHatchModificationInterpolationData;
 }
 
 
 
-Local<Object> convertLib3MFHatchOverrideInterpolationDataToObject(Isolate* isolate, sLib3MFHatchOverrideInterpolationData sHatchOverrideInterpolationData)
+Local<Object> convertLib3MFHatchModificationInterpolationDataToObject(Isolate* isolate, sLib3MFHatchModificationInterpolationData sHatchModificationInterpolationData)
 {
 	Local<Object> returnInstance = Object::New(isolate);
-	returnInstance->Set(String::NewFromUtf8(isolate, "Parameter"), Number::New (isolate, sHatchOverrideInterpolationData.m_Parameter));
-	returnInstance->Set(String::NewFromUtf8(isolate, "Override"), Number::New (isolate, sHatchOverrideInterpolationData.m_Override));
+	returnInstance->Set(String::NewFromUtf8(isolate, "Parameter"), Number::New (isolate, sHatchModificationInterpolationData.m_Parameter));
+	returnInstance->Set(String::NewFromUtf8(isolate, "Factor"), Number::New (isolate, sHatchModificationInterpolationData.m_Factor));
 
 	return returnInstance;
 }
@@ -22912,13 +22845,13 @@ void CLib3MFToolpathProfile::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "RemoveParameter", RemoveParameter);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierCount", GetModifierCount);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierNameByIndex", GetModifierNameByIndex);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierTypeByIndex", GetModifierTypeByIndex);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierNameSpaceByIndex", GetModifierNameSpaceByIndex);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "HasModifier", HasModifier);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierInformationByIndex", GetModifierInformationByIndex);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierInformationByName", GetModifierInformationByName);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "SetModifier", SetModifier);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "RemoveModifier", RemoveModifier);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "EvaluateDoubleValue", EvaluateDoubleValue);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
 }
@@ -23654,6 +23587,32 @@ void CLib3MFToolpathProfile::GetModifierNameByIndex(const FunctionCallbackInfo<V
 }
 
 
+void CLib3MFToolpathProfile::GetModifierTypeByIndex(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsUint32()) {
+            throw std::runtime_error("Expected uint32 parameter 0 (Index)");
+        }
+        unsigned int nIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        eLib3MFToolpathProfileModificationType eReturnModifierType;
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetModifierTypeByIndex.");
+        if (wrapperTable->m_ToolpathProfile_GetModifierTypeByIndex == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::GetModifierTypeByIndex.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_GetModifierTypeByIndex(instanceHandle, nIndex, &eReturnModifierType);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(Integer::New(isolate, (int)eReturnModifierType));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
 void CLib3MFToolpathProfile::GetModifierNameSpaceByIndex(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
@@ -23731,28 +23690,30 @@ void CLib3MFToolpathProfile::GetModifierInformationByIndex(const FunctionCallbac
         unsigned int bytesWrittenNameSpaceName = 0;
         unsigned int bytesNeededValueName = 0;
         unsigned int bytesWrittenValueName = 0;
-        eLib3MFToolpathProfileOverrideFactor eReturnOverrideFactor;
-        double dReturnDeltaValue0 = 0.0;
-        double dReturnDeltaValue1 = 0.0;
+        eLib3MFToolpathProfileModificationType eReturnModifierType;
+        eLib3MFToolpathProfileModificationFactor eReturnModificationFactor;
+        double dReturnMinValue = 0.0;
+        double dReturnMaxValue = 0.0;
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
             throw std::runtime_error("Could not get wrapper table for Lib3MF method GetModifierInformationByIndex.");
         if (wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex == nullptr)
             throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::GetModifierInformationByIndex.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult initErrorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex(instanceHandle, nIndex, 0, &bytesNeededNameSpaceName, nullptr, 0, &bytesNeededValueName, nullptr, &eReturnOverrideFactor, &dReturnDeltaValue0, &dReturnDeltaValue1);
+        Lib3MFResult initErrorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex(instanceHandle, nIndex, 0, &bytesNeededNameSpaceName, nullptr, 0, &bytesNeededValueName, nullptr, &eReturnModifierType, &eReturnModificationFactor, &dReturnMinValue, &dReturnMaxValue);
         CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
         std::vector<char> bufferNameSpaceName;
         bufferNameSpaceName.resize(bytesNeededNameSpaceName);
         std::vector<char> bufferValueName;
         bufferValueName.resize(bytesNeededValueName);
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex(instanceHandle, nIndex, bytesNeededNameSpaceName, &bytesWrittenNameSpaceName, &bufferNameSpaceName[0], bytesNeededValueName, &bytesWrittenValueName, &bufferValueName[0], &eReturnOverrideFactor, &dReturnDeltaValue0, &dReturnDeltaValue1);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex(instanceHandle, nIndex, bytesNeededNameSpaceName, &bytesWrittenNameSpaceName, &bufferNameSpaceName[0], bytesNeededValueName, &bytesWrittenValueName, &bufferValueName[0], &eReturnModifierType, &eReturnModificationFactor, &dReturnMinValue, &dReturnMaxValue);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "NameSpaceName"), String::NewFromUtf8(isolate, &bufferNameSpaceName[0]));
         outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ValueName"), String::NewFromUtf8(isolate, &bufferValueName[0]));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "OverrideFactor"), Integer::New(isolate, (int)eReturnOverrideFactor));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "DeltaValue0"), Number::New(isolate, dReturnDeltaValue0));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "DeltaValue1"), Number::New(isolate, dReturnDeltaValue1));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ModifierType"), Integer::New(isolate, (int)eReturnModifierType));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ModificationFactor"), Integer::New(isolate, (int)eReturnModificationFactor));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "MinValue"), Number::New(isolate, dReturnMinValue));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "MaxValue"), Number::New(isolate, dReturnMaxValue));
         args.GetReturnValue().Set(outObject);
 
 		} catch (std::exception & E) {
@@ -23777,20 +23738,22 @@ void CLib3MFToolpathProfile::GetModifierInformationByName(const FunctionCallback
         std::string sNameSpaceName = *sutf8NameSpaceName;
         v8::String::Utf8Value sutf8ValueName(isolate, args[1]);
         std::string sValueName = *sutf8ValueName;
-        eLib3MFToolpathProfileOverrideFactor eReturnOverrideFactor;
-        double dReturnDeltaValue0 = 0.0;
-        double dReturnDeltaValue1 = 0.0;
+        eLib3MFToolpathProfileModificationType eReturnModifierType;
+        eLib3MFToolpathProfileModificationFactor eReturnModificationFactor;
+        double dReturnMinValue = 0.0;
+        double dReturnMaxValue = 0.0;
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
             throw std::runtime_error("Could not get wrapper table for Lib3MF method GetModifierInformationByName.");
         if (wrapperTable->m_ToolpathProfile_GetModifierInformationByName == nullptr)
             throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::GetModifierInformationByName.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByName(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), &eReturnOverrideFactor, &dReturnDeltaValue0, &dReturnDeltaValue1);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_GetModifierInformationByName(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), &eReturnModifierType, &eReturnModificationFactor, &dReturnMinValue, &dReturnMaxValue);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "OverrideFactor"), Integer::New(isolate, (int)eReturnOverrideFactor));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "DeltaValue0"), Number::New(isolate, dReturnDeltaValue0));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "DeltaValue1"), Number::New(isolate, dReturnDeltaValue1));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ModifierType"), Integer::New(isolate, (int)eReturnModifierType));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ModificationFactor"), Integer::New(isolate, (int)eReturnModificationFactor));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "MinValue"), Number::New(isolate, dReturnMinValue));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "MaxValue"), Number::New(isolate, dReturnMaxValue));
         args.GetReturnValue().Set(outObject);
 
 		} catch (std::exception & E) {
@@ -23811,28 +23774,32 @@ void CLib3MFToolpathProfile::SetModifier(const FunctionCallbackInfo<Value>& args
             throw std::runtime_error("Expected string parameter 1 (ValueName)");
         }
         if (!args[2]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 2 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 2 (ModifierType)");
         }
-        if (!args[3]->IsNumber()) {
-            throw std::runtime_error("Expected double parameter 3 (DeltaValue0)");
+        if (!args[3]->IsUint32()) {
+            throw std::runtime_error("Expected enum parameter 3 (ModificationFactor)");
         }
         if (!args[4]->IsNumber()) {
-            throw std::runtime_error("Expected double parameter 4 (DeltaValue1)");
+            throw std::runtime_error("Expected double parameter 4 (MinValue)");
+        }
+        if (!args[5]->IsNumber()) {
+            throw std::runtime_error("Expected double parameter 5 (MaxValue)");
         }
         v8::String::Utf8Value sutf8NameSpaceName(isolate, args[0]);
         std::string sNameSpaceName = *sutf8NameSpaceName;
         v8::String::Utf8Value sutf8ValueName(isolate, args[1]);
         std::string sValueName = *sutf8ValueName;
-        unsigned int eOverrideFactor = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        double dDeltaValue0 = (double) args[3]->NumberValue(isolate->GetCurrentContext()).ToChecked();
-        double dDeltaValue1 = (double) args[4]->NumberValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModifierType = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[3]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        double dMinValue = (double) args[4]->NumberValue(isolate->GetCurrentContext()).ToChecked();
+        double dMaxValue = (double) args[5]->NumberValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
             throw std::runtime_error("Could not get wrapper table for Lib3MF method SetModifier.");
         if (wrapperTable->m_ToolpathProfile_SetModifier == nullptr)
             throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::SetModifier.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_SetModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, dDeltaValue0, dDeltaValue1);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_SetModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), (eLib3MFToolpathProfileModificationType) eModifierType, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, dMinValue, dMaxValue);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -23864,50 +23831,6 @@ void CLib3MFToolpathProfile::RemoveModifier(const FunctionCallbackInfo<Value>& a
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
         Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_RemoveModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str());
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-
-		} catch (std::exception & E) {
-				RaiseError(isolate, E.what());
-		}
-}
-
-
-void CLib3MFToolpathProfile::EvaluateDoubleValue(const FunctionCallbackInfo<Value>& args) 
-{
-		Isolate* isolate = args.GetIsolate();
-		HandleScope scope(isolate);
-		try {
-        if (!args[0]->IsString()) {
-            throw std::runtime_error("Expected string parameter 0 (NameSpaceName)");
-        }
-        if (!args[1]->IsString()) {
-            throw std::runtime_error("Expected string parameter 1 (ValueName)");
-        }
-        if (!args[2]->IsNumber()) {
-            throw std::runtime_error("Expected double parameter 2 (FactorF)");
-        }
-        if (!args[3]->IsNumber()) {
-            throw std::runtime_error("Expected double parameter 3 (FactorG)");
-        }
-        if (!args[4]->IsNumber()) {
-            throw std::runtime_error("Expected double parameter 4 (FactorH)");
-        }
-        v8::String::Utf8Value sutf8NameSpaceName(isolate, args[0]);
-        std::string sNameSpaceName = *sutf8NameSpaceName;
-        v8::String::Utf8Value sutf8ValueName(isolate, args[1]);
-        std::string sValueName = *sutf8ValueName;
-        double dFactorF = (double) args[2]->NumberValue(isolate->GetCurrentContext()).ToChecked();
-        double dFactorG = (double) args[3]->NumberValue(isolate->GetCurrentContext()).ToChecked();
-        double dFactorH = (double) args[4]->NumberValue(isolate->GetCurrentContext()).ToChecked();
-        double dReturnEvaluationResult = 0.0;
-        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
-        if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method EvaluateDoubleValue.");
-        if (wrapperTable->m_ToolpathProfile_EvaluateDoubleValue == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::EvaluateDoubleValue.");
-        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_EvaluateDoubleValue(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), dFactorF, dFactorG, dFactorH, &dReturnEvaluationResult);
-        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(Number::New(isolate, dReturnEvaluationResult));
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -23961,17 +23884,16 @@ void CLib3MFToolpathLayerReader::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentDefaultProfileUUID", GetSegmentDefaultProfileUUID);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentDefaultProfileID", GetSegmentDefaultProfileID);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetProfileUUIDByLocalProfileID", GetProfileUUIDByLocalProfileID);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "SegmentHasOverrideFactors", SegmentHasOverrideFactors);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "SegmentHasUniformProfile", SegmentHasUniformProfile);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "SegmentHasModificationFactors", SegmentHasModificationFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentPointDataInModelUnits", GetSegmentPointDataInModelUnits);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentPointDataDiscrete", GetSegmentPointDataDiscrete);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentPointOverrideFactors", GetSegmentPointOverrideFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentPointModificationFactors", GetSegmentPointModificationFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentHatchDataInModelUnits", GetSegmentHatchDataInModelUnits);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentHatchDataDiscrete", GetSegmentHatchDataDiscrete);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetLinearSegmentHatchOverrideFactors", GetLinearSegmentHatchOverrideFactors);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "SegmentHasNonlinearHatchOverrideInterpolation", SegmentHasNonlinearHatchOverrideInterpolation);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentNonlinearHatchOverrideInterpolation", GetSegmentNonlinearHatchOverrideInterpolation);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentAllNonlinearHatchesOverrideInterpolation", GetSegmentAllNonlinearHatchesOverrideInterpolation);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetLinearSegmentHatchModificationFactors", GetLinearSegmentHatchModificationFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "SegmentHasNonlinearHatchModificationInterpolation", SegmentHasNonlinearHatchModificationInterpolation);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentNonlinearHatchModificationInterpolation", GetSegmentNonlinearHatchModificationInterpolation);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSegmentAllNonlinearHatchesModificationInterpolation", GetSegmentAllNonlinearHatchesModificationInterpolation);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
 }
@@ -24717,7 +24639,7 @@ void CLib3MFToolpathLayerReader::GetProfileUUIDByLocalProfileID(const FunctionCa
 }
 
 
-void CLib3MFToolpathLayerReader::SegmentHasOverrideFactors(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::SegmentHasModificationFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24726,46 +24648,20 @@ void CLib3MFToolpathLayerReader::SegmentHasOverrideFactors(const FunctionCallbac
             throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
         }
         if (!args[1]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 1 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 1 (ModificationFactor)");
         }
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        unsigned int eOverrideFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        bool bReturnHasOverrides = false;
+        unsigned int eModificationFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        bool bReturnHasModificationFactors = false;
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method SegmentHasOverrideFactors.");
-        if (wrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::SegmentHasOverrideFactors.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method SegmentHasModificationFactors.");
+        if (wrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::SegmentHasModificationFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, &bReturnHasOverrides);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, &bReturnHasModificationFactors);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(Boolean::New(isolate, bReturnHasOverrides));
-
-		} catch (std::exception & E) {
-				RaiseError(isolate, E.what());
-		}
-}
-
-
-void CLib3MFToolpathLayerReader::SegmentHasUniformProfile(const FunctionCallbackInfo<Value>& args) 
-{
-		Isolate* isolate = args.GetIsolate();
-		HandleScope scope(isolate);
-		try {
-        if (!args[0]->IsUint32()) {
-            throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
-        }
-        unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        bool bReturnHasUniformProfile = false;
-        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
-        if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method SegmentHasUniformProfile.");
-        if (wrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::SegmentHasUniformProfile.");
-        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile(instanceHandle, nSegmentIndex, &bReturnHasUniformProfile);
-        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(Boolean::New(isolate, bReturnHasUniformProfile));
+        args.GetReturnValue().Set(Boolean::New(isolate, bReturnHasModificationFactors));
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -24821,7 +24717,7 @@ void CLib3MFToolpathLayerReader::GetSegmentPointDataDiscrete(const FunctionCallb
 }
 
 
-void CLib3MFToolpathLayerReader::GetSegmentPointOverrideFactors(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::GetSegmentPointModificationFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24830,17 +24726,17 @@ void CLib3MFToolpathLayerReader::GetSegmentPointOverrideFactors(const FunctionCa
             throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
         }
         if (!args[1]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 1 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 1 (ModificationFactor)");
         }
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        unsigned int eOverrideFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentPointOverrideFactors.");
-        if (wrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentPointOverrideFactors.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentPointModificationFactors.");
+        if (wrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentPointModificationFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, 0, nullptr, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, 0, nullptr, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -24897,7 +24793,7 @@ void CLib3MFToolpathLayerReader::GetSegmentHatchDataDiscrete(const FunctionCallb
 }
 
 
-void CLib3MFToolpathLayerReader::GetLinearSegmentHatchOverrideFactors(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::GetLinearSegmentHatchModificationFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24906,17 +24802,17 @@ void CLib3MFToolpathLayerReader::GetLinearSegmentHatchOverrideFactors(const Func
             throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
         }
         if (!args[1]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 1 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 1 (ModificationFactor)");
         }
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        unsigned int eOverrideFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetLinearSegmentHatchOverrideFactors.");
-        if (wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetLinearSegmentHatchOverrideFactors.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetLinearSegmentHatchModificationFactors.");
+        if (wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetLinearSegmentHatchModificationFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, 0, nullptr, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, 0, nullptr, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -24925,7 +24821,7 @@ void CLib3MFToolpathLayerReader::GetLinearSegmentHatchOverrideFactors(const Func
 }
 
 
-void CLib3MFToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::SegmentHasNonlinearHatchModificationInterpolation(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24934,16 +24830,16 @@ void CLib3MFToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation(c
             throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
         }
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        bool bReturnHasOverrideInterpolation = false;
+        bool bReturnHasModificationInterpolation = false;
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method SegmentHasNonlinearHatchOverrideInterpolation.");
-        if (wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method SegmentHasNonlinearHatchModificationInterpolation.");
+        if (wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::SegmentHasNonlinearHatchModificationInterpolation.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation(instanceHandle, nSegmentIndex, &bReturnHasOverrideInterpolation);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation(instanceHandle, nSegmentIndex, &bReturnHasModificationInterpolation);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(Boolean::New(isolate, bReturnHasOverrideInterpolation));
+        args.GetReturnValue().Set(Boolean::New(isolate, bReturnHasModificationInterpolation));
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -24951,7 +24847,7 @@ void CLib3MFToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation(c
 }
 
 
-void CLib3MFToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::GetSegmentNonlinearHatchModificationInterpolation(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24963,18 +24859,18 @@ void CLib3MFToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation(c
             throw std::runtime_error("Expected uint32 parameter 1 (HatchIndex)");
         }
         if (!args[2]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 2 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 2 (ModificationFactor)");
         }
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         unsigned int nHatchIndex = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        unsigned int eOverrideFactor = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentNonlinearHatchOverrideInterpolation.");
-        if (wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentNonlinearHatchModificationInterpolation.");
+        if (wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentNonlinearHatchModificationInterpolation.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation(instanceHandle, nSegmentIndex, nHatchIndex, (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, 0, nullptr, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation(instanceHandle, nSegmentIndex, nHatchIndex, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, 0, nullptr, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -24983,7 +24879,7 @@ void CLib3MFToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation(c
 }
 
 
-void CLib3MFToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolation(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerReader::GetSegmentAllNonlinearHatchesModificationInterpolation(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -24992,18 +24888,18 @@ void CLib3MFToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolat
             throw std::runtime_error("Expected uint32 parameter 0 (SegmentIndex)");
         }
         if (!args[1]->IsUint32()) {
-            throw std::runtime_error("Expected enum parameter 1 (OverrideFactor)");
+            throw std::runtime_error("Expected enum parameter 1 (ModificationFactor)");
         }
         Local<Object> outObject = Object::New(isolate);
         unsigned int nSegmentIndex = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        unsigned int eOverrideFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentAllNonlinearHatchesOverrideInterpolation.");
-        if (wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolation.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetSegmentAllNonlinearHatchesModificationInterpolation.");
+        if (wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerReader::GetSegmentAllNonlinearHatchesModificationInterpolation.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileOverrideFactor) eOverrideFactor, 0, nullptr, nullptr, 0, nullptr, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation(instanceHandle, nSegmentIndex, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, 0, nullptr, nullptr, 0, nullptr, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         args.GetReturnValue().Set(outObject);
 
@@ -25042,24 +24938,22 @@ void CLib3MFToolpathLayerData::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "ClearSegmentAttributes", ClearSegmentAttributes);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "SetLaserIndex", SetLaserIndex);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "ClearLaserIndex", ClearLaserIndex);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "SetOverrideFraction", SetOverrideFraction);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetOverrideFraction", GetOverrideFraction);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnits", WriteHatchDataInModelUnits);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithConstantOverrides", WriteHatchDataInModelUnitsWithConstantOverrides);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithLinearOverrides", WriteHatchDataInModelUnitsWithLinearOverrides);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithNonlinearOverrides", WriteHatchDataInModelUnitsWithNonlinearOverrides);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithConstantFactors", WriteHatchDataInModelUnitsWithConstantFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithLinearFactors", WriteHatchDataInModelUnitsWithLinearFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataInModelUnitsWithNonlinearFactors", WriteHatchDataInModelUnitsWithNonlinearFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscrete", WriteHatchDataDiscrete);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithConstantOverrides", WriteHatchDataDiscreteWithConstantOverrides);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithLinearOverrides", WriteHatchDataDiscreteWithLinearOverrides);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithNonlinearOverrides", WriteHatchDataDiscreteWithNonlinearOverrides);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithConstantFactors", WriteHatchDataDiscreteWithConstantFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithLinearFactors", WriteHatchDataDiscreteWithLinearFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteHatchDataDiscreteWithNonlinearFactors", WriteHatchDataDiscreteWithNonlinearFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopInModelUnits", WriteLoopInModelUnits);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopDiscrete", WriteLoopDiscrete);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopInModelUnitsWithOverrides", WriteLoopInModelUnitsWithOverrides);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopDiscreteWithOverrides", WriteLoopDiscreteWithOverrides);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopInModelUnitsWithFactors", WriteLoopInModelUnitsWithFactors);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WriteLoopDiscreteWithFactors", WriteLoopDiscreteWithFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineInModelUnits", WritePolylineInModelUnits);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineInModelUnitsWithOverrides", WritePolylineInModelUnitsWithOverrides);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineInModelUnitsWithFactors", WritePolylineInModelUnitsWithFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineDiscrete", WritePolylineDiscrete);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineDiscreteWithOverrides", WritePolylineDiscreteWithOverrides);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "WritePolylineDiscreteWithFactors", WritePolylineDiscreteWithFactors);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "AddCustomData", AddCustomData);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "Finish", Finish);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
@@ -25281,52 +25175,6 @@ void CLib3MFToolpathLayerData::ClearLaserIndex(const FunctionCallbackInfo<Value>
 }
 
 
-void CLib3MFToolpathLayerData::SetOverrideFraction(const FunctionCallbackInfo<Value>& args) 
-{
-		Isolate* isolate = args.GetIsolate();
-		HandleScope scope(isolate);
-		try {
-        if (!args[0]->IsUint32()) {
-            throw std::runtime_error("Expected uint32 parameter 0 (Value)");
-        }
-        unsigned int nValue = (unsigned int) args[0]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
-        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
-        if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method SetOverrideFraction.");
-        if (wrapperTable->m_ToolpathLayerData_SetOverrideFraction == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::SetOverrideFraction.");
-        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_SetOverrideFraction(instanceHandle, nValue);
-        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-
-		} catch (std::exception & E) {
-				RaiseError(isolate, E.what());
-		}
-}
-
-
-void CLib3MFToolpathLayerData::GetOverrideFraction(const FunctionCallbackInfo<Value>& args) 
-{
-		Isolate* isolate = args.GetIsolate();
-		HandleScope scope(isolate);
-		try {
-        unsigned int nReturnValue = 0;
-        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
-        if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetOverrideFraction.");
-        if (wrapperTable->m_ToolpathLayerData_GetOverrideFraction == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::GetOverrideFraction.");
-        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_GetOverrideFraction(instanceHandle, &nReturnValue);
-        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(Integer::NewFromUnsigned(isolate, nReturnValue));
-
-		} catch (std::exception & E) {
-				RaiseError(isolate, E.what());
-		}
-}
-
-
 void CLib3MFToolpathLayerData::WriteHatchDataInModelUnits(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
@@ -25355,7 +25203,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnits(const FunctionCallback
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25370,11 +25218,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides(c
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithConstantOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithConstantFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25383,7 +25231,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides(c
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25398,11 +25246,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides(con
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithLinearOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithLinearFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25411,7 +25259,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides(con
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25426,11 +25274,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithNonlinearOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataInModelUnitsWithNonlinearFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25467,7 +25315,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscrete(const FunctionCallbackInfo
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25482,11 +25330,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides(const
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithConstantOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithConstantFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25495,7 +25343,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides(const
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25510,11 +25358,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides(const F
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithLinearOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithLinearFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25523,7 +25371,7 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides(const F
 }
 
 
-void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25538,11 +25386,11 @@ void CLib3MFToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(cons
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithNonlinearOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteHatchDataDiscreteWithNonlinearFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25607,7 +25455,7 @@ void CLib3MFToolpathLayerData::WriteLoopDiscrete(const FunctionCallbackInfo<Valu
 }
 
 
-void CLib3MFToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteLoopInModelUnitsWithFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25622,11 +25470,11 @@ void CLib3MFToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const Function
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteLoopInModelUnitsWithOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteLoopInModelUnitsWithOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteLoopInModelUnitsWithFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteLoopInModelUnitsWithFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25635,7 +25483,7 @@ void CLib3MFToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const Function
 }
 
 
-void CLib3MFToolpathLayerData::WriteLoopDiscreteWithOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WriteLoopDiscreteWithFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25650,11 +25498,11 @@ void CLib3MFToolpathLayerData::WriteLoopDiscreteWithOverrides(const FunctionCall
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteLoopDiscreteWithOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteLoopDiscreteWithOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WriteLoopDiscreteWithFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WriteLoopDiscreteWithFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25691,7 +25539,7 @@ void CLib3MFToolpathLayerData::WritePolylineInModelUnits(const FunctionCallbackI
 }
 
 
-void CLib3MFToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WritePolylineInModelUnitsWithFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25706,11 +25554,11 @@ void CLib3MFToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const Func
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WritePolylineInModelUnitsWithOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WritePolylineInModelUnitsWithOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WritePolylineInModelUnitsWithFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WritePolylineInModelUnitsWithFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -25747,7 +25595,7 @@ void CLib3MFToolpathLayerData::WritePolylineDiscrete(const FunctionCallbackInfo<
 }
 
 
-void CLib3MFToolpathLayerData::WritePolylineDiscreteWithOverrides(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathLayerData::WritePolylineDiscreteWithFactors(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -25762,11 +25610,11 @@ void CLib3MFToolpathLayerData::WritePolylineDiscreteWithOverrides(const Function
         unsigned int nPartID = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method WritePolylineDiscreteWithOverrides.");
-        if (wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WritePolylineDiscreteWithOverrides.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method WritePolylineDiscreteWithFactors.");
+        if (wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathLayerData::WritePolylineDiscreteWithFactors.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors(instanceHandle, nProfileID, nPartID, 0, nullptr, 0, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -30822,10 +30670,14 @@ void CLib3MFWrapper::New(const FunctionCallbackInfo<Value>& args)
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathAttributeType_Unknown"), Integer::New(isolate, 0));
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathAttributeType_Integer"), Integer::New(isolate, 1));
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathAttributeType_Double"), Integer::New(isolate, 2));
-						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileOverrideFactor_Unknown"), Integer::New(isolate, 0));
-						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileOverrideFactor_FactorF"), Integer::New(isolate, 1));
-						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileOverrideFactor_FactorG"), Integer::New(isolate, 2));
-						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileOverrideFactor_FactorH"), Integer::New(isolate, 3));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationFactor_Unknown"), Integer::New(isolate, 0));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationFactor_FactorF"), Integer::New(isolate, 1));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationFactor_FactorG"), Integer::New(isolate, 2));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationFactor_FactorH"), Integer::New(isolate, 3));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationType_NoModification"), Integer::New(isolate, 0));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationType_ConstantModification"), Integer::New(isolate, 1));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationType_LinearModification"), Integer::New(isolate, 2));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eToolpathProfileModificationType_NonlinearModification"), Integer::New(isolate, 3));
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eCompositionMethod_WeightedSum"), Integer::New(isolate, 0));
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eCompositionMethod_Multiply"), Integer::New(isolate, 1));
 						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eCompositionMethod_Min"), Integer::New(isolate, 2));

@@ -111,19 +111,19 @@ public:
 
 	std::string GetModifierNameByIndex(const Lib3MF_uint32 nIndex) override;
 
+	Lib3MF::eToolpathProfileModificationType GetModifierTypeByIndex(const Lib3MF_uint32 nIndex) override;
+
 	std::string GetModifierNameSpaceByIndex(const Lib3MF_uint32 nIndex) override;
 
 	bool HasModifier(const std::string& sNameSpaceName, const std::string& sValueName) override;
+	
+	void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string& sNameSpaceName, std::string& sValueName, Lib3MF::eToolpathProfileModificationType& eModifierType, Lib3MF::eToolpathProfileModificationFactor& eModificationFactor, Lib3MF_double& dMinValue, Lib3MF_double& dMaxValue) override;
 
-	void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string& sNameSpaceName, std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue0, Lib3MF_double& dDeltaValue1) override;
+	void GetModifierInformationByName(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType& eModifierType, Lib3MF::eToolpathProfileModificationFactor& eModificationFactor, Lib3MF_double& dMinValue, Lib3MF_double& dMaxValue) override;
 
-	void GetModifierInformationByName(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileOverrideFactor& eOverrideFactor, Lib3MF_double& dDeltaValue0, Lib3MF_double& dDeltaValue1) override;
-
-	void SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_double dDeltaValue0, const Lib3MF_double dDeltaValue1) override;
+	void SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) override;
 
 	void RemoveModifier(const std::string& sNameSpaceName, const std::string& sValueName) override;
-
-	Lib3MF_double EvaluateDoubleValue(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF_double dFactorF, const Lib3MF_double dFactorG, const Lib3MF_double dFactorH) override;
 
 	NMR::PModelToolpathProfile getProfileInstance();
 

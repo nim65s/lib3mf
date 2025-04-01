@@ -49,12 +49,18 @@ namespace NMR {
 		nfBool m_bHasY2;
 
 		nfInt32 m_nTag;
-		nfDouble m_nFactorF1;
-		nfDouble m_nFactorG1;
-		nfDouble m_nFactorH1;
-		nfDouble m_nFactorF2;
-		nfDouble m_nFactorG2;
-		nfDouble m_nFactorH2;
+		nfDouble m_dFactorF1;
+		nfDouble m_dFactorG1;
+		nfDouble m_dFactorH1;
+		nfDouble m_dFactorF2;
+		nfDouble m_dFactorG2;
+		nfDouble m_dFactorH2;
+		bool m_bHasFactorF1;
+		bool m_bHasFactorF2;
+		bool m_bHasFactorG1;
+		bool m_bHasFactorG2;
+		bool m_bHasFactorH1;
+		bool m_bHasFactorH2;
 
 		CModelToolpathLayerReadData * m_pReadData;
 
@@ -68,18 +74,26 @@ namespace NMR {
 
 		virtual void parseXML(_In_ CXmlReader * pXMLReader);
 
-		nfInt32 getX1();
-		nfInt32 getY1();
-		nfInt32 getX2();
-		nfInt32 getY2();
+		nfInt32 getX1() const;
+		nfInt32 getY1() const;
+		nfInt32 getX2() const;
+		nfInt32 getY2() const;
 
-		nfInt32 getTag();
-		nfDouble getFactorF1();
-		nfDouble getFactorG1();
-		nfDouble getFactorH1();
-		nfDouble getFactorF2();
-		nfDouble getFactorG2();
-		nfDouble getFactorH2();
+		nfInt32 getTag() const;
+		nfDouble getFactorF1() const;
+		nfDouble getFactorG1() const;
+		nfDouble getFactorH1() const;
+		nfDouble getFactorF2() const;
+		nfDouble getFactorG2() const;
+		nfDouble getFactorH2() const;
+
+		bool hasFactorF1() const;
+		bool hasFactorF2() const;
+		bool hasFactorG1() const;
+		bool hasFactorG2() const;
+		bool hasFactorH1() const;
+		bool hasFactorH2() const;
+
 	};
 
 	typedef std::shared_ptr <CToolpathReaderNode_Hatch> PToolpathReaderNode_Hatch;

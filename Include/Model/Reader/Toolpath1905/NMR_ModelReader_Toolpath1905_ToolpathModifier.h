@@ -50,13 +50,14 @@ namespace NMR {
 		nfBool m_bHasAttribute;
 		std::string m_sAttribute;
 
-		nfBool m_bHasDelta0;
-		double m_dDelta0;
+		nfBool m_bHasMinimum;
+		double m_dMinimum;
 
-		nfBool m_bHasDelta1;
-		double m_dDelta1;
+		nfBool m_bHasMaximum;
+		double m_dMaximum;
 
-		NMR::eModelToolpathProfileOverrideFactor m_OverrideFactor;
+		Lib3MF::eToolpathProfileModificationType m_ModificationType;
+		Lib3MF::eToolpathProfileModificationFactor m_ModificationFactor;
 
 	protected:
 		virtual void OnAttribute(_In_z_ const nfChar * pAttributeName, _In_z_ const nfChar * pAttributeValue);

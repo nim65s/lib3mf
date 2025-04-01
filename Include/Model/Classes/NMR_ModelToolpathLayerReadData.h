@@ -49,6 +49,10 @@ NMR_ModelToolpath.h defines the Model Toolpath Layer Data.
 
 #define TOOLPATHSEGMENTATTRIBUTEPAGESIZE 65536
 
+#define TOOLPATHREADSEGMENTFLAG_HASFACTORF 0x01
+#define TOOLPATHREADSEGMENTFLAG_HASFACTORG 0x02
+#define TOOLPATHREADSEGMENTFLAG_HASFACTORH 0x04
+
 namespace NMR {
 
 	class CModelToolpath;
@@ -71,6 +75,7 @@ namespace NMR {
 
 	typedef struct {
 		eModelToolpathSegmentType m_eType;
+		nfUint32 m_nFlags;
 		nfUint32 m_nProfileID;
 		nfUint32 m_nPartID;
 		nfUint32 m_nStartPoint;
@@ -83,6 +88,7 @@ namespace NMR {
 		nfInt32 m_nX;
 		nfInt32 m_nY;
 		nfInt32 m_nTag;
+		nfUint32 m_nFlags;
 		nfDouble m_nFactorF;
 		nfDouble m_nFactorG;
 		nfDouble m_nFactorH;
@@ -139,7 +145,7 @@ namespace NMR {
 
 		void beginSegment(eModelToolpathSegmentType eType, nfUint32 nProfileID, nfUint32 nPartID);
 		void endSegment();
-		void addDiscretePoint (nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfDouble nFactorF, nfDouble nFactorG, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount);
+		void addDiscretePoint (nfInt32 nX, nfInt32 nY, nfInt32 nTag, bool bHasFactorF, nfDouble nFactorF, bool bHasFactorG, nfDouble nFactorG, bool bHasFactorH, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount);
 
 		TOOLPATHREADOVERRIDE& getOverrideInterpolationData(uint32_t nGlobalIndex);
 		uint32_t getGlobalOverrideInterpolationCount();
@@ -151,6 +157,7 @@ namespace NMR {
 		TOOLPATHREADPOINT & getSegmentPoint (nfUint32 nSegmentIndex, nfUint32 nPointIndex);
 		void getSegmentHatchOverrideInterpolationIndices(nfUint32 nSegmentIndex, nfUint32 nHatchIndex, nfUint32 & nOverrideStartIndex, nfUint32 & nOverrideCount);
 		uint32_t getSegmentOverrideInterpolationCount(uint32_t nSegmentIndex);
+        bool segmentHasModificationFactors(nfUint32 nSegmentIndex, Lib3MF::eToolpathProfileModificationFactor modificationFactor);
 
 		uint32_t getPartCount();
 
@@ -171,9 +178,6 @@ namespace NMR {
 		int64_t getSegmentIntegerAttribute(nfUint32 nSegmentIndex, uint32_t nAttributeID);
 		double getSegmentDoubleAttribute(nfUint32 nSegmentIndex, uint32_t nAttributeID);
 		std::pair<uint32_t, eModelToolpathSegmentAttributeType> findSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, bool bMustExist);
-
-		bool segmentHasUniformProfile(nfUint32 nSegmentIndex);
-		bool segmentHasOverrideFactors(nfUint32 nSegmentIndex, NMR::eModelToolpathProfileOverrideFactor overrideFactor);
 
 		double getUnits();
 

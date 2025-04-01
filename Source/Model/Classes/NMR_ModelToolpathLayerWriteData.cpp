@@ -49,7 +49,7 @@ namespace NMR {
 
 	CModelToolpathLayerWriteData::CModelToolpathLayerWriteData(CModelToolpath * pModelToolpath, NMR::PModelWriter_3MF pModelWriter, const std::string & sPackagePath, std::map<std::string, std::string> PrefixToNameSpaceMap)
 		: m_pModelToolpath (pModelToolpath), m_pModelWriter (pModelWriter), m_sPackagePath (sPackagePath), m_PrefixToNameSpaceMap (PrefixToNameSpaceMap),
-		m_nCurrentLaserIndex (0), m_nOverrideFraction(TOOLPATHWRITER_DEFAULTOVERRIDEFRACTION)
+		m_nCurrentLaserIndex (0)
 	{
 		if (pModelToolpath == nullptr)
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
@@ -128,7 +128,7 @@ namespace NMR {
 	}
 
 
-	void CModelToolpathLayerWriteData::WriteHatchData(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nHatchCount, const nfInt32* pX1Buffer, const nfInt32* pY1Buffer, const nfInt32* pX2Buffer, const nfInt32* pY2Buffer, const nfInt32* pTagBuffer, const double* pScalingDataF1Buffer, const double* pScalingDataF2Buffer, const uint32_t * pSubinterpolationCountBuffer, uint64_t nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer)
+	void CModelToolpathLayerWriteData::WriteHatchData(const nfUint32 nProfileID, const nfUint32 nPartID, const nfUint32 nHatchCount, const nfInt32* pX1Buffer, const nfInt32* pY1Buffer, const nfInt32* pX2Buffer, const nfInt32* pY2Buffer, const nfInt32* pTagBuffer, const double* pScalingDataF1Buffer, const double* pScalingDataF2Buffer, const uint32_t * pSubinterpolationCountBuffer, uint64_t nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData* pOverrideInterpolationDataBuffer)
 	{
 		uint32_t nTotalSubinterpolations = 0;
 
@@ -430,7 +430,7 @@ namespace NMR {
 						auto pInfo = &pOverrideInterpolationDataBuffer[nTotalSubinterpolations];
 
 						std::string sParameter = std::to_string(pInfo->m_Parameter);
-						std::string sFactorF = std::to_string(pInfo->m_Override);
+						std::string sFactorF = std::to_string(pInfo->m_Factor);
 
 						m_pXmlWriter->WriteStartElement(nullptr, XML_3MF_TOOLPATHELEMENT_OVERRIDEINTERPOLATION, nullptr);
 						m_pXmlWriter->WriteAttributeString(nullptr, XML_3MF_TOOLPATHATTRIBUTE_PARAMETERVALUE, nullptr, sParameter.c_str ());
@@ -923,18 +923,6 @@ namespace NMR {
 		m_nCurrentLaserIndex = nLaserIndex;
 	}
 
-	void CModelToolpathLayerWriteData::setOverrideFraction(uint32_t nOverrideFraction)
-	{
-		if ((nOverrideFraction < TOOLPATHWRITER_MINFACTORRANGE) || (nOverrideFraction > TOOLPATHWRITER_MAXFACTORRANGE))
-			throw CNMRException(NMR_ERROR_TOOLPATH_INVALIDFACTORRANGE);
-
-		m_nOverrideFraction = nOverrideFraction;
-	}
-
-	uint32_t CModelToolpathLayerWriteData::getOverrideFraction()
-	{
-		return m_nOverrideFraction;
-	}
 
 
 }

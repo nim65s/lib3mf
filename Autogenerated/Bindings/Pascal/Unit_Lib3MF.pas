@@ -290,11 +290,18 @@ type
 		eToolpathAttributeTypeDouble
 	);
 
-	TLib3MFToolpathProfileOverrideFactor = (
-		eToolpathProfileOverrideFactorUnknown,
-		eToolpathProfileOverrideFactorFactorF,
-		eToolpathProfileOverrideFactorFactorG,
-		eToolpathProfileOverrideFactorFactorH
+	TLib3MFToolpathProfileModificationFactor = (
+		eToolpathProfileModificationFactorUnknown,
+		eToolpathProfileModificationFactorFactorF,
+		eToolpathProfileModificationFactorFactorG,
+		eToolpathProfileModificationFactorFactorH
+	);
+
+	TLib3MFToolpathProfileModificationType = (
+		eToolpathProfileModificationTypeNoModification,
+		eToolpathProfileModificationTypeConstantModification,
+		eToolpathProfileModificationTypeLinearModification,
+		eToolpathProfileModificationTypeNonlinearModification
 	);
 
 	TLib3MFCompositionMethod = (
@@ -443,22 +450,16 @@ type
 		FTag: Integer;
 	end;
 
-	PLib3MFHatch2DOverrides = ^TLib3MFHatch2DOverrides;
-	TLib3MFHatch2DOverrides = packed record
-		FPoint1Override: Double;
-		FPoint2Override: Double;
+	PLib3MFHatch2DFactors = ^TLib3MFHatch2DFactors;
+	TLib3MFHatch2DFactors = packed record
+		FPoint1Factor: Double;
+		FPoint2Factor: Double;
 	end;
 
-	PLib3MFHatchOverrideInterpolationIndices = ^TLib3MFHatchOverrideInterpolationIndices;
-	TLib3MFHatchOverrideInterpolationIndices = packed record
-		FStartIndex: Cardinal;
-		FValueCount: Cardinal;
-	end;
-
-	PLib3MFHatchOverrideInterpolationData = ^TLib3MFHatchOverrideInterpolationData;
-	TLib3MFHatchOverrideInterpolationData = packed record
+	PLib3MFHatchModificationInterpolationData = ^TLib3MFHatchModificationInterpolationData;
+	TLib3MFHatchModificationInterpolationData = packed record
 		FParameter: Double;
-		FOverride: Double;
+		FFactor: Double;
 	end;
 
 	PLib3MFDiscreteHatch2D = ^TLib3MFDiscreteHatch2D;
@@ -539,9 +540,8 @@ type
 	ArrayOfLib3MFPosition2D = array of TLib3MFPosition2D;
 	ArrayOfLib3MFDiscretePosition2D = array of TLib3MFDiscretePosition2D;
 	ArrayOfLib3MFHatch2D = array of TLib3MFHatch2D;
-	ArrayOfLib3MFHatch2DOverrides = array of TLib3MFHatch2DOverrides;
-	ArrayOfLib3MFHatchOverrideInterpolationIndices = array of TLib3MFHatchOverrideInterpolationIndices;
-	ArrayOfLib3MFHatchOverrideInterpolationData = array of TLib3MFHatchOverrideInterpolationData;
+	ArrayOfLib3MFHatch2DFactors = array of TLib3MFHatch2DFactors;
+	ArrayOfLib3MFHatchModificationInterpolationData = array of TLib3MFHatchModificationInterpolationData;
 	ArrayOfLib3MFDiscreteHatch2D = array of TLib3MFDiscreteHatch2D;
 	ArrayOfLib3MFCompositeConstituent = array of TLib3MFCompositeConstituent;
 	ArrayOfLib3MFMultiPropertyLayer = array of TLib3MFMultiPropertyLayer;
@@ -6851,6 +6851,16 @@ type
 	TLib3MFToolpathProfile_GetModifierNameByIndexFunc = function(pToolpathProfile: TLib3MFHandle; const nIndex: Cardinal; const nNameBufferSize: Cardinal; out pNameNeededChars: Cardinal; pNameBuffer: PAnsiChar): TLib3MFResult; cdecl;
 	
 	(**
+	* Returns the type of a modifier by its index.
+	*
+	* @param[in] pToolpathProfile - ToolpathProfile instance.
+	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
+	* @param[out] pModifierType - Returns the type of the modifier.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFToolpathProfile_GetModifierTypeByIndexFunc = function(pToolpathProfile: TLib3MFHandle; const nIndex: Cardinal; out pModifierType: Integer): TLib3MFResult; cdecl;
+	
+	(**
 	* Returns the NameSpace of a modifier by its index.
 	*
 	* @param[in] pToolpathProfile - ToolpathProfile instance.
@@ -6884,12 +6894,13 @@ type
 	* @param[in] nValueNameBufferSize - size of the buffer (including trailing 0)
 	* @param[out] pValueNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 	* @param[out] pValueNameBuffer -  buffer of Parameter key string., may be NULL
-	* @param[out] pOverrideFactor - which type of override factor to use.
-	* @param[out] pDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] pDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] pModifierType - Returns the type of the modifier.
+	* @param[out] pModificationFactor - which type of modification factor to use.
+	* @param[out] pMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] pMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathProfile_GetModifierInformationByIndexFunc = function(pToolpathProfile: TLib3MFHandle; const nIndex: Cardinal; const nNameSpaceNameBufferSize: Cardinal; out pNameSpaceNameNeededChars: Cardinal; pNameSpaceNameBuffer: PAnsiChar; const nValueNameBufferSize: Cardinal; out pValueNameNeededChars: Cardinal; pValueNameBuffer: PAnsiChar; out pOverrideFactor: Integer; out pDeltaValue0: Double; out pDeltaValue1: Double): TLib3MFResult; cdecl;
+	TLib3MFToolpathProfile_GetModifierInformationByIndexFunc = function(pToolpathProfile: TLib3MFHandle; const nIndex: Cardinal; const nNameSpaceNameBufferSize: Cardinal; out pNameSpaceNameNeededChars: Cardinal; pNameSpaceNameBuffer: PAnsiChar; const nValueNameBufferSize: Cardinal; out pValueNameNeededChars: Cardinal; pValueNameBuffer: PAnsiChar; out pModifierType: Integer; out pModificationFactor: Integer; out pMinValue: Double; out pMaxValue: Double): TLib3MFResult; cdecl;
 	
 	(**
 	* Returns modifier by name.
@@ -6897,12 +6908,13 @@ type
 	* @param[in] pToolpathProfile - ToolpathProfile instance.
 	* @param[in] pNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] pValueName - Parameter key string.
-	* @param[out] pOverrideFactor - which type of override factor to use.
-	* @param[out] pDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] pDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] pModifierType - Returns the type of the modifier.
+	* @param[out] pModificationFactor - which type of modification factor to use.
+	* @param[out] pMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] pMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathProfile_GetModifierInformationByNameFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; out pOverrideFactor: Integer; out pDeltaValue0: Double; out pDeltaValue1: Double): TLib3MFResult; cdecl;
+	TLib3MFToolpathProfile_GetModifierInformationByNameFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; out pModifierType: Integer; out pModificationFactor: Integer; out pMinValue: Double; out pMaxValue: Double): TLib3MFResult; cdecl;
 	
 	(**
 	* Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
@@ -6910,12 +6922,13 @@ type
 	* @param[in] pToolpathProfile - ToolpathProfile instance.
 	* @param[in] pNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] pValueName - Parameter key string.
-	* @param[in] eOverrideFactor - which type of override factor to use.
-	* @param[in] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[in] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathProfile_SetModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const eOverrideFactor: Integer; const dDeltaValue0: Double; const dDeltaValue1: Double): TLib3MFResult; cdecl;
+	TLib3MFToolpathProfile_SetModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const eModifierType: Integer; const eModificationFactor: Integer; const dMinValue: Double; const dMaxValue: Double): TLib3MFResult; cdecl;
 	
 	(**
 	* Removes a modifier, if it exists.
@@ -6926,20 +6939,6 @@ type
 	* @return error code or 0 (success)
 	*)
 	TLib3MFToolpathProfile_RemoveModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar): TLib3MFResult; cdecl;
-	
-	(**
-	* Evaluates a double parameter, taking an optional modifier into account. Fails if neither a parameter nor a modifier exists with this name/namespace.
-	*
-	* @param[in] pToolpathProfile - ToolpathProfile instance.
-	* @param[in] pNameSpaceName - Name of the Parameter Namespace.
-	* @param[in] pValueName - Parameter key string.
-	* @param[in] dFactorF - F Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorG - G Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorH - H Factor value (will be clipped between 0.0 and 1.0)
-	* @param[out] pEvaluationResult - Evaluation result.
-	* @return error code or 0 (success)
-	*)
-	TLib3MFToolpathProfile_EvaluateDoubleValueFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const dFactorF: Double; const dFactorG: Double; const dFactorH: Double; out pEvaluationResult: Double): TLib3MFResult; cdecl;
 	
 
 (*************************************************************************************************************************
@@ -7212,25 +7211,15 @@ type
 	TLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc = function(pToolpathLayerReader: TLib3MFHandle; const nLocalProfileID: Cardinal; const nProfileUUIDBufferSize: Cardinal; out pProfileUUIDNeededChars: Cardinal; pProfileUUIDBuffer: PAnsiChar): TLib3MFResult; cdecl;
 	
 	(**
-	* Retrieves if the segment has specific override factors attached.
+	* Retrieves if the segment has specific modification factors attached.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
-	* @param[out] pHasOverrides - Returns true, if the segment has attached any override factors of the given type, false otherwise.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
+	* @param[out] pHasModificationFactors - Returns true, if the segment has attached any modification factors of the given type, false otherwise.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eOverrideFactor: Integer; out pHasOverrides: Byte): TLib3MFResult; cdecl;
-	
-	(**
-	* Returns if the segment has a uniform profile. If it is uniform, then the default profile applies to the whole segment. If it is not uniform, the type specific retrieval functions have to be used (or the file has to be rejected). Returns false for delay and sync segments. The call is equivalent to SegmentHasOverrideFactors returning false with any possible type (F, G, H).
-	*
-	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
-	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
-	* @param[out] pHasUniformProfile - If true, the segment has a uniform profile ID.
-	* @return error code or 0 (success)
-	*)
-	TLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; out pHasUniformProfile: Byte): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eModificationFactor: Integer; out pHasModificationFactors: Byte): TLib3MFResult; cdecl;
 	
 	(**
 	* Retrieves the assigned segment point list. Fails if segment type is not loop or polyline.
@@ -7257,17 +7246,17 @@ type
 	TLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const nPointDataCount: QWord; out pPointDataNeededCount: QWord; pPointDataBuffer: PLib3MFDiscretePosition2D): TLib3MFResult; cdecl;
 	
 	(**
-	* Retrieves the assigned segment override factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
+	* Retrieves the assigned segment modification factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesCount - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - double buffer of An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[out] pFactorValuesBuffer - double buffer of An target modification factor for each point of the segment. In case of Polyline, the first array value describes the modification for the initial jump. In case of Loop, the first array value describes the modification for the inital jump and the last closing mark movement of the polyline.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eOverrideFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eModificationFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
 	* Retrieves the assigned segment hatch list. Converts any polyline or loop into hatches. Returns an empty array for delay and sync elements.
@@ -7294,57 +7283,57 @@ type
 	TLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const nHatchDataCount: QWord; out pHatchDataNeededCount: QWord; pHatchDataBuffer: PLib3MFDiscreteHatch2D): TLib3MFResult; cdecl;
 	
 	(**
-	* Retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
+	* Retrieves the assigned segment modification factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesCount - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - Hatch2DOverrides buffer of An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[out] pFactorValuesBuffer - Hatch2DFactors buffer of Two modification factors for each hatch of the segment. 
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eOverrideFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatch2DOverrides): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eModificationFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatch2DFactors): TLib3MFResult; cdecl;
 	
 	(**
-	* Checks if the segment has any sub-hatch override interpolation values. Returns false, if segment type is not hatch.
+	* Checks if the segment has any sub-hatch modification interpolation values. Returns false, if segment type is not hatch.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[out] pHasOverrideInterpolation - Returns true, if the segment has non-linear interpolation overrides.
+	* @param[out] pHasModificationInterpolation - Returns true, if the segment has non-linear interpolation modifications.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; out pHasOverrideInterpolation: Byte): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; out pHasModificationInterpolation: Byte): TLib3MFResult; cdecl;
 	
 	(**
-	* Retrieves the sub-hatch override interpolation values for a single hatch. Fails if segment type is not hatch.
+	* Retrieves the sub-hatch modification interpolation values for a single hatch. Fails if segment type is not hatch.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
 	* @param[in] nHatchIndex - Hatch Index in Segment. Must be between 0 and HatchCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesCount - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - HatchOverrideInterpolationData buffer of Array of interpolation data for the hatch.
+	* @param[out] pFactorValuesBuffer - HatchModificationInterpolationData buffer of Array of interpolation data for the hatch.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const nHatchIndex: Cardinal; const eOverrideFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatchOverrideInterpolationData): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const nHatchIndex: Cardinal; const eModificationFactor: Integer; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatchModificationInterpolationData): TLib3MFResult; cdecl;
 	
 	(**
-	* Retrieves the sub-hatch override interpolation values for all hatches of a segment. Fails if segment type is not hatch.
+	* Retrieves the sub-hatch modification interpolation values for all hatches of a segment. Fails if segment type is not hatch.
 	*
 	* @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nCountArrayCount - Number of elements in buffer
 	* @param[out] pCountArrayNeededCount - will be filled with the count of the written elements, or needed buffer size.
 	* @param[out] pCountArrayBuffer - uint32 buffer of Array how many Interpolation values exist for each hatch. Will contain number of hatches elements.
 	* @param[in] nFactorValuesCount - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - HatchOverrideInterpolationData buffer of Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements.
+	* @param[out] pFactorValuesBuffer - HatchModificationInterpolationData buffer of Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eOverrideFactor: Integer; const nCountArrayCount: QWord; out pCountArrayNeededCount: QWord; pCountArrayBuffer: PCardinal; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatchOverrideInterpolationData): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc = function(pToolpathLayerReader: TLib3MFHandle; const nSegmentIndex: Cardinal; const eModificationFactor: Integer; const nCountArrayCount: QWord; out pCountArrayNeededCount: QWord; pCountArrayBuffer: PCardinal; const nFactorValuesCount: QWord; out pFactorValuesNeededCount: QWord; pFactorValuesBuffer: PLib3MFHatchModificationInterpolationData): TLib3MFResult; cdecl;
 	
 
 (*************************************************************************************************************************
@@ -7419,24 +7408,6 @@ type
 	TLib3MFToolpathLayerData_ClearLaserIndexFunc = function(pToolpathLayerData: TLib3MFHandle): TLib3MFResult; cdecl;
 	
 	(**
-	* Sets the denominator for the scaling factor all subsequent segments. Default is 1000.
-	*
-	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
-	* @param[in] nValue - The value of factor denominator. MUST a positive integer.
-	* @return error code or 0 (success)
-	*)
-	TLib3MFToolpathLayerData_SetOverrideFractionFunc = function(pToolpathLayerData: TLib3MFHandle; const nValue: Cardinal): TLib3MFResult; cdecl;
-	
-	(**
-	* Returns the current denominator for the scaling factor all subsequent segments. Default is 1000.
-	*
-	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
-	* @param[out] pValue - The value of factor denominator.
-	* @return error code or 0 (success)
-	*)
-	TLib3MFToolpathLayerData_GetOverrideFractionFunc = function(pToolpathLayerData: TLib3MFHandle; out pValue: Cardinal): TLib3MFResult; cdecl;
-	
-	(**
 	* writes hatch data to the layer in model units.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
@@ -7449,54 +7420,54 @@ type
 	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D): TLib3MFResult; cdecl;
 	
 	(**
-	* writes hatch data to the layer in model units with constant profile overrides per hatch.
+	* writes hatch data to the layer in model units with constant profile modification factors per hatch.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataCount - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - Hatch2D buffer of The hatch data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile modification scale factors (f). MUST have the same cardinality as HatchData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
-	* writes hatch data to the layer in model units with linearly ramped profile overrides per hatch.
+	* writes hatch data to the layer in model units with linearly ramped profile modification fators per hatch.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataCount - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - Hatch2D buffer of The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] nScalingData1Count - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - double buffer of The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2Count - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - double buffer of The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pHatchDataBuffer - Hatch2D buffer of The hatch data in model units. Array MUST NOT be empty.
+	* @param[in] nFactorData1Count - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - double buffer of The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2Count - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - double buffer of The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nScalingData1Count: QWord; const pScalingData1Buffer: PDouble; const nScalingData2Count: QWord; const pScalingData2Buffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nFactorData1Count: QWord; const pFactorData1Buffer: PDouble; const nFactorData2Count: QWord; const pFactorData2Buffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
-	* writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
+	* writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataCount - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - Hatch2D buffer of The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] nScalingData1Count - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - double buffer of The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2Count - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - double buffer of The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pHatchDataBuffer - Hatch2D buffer of The hatch data in model units. Array MUST NOT be empty. 
+	* @param[in] nFactorData1Count - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - double buffer of The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2Count - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - double buffer of The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nSubInterpolationCountsCount - Number of elements in buffer
 	* @param[in] pSubInterpolationCountsBuffer - uint32 buffer of Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nOverrideInterpolationDataCount - Number of elements in buffer
-	* @param[in] pOverrideInterpolationDataBuffer - HatchOverrideInterpolationData buffer of Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] nModificationInterpolationDataCount - Number of elements in buffer
+	* @param[in] pModificationInterpolationDataBuffer - HatchModificationInterpolationData buffer of Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nScalingData1Count: QWord; const pScalingData1Buffer: PDouble; const nScalingData2Count: QWord; const pScalingData2Buffer: PDouble; const nSubInterpolationCountsCount: QWord; const pSubInterpolationCountsBuffer: PCardinal; const nOverrideInterpolationDataCount: QWord; const pOverrideInterpolationDataBuffer: PLib3MFHatchOverrideInterpolationData): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFHatch2D; const nFactorData1Count: QWord; const pFactorData1Buffer: PDouble; const nFactorData2Count: QWord; const pFactorData2Buffer: PDouble; const nSubInterpolationCountsCount: QWord; const pSubInterpolationCountsBuffer: PCardinal; const nModificationInterpolationDataCount: QWord; const pModificationInterpolationDataBuffer: PLib3MFHatchModificationInterpolationData): TLib3MFResult; cdecl;
 	
 	(**
 	* writes hatch data to the layer in toolpath units.
@@ -7511,21 +7482,37 @@ type
 	TLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D): TLib3MFResult; cdecl;
 	
 	(**
-	* writes hatch data to the layer in toolpath units with constant profile overrides per hatch.
+	* writes hatch data to the layer in toolpath units with constant profile factors per hatch.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataCount - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - DiscreteHatch2D buffer of The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile factors scale factors (f). MUST have the same cardinality as HatchData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
-	* writes hatch data to the layer in toolpath units with linearly ramped profile overrides per hatch.
+	* writes hatch data to the layer in toolpath units with linearly ramped profile factors per hatch.
+	*
+	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
+	* @param[in] nProfileID - The toolpath profile to use
+	* @param[in] nPartID - The toolpath part to use
+	* @param[in] nHatchDataCount - Number of elements in buffer
+	* @param[in] pHatchDataBuffer - DiscreteHatch2D buffer of The hatch data in toolpath units. Array MUST NOT be empty.
+	* @param[in] nFactorData1Count - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - double buffer of The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2Count - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - double buffer of The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nFactorData1Count: QWord; const pFactorData1Buffer: PDouble; const nFactorData2Count: QWord; const pFactorData2Buffer: PDouble): TLib3MFResult; cdecl;
+	
+	(**
+	* writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use
@@ -7533,32 +7520,16 @@ type
 	* @param[in] nHatchDataCount - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - DiscreteHatch2D buffer of The hatch data in toolpath units. Array MUST NOT be empty.
 	* @param[in] nScalingData1Count - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - double buffer of The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pScalingData1Buffer - double buffer of The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nScalingData2Count - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - double buffer of The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
-	* @return error code or 0 (success)
-	*)
-	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nScalingData1Count: QWord; const pScalingData1Buffer: PDouble; const nScalingData2Count: QWord; const pScalingData2Buffer: PDouble): TLib3MFResult; cdecl;
-	
-	(**
-	* writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
-	*
-	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
-	* @param[in] nProfileID - The toolpath profile to use
-	* @param[in] nPartID - The toolpath part to use
-	* @param[in] nHatchDataCount - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - DiscreteHatch2D buffer of The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingData1Count - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - double buffer of The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2Count - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - double buffer of The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pScalingData2Buffer - double buffer of The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nSubInterpolationCountsCount - Number of elements in buffer
 	* @param[in] pSubInterpolationCountsBuffer - uint32 buffer of Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nOverrideInterpolationDataCount - Number of elements in buffer
-	* @param[in] pOverrideInterpolationDataBuffer - HatchOverrideInterpolationData buffer of Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] nModificationInterpolationDataCount - Number of elements in buffer
+	* @param[in] pModificationInterpolationDataBuffer - HatchModificationInterpolationData buffer of Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nScalingData1Count: QWord; const pScalingData1Buffer: PDouble; const nScalingData2Count: QWord; const pScalingData2Buffer: PDouble; const nSubInterpolationCountsCount: QWord; const pSubInterpolationCountsBuffer: PCardinal; const nOverrideInterpolationDataCount: QWord; const pOverrideInterpolationDataBuffer: PLib3MFHatchOverrideInterpolationData): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nHatchDataCount: QWord; const pHatchDataBuffer: PLib3MFDiscreteHatch2D; const nScalingData1Count: QWord; const pScalingData1Buffer: PDouble; const nScalingData2Count: QWord; const pScalingData2Buffer: PDouble; const nSubInterpolationCountsCount: QWord; const pSubInterpolationCountsBuffer: PCardinal; const nModificationInterpolationDataCount: QWord; const pModificationInterpolationDataBuffer: PLib3MFHatchModificationInterpolationData): TLib3MFResult; cdecl;
 	
 	(**
 	* writes loop data to the layer in model units.
@@ -7585,32 +7556,32 @@ type
 	TLib3MFToolpathLayerData_WriteLoopDiscreteFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D): TLib3MFResult; cdecl;
 	
 	(**
-	* writes loop data to the layer in model units with profile overrides.
+	* writes loop data to the layer in model units with profile modification factors.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataCount - Number of elements in buffer
 	* @param[in] pPointDataBuffer - Position2D buffer of The point data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFPosition2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFPosition2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
-	* writes loop data to the layer in toolpath units with profile overrides..
+	* writes loop data to the layer in toolpath units with profile modification factors..
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataCount - Number of elements in buffer
 	* @param[in] pPointDataBuffer - DiscretePosition2D buffer of The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
 	* writes polyline data to the layer.
@@ -7625,18 +7596,18 @@ type
 	TLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFPosition2D): TLib3MFResult; cdecl;
 	
 	(**
-	* writes polyline data to the layer with profile overrides.
+	* writes polyline data to the layer with profile modification factors.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataCount - Number of elements in buffer
 	* @param[in] pPointDataBuffer - Position2D buffer of The point data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFPosition2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFPosition2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
 	* writes polyline data to the layer.
@@ -7651,18 +7622,18 @@ type
 	TLib3MFToolpathLayerData_WritePolylineDiscreteFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D): TLib3MFResult; cdecl;
 	
 	(**
-	* writes polyline data to the layer with profile overrides.
+	* writes polyline data to the layer with profile modification factors.
 	*
 	* @param[in] pToolpathLayerData - ToolpathLayerData instance.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataCount - Number of elements in buffer
 	* @param[in] pPointDataBuffer - DiscretePosition2D buffer of The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataCount - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - double buffer of The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] nFactorDataCount - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - double buffer of The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D; const nScalingDataCount: QWord; const pScalingDataBuffer: PDouble): TLib3MFResult; cdecl;
+	TLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc = function(pToolpathLayerData: TLib3MFHandle; const nProfileID: Cardinal; const nPartID: Cardinal; const nPointDataCount: QWord; const pPointDataBuffer: PLib3MFDiscretePosition2D; const nFactorDataCount: QWord; const pFactorDataBuffer: PDouble): TLib3MFResult; cdecl;
 	
 	(**
 	* Adds a custom data DOM tree to the layer. Layer MUST not be finished when changing the DOM tree.
@@ -11331,13 +11302,13 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		procedure RemoveParameter(const ANameSpaceName: String; const AValueName: String);
 		function GetModifierCount(): Cardinal;
 		function GetModifierNameByIndex(const AIndex: Cardinal): String;
+		function GetModifierTypeByIndex(const AIndex: Cardinal): TLib3MFToolpathProfileModificationType;
 		function GetModifierNameSpaceByIndex(const AIndex: Cardinal): String;
 		function HasModifier(const ANameSpaceName: String; const AValueName: String): Boolean;
-		procedure GetModifierInformationByIndex(const AIndex: Cardinal; out ANameSpaceName: String; out AValueName: String; out AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ADeltaValue0: Double; out ADeltaValue1: Double);
-		procedure GetModifierInformationByName(const ANameSpaceName: String; const AValueName: String; out AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ADeltaValue0: Double; out ADeltaValue1: Double);
-		procedure SetModifier(const ANameSpaceName: String; const AValueName: String; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; const ADeltaValue0: Double; const ADeltaValue1: Double);
+		procedure GetModifierInformationByIndex(const AIndex: Cardinal; out ANameSpaceName: String; out AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
+		procedure GetModifierInformationByName(const ANameSpaceName: String; const AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
+		procedure SetModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
 		procedure RemoveModifier(const ANameSpaceName: String; const AValueName: String);
-		function EvaluateDoubleValue(const ANameSpaceName: String; const AValueName: String; const AFactorF: Double; const AFactorG: Double; const AFactorH: Double): Double;
 	end;
 
 
@@ -11373,17 +11344,16 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		function GetSegmentDefaultProfileUUID(const ASegmentIndex: Cardinal): String;
 		function GetSegmentDefaultProfileID(const ASegmentIndex: Cardinal): Cardinal;
 		function GetProfileUUIDByLocalProfileID(const ALocalProfileID: Cardinal): String;
-		function SegmentHasOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor): Boolean;
-		function SegmentHasUniformProfile(const ASegmentIndex: Cardinal): Boolean;
+		function SegmentHasModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor): Boolean;
 		procedure GetSegmentPointDataInModelUnits(const ASegmentIndex: Cardinal; out APointData: ArrayOfLib3MFPosition2D);
 		procedure GetSegmentPointDataDiscrete(const ASegmentIndex: Cardinal; out APointData: ArrayOfLib3MFDiscretePosition2D);
-		procedure GetSegmentPointOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: TDoubleDynArray);
+		procedure GetSegmentPointModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: TDoubleDynArray);
 		procedure GetSegmentHatchDataInModelUnits(const ASegmentIndex: Cardinal; out AHatchData: ArrayOfLib3MFHatch2D);
 		procedure GetSegmentHatchDataDiscrete(const ASegmentIndex: Cardinal; out AHatchData: ArrayOfLib3MFDiscreteHatch2D);
-		procedure GetLinearSegmentHatchOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: ArrayOfLib3MFHatch2DOverrides);
-		function SegmentHasNonlinearHatchOverrideInterpolation(const ASegmentIndex: Cardinal): Boolean;
-		procedure GetSegmentNonlinearHatchOverrideInterpolation(const ASegmentIndex: Cardinal; const AHatchIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: ArrayOfLib3MFHatchOverrideInterpolationData);
-		procedure GetSegmentAllNonlinearHatchesOverrideInterpolation(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ACountArray: TCardinalDynArray; out AFactorValues: ArrayOfLib3MFHatchOverrideInterpolationData);
+		procedure GetLinearSegmentHatchModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: ArrayOfLib3MFHatch2DFactors);
+		function SegmentHasNonlinearHatchModificationInterpolation(const ASegmentIndex: Cardinal): Boolean;
+		procedure GetSegmentNonlinearHatchModificationInterpolation(const ASegmentIndex: Cardinal; const AHatchIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: ArrayOfLib3MFHatchModificationInterpolationData);
+		procedure GetSegmentAllNonlinearHatchesModificationInterpolation(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out ACountArray: TCardinalDynArray; out AFactorValues: ArrayOfLib3MFHatchModificationInterpolationData);
 	end;
 
 
@@ -11402,24 +11372,22 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		procedure ClearSegmentAttributes();
 		procedure SetLaserIndex(const AValue: Cardinal);
 		procedure ClearLaserIndex();
-		procedure SetOverrideFraction(const AValue: Cardinal);
-		function GetOverrideFraction(): Cardinal;
 		procedure WriteHatchDataInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D);
-		procedure WriteHatchDataInModelUnitsWithConstantOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData: TDoubleDynArray);
-		procedure WriteHatchDataInModelUnitsWithLinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray);
-		procedure WriteHatchDataInModelUnitsWithNonlinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AOverrideInterpolationData: ArrayOfLib3MFHatchOverrideInterpolationData);
+		procedure WriteHatchDataInModelUnitsWithConstantFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData: TDoubleDynArray);
+		procedure WriteHatchDataInModelUnitsWithLinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray);
+		procedure WriteHatchDataInModelUnitsWithNonlinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AModificationInterpolationData: ArrayOfLib3MFHatchModificationInterpolationData);
 		procedure WriteHatchDataDiscrete(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D);
-		procedure WriteHatchDataDiscreteWithConstantOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData: TDoubleDynArray);
-		procedure WriteHatchDataDiscreteWithLinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray);
-		procedure WriteHatchDataDiscreteWithNonlinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AOverrideInterpolationData: ArrayOfLib3MFHatchOverrideInterpolationData);
+		procedure WriteHatchDataDiscreteWithConstantFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AFactorData: TDoubleDynArray);
+		procedure WriteHatchDataDiscreteWithLinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray);
+		procedure WriteHatchDataDiscreteWithNonlinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AModificationInterpolationData: ArrayOfLib3MFHatchModificationInterpolationData);
 		procedure WriteLoopInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D);
 		procedure WriteLoopDiscrete(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D);
-		procedure WriteLoopInModelUnitsWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AScalingData: TDoubleDynArray);
-		procedure WriteLoopDiscreteWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AScalingData: TDoubleDynArray);
+		procedure WriteLoopInModelUnitsWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AFactorData: TDoubleDynArray);
+		procedure WriteLoopDiscreteWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AFactorData: TDoubleDynArray);
 		procedure WritePolylineInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D);
-		procedure WritePolylineInModelUnitsWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AScalingData: TDoubleDynArray);
+		procedure WritePolylineInModelUnitsWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AFactorData: TDoubleDynArray);
 		procedure WritePolylineDiscrete(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D);
-		procedure WritePolylineDiscreteWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AScalingData: TDoubleDynArray);
+		procedure WritePolylineDiscreteWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AFactorData: TDoubleDynArray);
 		function AddCustomData(const ANameSpace: String; const ADataName: String): TLib3MFCustomDOMTree;
 		procedure Finish();
 	end;
@@ -12260,13 +12228,13 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFToolpathProfile_RemoveParameterFunc: TLib3MFToolpathProfile_RemoveParameterFunc;
 		FLib3MFToolpathProfile_GetModifierCountFunc: TLib3MFToolpathProfile_GetModifierCountFunc;
 		FLib3MFToolpathProfile_GetModifierNameByIndexFunc: TLib3MFToolpathProfile_GetModifierNameByIndexFunc;
+		FLib3MFToolpathProfile_GetModifierTypeByIndexFunc: TLib3MFToolpathProfile_GetModifierTypeByIndexFunc;
 		FLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc: TLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc;
 		FLib3MFToolpathProfile_HasModifierFunc: TLib3MFToolpathProfile_HasModifierFunc;
 		FLib3MFToolpathProfile_GetModifierInformationByIndexFunc: TLib3MFToolpathProfile_GetModifierInformationByIndexFunc;
 		FLib3MFToolpathProfile_GetModifierInformationByNameFunc: TLib3MFToolpathProfile_GetModifierInformationByNameFunc;
 		FLib3MFToolpathProfile_SetModifierFunc: TLib3MFToolpathProfile_SetModifierFunc;
 		FLib3MFToolpathProfile_RemoveModifierFunc: TLib3MFToolpathProfile_RemoveModifierFunc;
-		FLib3MFToolpathProfile_EvaluateDoubleValueFunc: TLib3MFToolpathProfile_EvaluateDoubleValueFunc;
 		FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc: TLib3MFToolpathLayerReader_GetLayerDataUUIDFunc;
 		FLib3MFToolpathLayerReader_GetCustomDataCountFunc: TLib3MFToolpathLayerReader_GetCustomDataCountFunc;
 		FLib3MFToolpathLayerReader_GetCustomDataFunc: TLib3MFToolpathLayerReader_GetCustomDataFunc;
@@ -12291,17 +12259,16 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc: TLib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc;
 		FLib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc: TLib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc;
 		FLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc: TLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc;
-		FLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc: TLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc;
-		FLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc: TLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc;
+		FLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc: TLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc;
 		FLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc: TLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc;
 		FLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc: TLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc;
-		FLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc: TLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc;
+		FLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc: TLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc;
 		FLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc: TLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc;
 		FLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc: TLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc;
-		FLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc: TLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc;
-		FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc: TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc;
-		FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc;
-		FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc;
+		FLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc: TLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc;
+		FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc: TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc;
+		FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc;
+		FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc;
 		FLib3MFToolpathLayerData_GetLayerDataUUIDFunc: TLib3MFToolpathLayerData_GetLayerDataUUIDFunc;
 		FLib3MFToolpathLayerData_RegisterProfileFunc: TLib3MFToolpathLayerData_RegisterProfileFunc;
 		FLib3MFToolpathLayerData_RegisterBuildItemFunc: TLib3MFToolpathLayerData_RegisterBuildItemFunc;
@@ -12309,24 +12276,22 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFToolpathLayerData_ClearSegmentAttributesFunc: TLib3MFToolpathLayerData_ClearSegmentAttributesFunc;
 		FLib3MFToolpathLayerData_SetLaserIndexFunc: TLib3MFToolpathLayerData_SetLaserIndexFunc;
 		FLib3MFToolpathLayerData_ClearLaserIndexFunc: TLib3MFToolpathLayerData_ClearLaserIndexFunc;
-		FLib3MFToolpathLayerData_SetOverrideFractionFunc: TLib3MFToolpathLayerData_SetOverrideFractionFunc;
-		FLib3MFToolpathLayerData_GetOverrideFractionFunc: TLib3MFToolpathLayerData_GetOverrideFractionFunc;
 		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc;
 		FLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc;
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc;
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc;
 		FLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc;
 		FLib3MFToolpathLayerData_WriteLoopDiscreteFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteFunc;
-		FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc;
-		FLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc;
+		FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc;
+		FLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc;
 		FLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc;
-		FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc;
+		FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc;
 		FLib3MFToolpathLayerData_WritePolylineDiscreteFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteFunc;
-		FLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc;
+		FLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc;
 		FLib3MFToolpathLayerData_AddCustomDataFunc: TLib3MFToolpathLayerData_AddCustomDataFunc;
 		FLib3MFToolpathLayerData_FinishFunc: TLib3MFToolpathLayerData_FinishFunc;
 		FLib3MFToolpath_GetUUIDFunc: TLib3MFToolpath_GetUUIDFunc;
@@ -13077,13 +13042,13 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFToolpathProfile_RemoveParameterFunc: TLib3MFToolpathProfile_RemoveParameterFunc read FLib3MFToolpathProfile_RemoveParameterFunc;
 		property Lib3MFToolpathProfile_GetModifierCountFunc: TLib3MFToolpathProfile_GetModifierCountFunc read FLib3MFToolpathProfile_GetModifierCountFunc;
 		property Lib3MFToolpathProfile_GetModifierNameByIndexFunc: TLib3MFToolpathProfile_GetModifierNameByIndexFunc read FLib3MFToolpathProfile_GetModifierNameByIndexFunc;
+		property Lib3MFToolpathProfile_GetModifierTypeByIndexFunc: TLib3MFToolpathProfile_GetModifierTypeByIndexFunc read FLib3MFToolpathProfile_GetModifierTypeByIndexFunc;
 		property Lib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc: TLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc read FLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc;
 		property Lib3MFToolpathProfile_HasModifierFunc: TLib3MFToolpathProfile_HasModifierFunc read FLib3MFToolpathProfile_HasModifierFunc;
 		property Lib3MFToolpathProfile_GetModifierInformationByIndexFunc: TLib3MFToolpathProfile_GetModifierInformationByIndexFunc read FLib3MFToolpathProfile_GetModifierInformationByIndexFunc;
 		property Lib3MFToolpathProfile_GetModifierInformationByNameFunc: TLib3MFToolpathProfile_GetModifierInformationByNameFunc read FLib3MFToolpathProfile_GetModifierInformationByNameFunc;
 		property Lib3MFToolpathProfile_SetModifierFunc: TLib3MFToolpathProfile_SetModifierFunc read FLib3MFToolpathProfile_SetModifierFunc;
 		property Lib3MFToolpathProfile_RemoveModifierFunc: TLib3MFToolpathProfile_RemoveModifierFunc read FLib3MFToolpathProfile_RemoveModifierFunc;
-		property Lib3MFToolpathProfile_EvaluateDoubleValueFunc: TLib3MFToolpathProfile_EvaluateDoubleValueFunc read FLib3MFToolpathProfile_EvaluateDoubleValueFunc;
 		property Lib3MFToolpathLayerReader_GetLayerDataUUIDFunc: TLib3MFToolpathLayerReader_GetLayerDataUUIDFunc read FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc;
 		property Lib3MFToolpathLayerReader_GetCustomDataCountFunc: TLib3MFToolpathLayerReader_GetCustomDataCountFunc read FLib3MFToolpathLayerReader_GetCustomDataCountFunc;
 		property Lib3MFToolpathLayerReader_GetCustomDataFunc: TLib3MFToolpathLayerReader_GetCustomDataFunc read FLib3MFToolpathLayerReader_GetCustomDataFunc;
@@ -13108,17 +13073,16 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc: TLib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc read FLib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc;
 		property Lib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc: TLib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc read FLib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc;
 		property Lib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc: TLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc read FLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc;
-		property Lib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc: TLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc read FLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc;
-		property Lib3MFToolpathLayerReader_SegmentHasUniformProfileFunc: TLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc read FLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc;
+		property Lib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc: TLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc read FLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc;
 		property Lib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc: TLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc read FLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc;
 		property Lib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc: TLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc read FLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc;
-		property Lib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc: TLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc read FLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc;
+		property Lib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc: TLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc read FLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc;
 		property Lib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc: TLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc read FLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc;
 		property Lib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc: TLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc read FLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc;
-		property Lib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc: TLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc read FLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc;
-		property Lib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc: TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc read FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc;
-		property Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc read FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc;
-		property Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc read FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc;
+		property Lib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc: TLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc read FLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc;
+		property Lib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc: TLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc read FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc;
+		property Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc read FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc;
+		property Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc: TLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc read FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc;
 		property Lib3MFToolpathLayerData_GetLayerDataUUIDFunc: TLib3MFToolpathLayerData_GetLayerDataUUIDFunc read FLib3MFToolpathLayerData_GetLayerDataUUIDFunc;
 		property Lib3MFToolpathLayerData_RegisterProfileFunc: TLib3MFToolpathLayerData_RegisterProfileFunc read FLib3MFToolpathLayerData_RegisterProfileFunc;
 		property Lib3MFToolpathLayerData_RegisterBuildItemFunc: TLib3MFToolpathLayerData_RegisterBuildItemFunc read FLib3MFToolpathLayerData_RegisterBuildItemFunc;
@@ -13126,24 +13090,22 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFToolpathLayerData_ClearSegmentAttributesFunc: TLib3MFToolpathLayerData_ClearSegmentAttributesFunc read FLib3MFToolpathLayerData_ClearSegmentAttributesFunc;
 		property Lib3MFToolpathLayerData_SetLaserIndexFunc: TLib3MFToolpathLayerData_SetLaserIndexFunc read FLib3MFToolpathLayerData_SetLaserIndexFunc;
 		property Lib3MFToolpathLayerData_ClearLaserIndexFunc: TLib3MFToolpathLayerData_ClearLaserIndexFunc read FLib3MFToolpathLayerData_ClearLaserIndexFunc;
-		property Lib3MFToolpathLayerData_SetOverrideFractionFunc: TLib3MFToolpathLayerData_SetOverrideFractionFunc read FLib3MFToolpathLayerData_SetOverrideFractionFunc;
-		property Lib3MFToolpathLayerData_GetOverrideFractionFunc: TLib3MFToolpathLayerData_GetOverrideFractionFunc read FLib3MFToolpathLayerData_GetOverrideFractionFunc;
 		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc;
 		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc;
-		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc;
+		property Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc: TLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc read FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc;
 		property Lib3MFToolpathLayerData_WriteLoopInModelUnitsFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc read FLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc;
 		property Lib3MFToolpathLayerData_WriteLoopDiscreteFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteFunc read FLib3MFToolpathLayerData_WriteLoopDiscreteFunc;
-		property Lib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc read FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc;
-		property Lib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc read FLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc;
+		property Lib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc: TLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc read FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc;
+		property Lib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc: TLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc read FLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc;
 		property Lib3MFToolpathLayerData_WritePolylineInModelUnitsFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc read FLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc;
-		property Lib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc read FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc;
+		property Lib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc: TLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc read FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc;
 		property Lib3MFToolpathLayerData_WritePolylineDiscreteFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteFunc read FLib3MFToolpathLayerData_WritePolylineDiscreteFunc;
-		property Lib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc read FLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc;
+		property Lib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc: TLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc read FLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc;
 		property Lib3MFToolpathLayerData_AddCustomDataFunc: TLib3MFToolpathLayerData_AddCustomDataFunc read FLib3MFToolpathLayerData_AddCustomDataFunc;
 		property Lib3MFToolpathLayerData_FinishFunc: TLib3MFToolpathLayerData_FinishFunc read FLib3MFToolpathLayerData_FinishFunc;
 		property Lib3MFToolpath_GetUUIDFunc: TLib3MFToolpath_GetUUIDFunc read FLib3MFToolpath_GetUUIDFunc;
@@ -13387,8 +13349,10 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 	function convertConstToChannelName(const AValue: Integer): TLib3MFChannelName;
 	function convertToolpathAttributeTypeToConst(const AValue: TLib3MFToolpathAttributeType): Integer;
 	function convertConstToToolpathAttributeType(const AValue: Integer): TLib3MFToolpathAttributeType;
-	function convertToolpathProfileOverrideFactorToConst(const AValue: TLib3MFToolpathProfileOverrideFactor): Integer;
-	function convertConstToToolpathProfileOverrideFactor(const AValue: Integer): TLib3MFToolpathProfileOverrideFactor;
+	function convertToolpathProfileModificationFactorToConst(const AValue: TLib3MFToolpathProfileModificationFactor): Integer;
+	function convertConstToToolpathProfileModificationFactor(const AValue: Integer): TLib3MFToolpathProfileModificationFactor;
+	function convertToolpathProfileModificationTypeToConst(const AValue: TLib3MFToolpathProfileModificationType): Integer;
+	function convertConstToToolpathProfileModificationType(const AValue: Integer): TLib3MFToolpathProfileModificationType;
 	function convertCompositionMethodToConst(const AValue: TLib3MFCompositionMethod): Integer;
 	function convertConstToCompositionMethod(const AValue: Integer): TLib3MFCompositionMethod;
 	function convertCompositionSpaceToConst(const AValue: TLib3MFCompositionSpace): Integer;
@@ -14006,25 +13970,50 @@ implementation
 	end;
 	
 	
-	function convertToolpathProfileOverrideFactorToConst(const AValue: TLib3MFToolpathProfileOverrideFactor): Integer;
+	function convertToolpathProfileModificationFactorToConst(const AValue: TLib3MFToolpathProfileModificationFactor): Integer;
 	begin
 		case AValue of
-			eToolpathProfileOverrideFactorUnknown: Result := 0;
-			eToolpathProfileOverrideFactorFactorF: Result := 1;
-			eToolpathProfileOverrideFactorFactorG: Result := 2;
-			eToolpathProfileOverrideFactorFactorH: Result := 3;
+			eToolpathProfileModificationFactorUnknown: Result := 0;
+			eToolpathProfileModificationFactorFactorF: Result := 1;
+			eToolpathProfileModificationFactorFactorG: Result := 2;
+			eToolpathProfileModificationFactorFactorH: Result := 3;
 			else 
 				raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'invalid enum value');
 		end;
 	end;
 	
-	function convertConstToToolpathProfileOverrideFactor(const AValue: Integer): TLib3MFToolpathProfileOverrideFactor;
+	function convertConstToToolpathProfileModificationFactor(const AValue: Integer): TLib3MFToolpathProfileModificationFactor;
 	begin
 		case AValue of
-			0: Result := eToolpathProfileOverrideFactorUnknown;
-			1: Result := eToolpathProfileOverrideFactorFactorF;
-			2: Result := eToolpathProfileOverrideFactorFactorG;
-			3: Result := eToolpathProfileOverrideFactorFactorH;
+			0: Result := eToolpathProfileModificationFactorUnknown;
+			1: Result := eToolpathProfileModificationFactorFactorF;
+			2: Result := eToolpathProfileModificationFactorFactorG;
+			3: Result := eToolpathProfileModificationFactorFactorH;
+			else 
+				raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'invalid enum constant');
+		end;
+	end;
+	
+	
+	function convertToolpathProfileModificationTypeToConst(const AValue: TLib3MFToolpathProfileModificationType): Integer;
+	begin
+		case AValue of
+			eToolpathProfileModificationTypeNoModification: Result := 0;
+			eToolpathProfileModificationTypeConstantModification: Result := 1;
+			eToolpathProfileModificationTypeLinearModification: Result := 2;
+			eToolpathProfileModificationTypeNonlinearModification: Result := 3;
+			else 
+				raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'invalid enum value');
+		end;
+	end;
+	
+	function convertConstToToolpathProfileModificationType(const AValue: Integer): TLib3MFToolpathProfileModificationType;
+	begin
+		case AValue of
+			0: Result := eToolpathProfileModificationTypeNoModification;
+			1: Result := eToolpathProfileModificationTypeConstantModification;
+			2: Result := eToolpathProfileModificationTypeLinearModification;
+			3: Result := eToolpathProfileModificationTypeNonlinearModification;
 			else 
 				raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'invalid enum constant');
 		end;
@@ -21833,6 +21822,15 @@ implementation
 		Result := StrPas(@bufferName[0]);
 	end;
 
+	function TLib3MFToolpathProfile.GetModifierTypeByIndex(const AIndex: Cardinal): TLib3MFToolpathProfileModificationType;
+	var
+		ResultModifierType: Integer;
+	begin
+		ResultModifierType := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierTypeByIndexFunc(FHandle, AIndex, ResultModifierType));
+		Result := convertConstToToolpathProfileModificationType(ResultModifierType);
+	end;
+
 	function TLib3MFToolpathProfile.GetModifierNameSpaceByIndex(const AIndex: Cardinal): String;
 	var
 		bytesNeededNameSpace: Cardinal;
@@ -21856,7 +21854,7 @@ implementation
 		Result := (ResultValueExists <> 0);
 	end;
 
-	procedure TLib3MFToolpathProfile.GetModifierInformationByIndex(const AIndex: Cardinal; out ANameSpaceName: String; out AValueName: String; out AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ADeltaValue0: Double; out ADeltaValue1: Double);
+	procedure TLib3MFToolpathProfile.GetModifierInformationByIndex(const AIndex: Cardinal; out ANameSpaceName: String; out AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
 	var
 		bytesNeededNameSpaceName: Cardinal;
 		bytesWrittenNameSpaceName: Cardinal;
@@ -21864,44 +21862,45 @@ implementation
 		bytesNeededValueName: Cardinal;
 		bytesWrittenValueName: Cardinal;
 		bufferValueName: array of Char;
-		ResultOverrideFactor: Integer;
+		ResultModifierType: Integer;
+		ResultModificationFactor: Integer;
 	begin
 		bytesNeededNameSpaceName:= 0;
 		bytesWrittenNameSpaceName:= 0;
 		bytesNeededValueName:= 0;
 		bytesWrittenValueName:= 0;
-		ResultOverrideFactor := 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByIndexFunc(FHandle, AIndex, 0, bytesNeededNameSpaceName, nil, 0, bytesNeededValueName, nil, ResultOverrideFactor, ADeltaValue0, ADeltaValue1));
+		ResultModifierType := 0;
+		ResultModificationFactor := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByIndexFunc(FHandle, AIndex, 0, bytesNeededNameSpaceName, nil, 0, bytesNeededValueName, nil, ResultModifierType, ResultModificationFactor, AMinValue, AMaxValue));
 		SetLength(bufferNameSpaceName, bytesNeededNameSpaceName);
 		SetLength(bufferValueName, bytesNeededValueName);
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByIndexFunc(FHandle, AIndex, bytesNeededNameSpaceName, bytesWrittenNameSpaceName, @bufferNameSpaceName[0], bytesNeededValueName, bytesWrittenValueName, @bufferValueName[0], ResultOverrideFactor, ADeltaValue0, ADeltaValue1));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByIndexFunc(FHandle, AIndex, bytesNeededNameSpaceName, bytesWrittenNameSpaceName, @bufferNameSpaceName[0], bytesNeededValueName, bytesWrittenValueName, @bufferValueName[0], ResultModifierType, ResultModificationFactor, AMinValue, AMaxValue));
 		ANameSpaceName := StrPas(@bufferNameSpaceName[0]);
 		AValueName := StrPas(@bufferValueName[0]);
-		AOverrideFactor := convertConstToToolpathProfileOverrideFactor(ResultOverrideFactor);
+		AModifierType := convertConstToToolpathProfileModificationType(ResultModifierType);
+		AModificationFactor := convertConstToToolpathProfileModificationFactor(ResultModificationFactor);
 	end;
 
-	procedure TLib3MFToolpathProfile.GetModifierInformationByName(const ANameSpaceName: String; const AValueName: String; out AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ADeltaValue0: Double; out ADeltaValue1: Double);
+	procedure TLib3MFToolpathProfile.GetModifierInformationByName(const ANameSpaceName: String; const AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
 	var
-		ResultOverrideFactor: Integer;
+		ResultModifierType: Integer;
+		ResultModificationFactor: Integer;
 	begin
-		ResultOverrideFactor := 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByNameFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), ResultOverrideFactor, ADeltaValue0, ADeltaValue1));
-		AOverrideFactor := convertConstToToolpathProfileOverrideFactor(ResultOverrideFactor);
+		ResultModifierType := 0;
+		ResultModificationFactor := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_GetModifierInformationByNameFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), ResultModifierType, ResultModificationFactor, AMinValue, AMaxValue));
+		AModifierType := convertConstToToolpathProfileModificationType(ResultModifierType);
+		AModificationFactor := convertConstToToolpathProfileModificationFactor(ResultModificationFactor);
 	end;
 
-	procedure TLib3MFToolpathProfile.SetModifier(const ANameSpaceName: String; const AValueName: String; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; const ADeltaValue0: Double; const ADeltaValue1: Double);
+	procedure TLib3MFToolpathProfile.SetModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
 	begin
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_SetModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), convertToolpathProfileOverrideFactorToConst(AOverrideFactor), ADeltaValue0, ADeltaValue1));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_SetModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), convertToolpathProfileModificationTypeToConst(AModifierType), convertToolpathProfileModificationFactorToConst(AModificationFactor), AMinValue, AMaxValue));
 	end;
 
 	procedure TLib3MFToolpathProfile.RemoveModifier(const ANameSpaceName: String; const AValueName: String);
 	begin
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_RemoveModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName)));
-	end;
-
-	function TLib3MFToolpathProfile.EvaluateDoubleValue(const ANameSpaceName: String; const AValueName: String; const AFactorF: Double; const AFactorG: Double; const AFactorH: Double): Double;
-	begin
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_EvaluateDoubleValueFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), AFactorF, AFactorG, AFactorH, Result));
 	end;
 
 (*************************************************************************************************************************
@@ -22144,22 +22143,13 @@ implementation
 		Result := StrPas(@bufferProfileUUID[0]);
 	end;
 
-	function TLib3MFToolpathLayerReader.SegmentHasOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor): Boolean;
+	function TLib3MFToolpathLayerReader.SegmentHasModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor): Boolean;
 	var
-		ResultHasOverrides: Byte;
+		ResultHasModificationFactors: Byte;
 	begin
-		ResultHasOverrides := 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), ResultHasOverrides));
-		Result := (ResultHasOverrides <> 0);
-	end;
-
-	function TLib3MFToolpathLayerReader.SegmentHasUniformProfile(const ASegmentIndex: Cardinal): Boolean;
-	var
-		ResultHasUniformProfile: Byte;
-	begin
-		ResultHasUniformProfile := 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_SegmentHasUniformProfileFunc(FHandle, ASegmentIndex, ResultHasUniformProfile));
-		Result := (ResultHasUniformProfile <> 0);
+		ResultHasModificationFactors := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), ResultHasModificationFactors));
+		Result := (ResultHasModificationFactors <> 0);
 	end;
 
 	procedure TLib3MFToolpathLayerReader.GetSegmentPointDataInModelUnits(const ASegmentIndex: Cardinal; out APointData: ArrayOfLib3MFPosition2D);
@@ -22186,16 +22176,16 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc(FHandle, ASegmentIndex, countNeededPointData, countWrittenPointData, @APointData[0]));
 	end;
 
-	procedure TLib3MFToolpathLayerReader.GetSegmentPointOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerReader.GetSegmentPointModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: TDoubleDynArray);
 	var
 		countNeededFactorValues: QWord;
 		countWrittenFactorValues: QWord;
 	begin
 		countNeededFactorValues:= 0;
 		countWrittenFactorValues:= 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), 0, countNeededFactorValues, nil));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), 0, countNeededFactorValues, nil));
 		SetLength(AFactorValues, countNeededFactorValues);
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
 	end;
 
 	procedure TLib3MFToolpathLayerReader.GetSegmentHatchDataInModelUnits(const ASegmentIndex: Cardinal; out AHatchData: ArrayOfLib3MFHatch2D);
@@ -22222,40 +22212,40 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc(FHandle, ASegmentIndex, countNeededHatchData, countWrittenHatchData, @AHatchData[0]));
 	end;
 
-	procedure TLib3MFToolpathLayerReader.GetLinearSegmentHatchOverrideFactors(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: ArrayOfLib3MFHatch2DOverrides);
+	procedure TLib3MFToolpathLayerReader.GetLinearSegmentHatchModificationFactors(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: ArrayOfLib3MFHatch2DFactors);
 	var
 		countNeededFactorValues: QWord;
 		countWrittenFactorValues: QWord;
 	begin
 		countNeededFactorValues:= 0;
 		countWrittenFactorValues:= 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), 0, countNeededFactorValues, nil));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), 0, countNeededFactorValues, nil));
 		SetLength(AFactorValues, countNeededFactorValues);
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
 	end;
 
-	function TLib3MFToolpathLayerReader.SegmentHasNonlinearHatchOverrideInterpolation(const ASegmentIndex: Cardinal): Boolean;
+	function TLib3MFToolpathLayerReader.SegmentHasNonlinearHatchModificationInterpolation(const ASegmentIndex: Cardinal): Boolean;
 	var
-		ResultHasOverrideInterpolation: Byte;
+		ResultHasModificationInterpolation: Byte;
 	begin
-		ResultHasOverrideInterpolation := 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc(FHandle, ASegmentIndex, ResultHasOverrideInterpolation));
-		Result := (ResultHasOverrideInterpolation <> 0);
+		ResultHasModificationInterpolation := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc(FHandle, ASegmentIndex, ResultHasModificationInterpolation));
+		Result := (ResultHasModificationInterpolation <> 0);
 	end;
 
-	procedure TLib3MFToolpathLayerReader.GetSegmentNonlinearHatchOverrideInterpolation(const ASegmentIndex: Cardinal; const AHatchIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out AFactorValues: ArrayOfLib3MFHatchOverrideInterpolationData);
+	procedure TLib3MFToolpathLayerReader.GetSegmentNonlinearHatchModificationInterpolation(const ASegmentIndex: Cardinal; const AHatchIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AFactorValues: ArrayOfLib3MFHatchModificationInterpolationData);
 	var
 		countNeededFactorValues: QWord;
 		countWrittenFactorValues: QWord;
 	begin
 		countNeededFactorValues:= 0;
 		countWrittenFactorValues:= 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc(FHandle, ASegmentIndex, AHatchIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), 0, countNeededFactorValues, nil));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc(FHandle, ASegmentIndex, AHatchIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), 0, countNeededFactorValues, nil));
 		SetLength(AFactorValues, countNeededFactorValues);
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc(FHandle, ASegmentIndex, AHatchIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc(FHandle, ASegmentIndex, AHatchIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
 	end;
 
-	procedure TLib3MFToolpathLayerReader.GetSegmentAllNonlinearHatchesOverrideInterpolation(const ASegmentIndex: Cardinal; const AOverrideFactor: TLib3MFToolpathProfileOverrideFactor; out ACountArray: TCardinalDynArray; out AFactorValues: ArrayOfLib3MFHatchOverrideInterpolationData);
+	procedure TLib3MFToolpathLayerReader.GetSegmentAllNonlinearHatchesModificationInterpolation(const ASegmentIndex: Cardinal; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; out ACountArray: TCardinalDynArray; out AFactorValues: ArrayOfLib3MFHatchModificationInterpolationData);
 	var
 		countNeededCountArray: QWord;
 		countWrittenCountArray: QWord;
@@ -22266,10 +22256,10 @@ implementation
 		countWrittenCountArray:= 0;
 		countNeededFactorValues:= 0;
 		countWrittenFactorValues:= 0;
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), 0, countNeededCountArray, nil, 0, countNeededFactorValues, nil));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), 0, countNeededCountArray, nil, 0, countNeededFactorValues, nil));
 		SetLength(ACountArray, countNeededCountArray);
 		SetLength(AFactorValues, countNeededFactorValues);
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc(FHandle, ASegmentIndex, convertToolpathProfileOverrideFactorToConst(AOverrideFactor), countNeededCountArray, countWrittenCountArray, @ACountArray[0], countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc(FHandle, ASegmentIndex, convertToolpathProfileModificationFactorToConst(AModificationFactor), countNeededCountArray, countWrittenCountArray, @ACountArray[0], countNeededFactorValues, countWrittenFactorValues, @AFactorValues[0]));
 	end;
 
 (*************************************************************************************************************************
@@ -22342,16 +22332,6 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_ClearLaserIndexFunc(FHandle));
 	end;
 
-	procedure TLib3MFToolpathLayerData.SetOverrideFraction(const AValue: Cardinal);
-	begin
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_SetOverrideFractionFunc(FHandle, AValue));
-	end;
-
-	function TLib3MFToolpathLayerData.GetOverrideFraction(): Cardinal;
-	begin
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_GetOverrideFractionFunc(FHandle, Result));
-	end;
-
 	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D);
 	var
 		PtrHatchData: PLib3MFHatch2D;
@@ -22368,12 +22348,12 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithConstantOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithConstantFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrHatchData: PLib3MFHatch2D;
 		LenHatchData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22383,25 +22363,25 @@ implementation
 		else
 			PtrHatchData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenFactorData), PtrFactorData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithLinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithLinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray);
 	var
 		PtrHatchData: PLib3MFHatch2D;
 		LenHatchData: QWord;
-		PtrScalingData1: PDouble;
-		LenScalingData1: QWord;
-		PtrScalingData2: PDouble;
-		LenScalingData2: QWord;
+		PtrFactorData1: PDouble;
+		LenFactorData1: QWord;
+		PtrFactorData2: PDouble;
+		LenFactorData2: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22411,37 +22391,37 @@ implementation
 		else
 			PtrHatchData := nil;
 		
-		LenScalingData1 := Length(AScalingData1);
-		if LenScalingData1 > $FFFFFFFF then
+		LenFactorData1 := Length(AFactorData1);
+		if LenFactorData1 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData1 > 0 then
-			PtrScalingData1 := @AScalingData1[0]
+		if LenFactorData1 > 0 then
+			PtrFactorData1 := @AFactorData1[0]
 		else
-			PtrScalingData1 := nil;
+			PtrFactorData1 := nil;
 		
-		LenScalingData2 := Length(AScalingData2);
-		if LenScalingData2 > $FFFFFFFF then
+		LenFactorData2 := Length(AFactorData2);
+		if LenFactorData2 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData2 > 0 then
-			PtrScalingData2 := @AScalingData2[0]
+		if LenFactorData2 > 0 then
+			PtrFactorData2 := @AFactorData2[0]
 		else
-			PtrScalingData2 := nil;
+			PtrFactorData2 := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData1), PtrScalingData1, QWord(LenScalingData2), PtrScalingData2));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenFactorData1), PtrFactorData1, QWord(LenFactorData2), PtrFactorData2));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithNonlinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AOverrideInterpolationData: ArrayOfLib3MFHatchOverrideInterpolationData);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataInModelUnitsWithNonlinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AModificationInterpolationData: ArrayOfLib3MFHatchModificationInterpolationData);
 	var
 		PtrHatchData: PLib3MFHatch2D;
 		LenHatchData: QWord;
-		PtrScalingData1: PDouble;
-		LenScalingData1: QWord;
-		PtrScalingData2: PDouble;
-		LenScalingData2: QWord;
+		PtrFactorData1: PDouble;
+		LenFactorData1: QWord;
+		PtrFactorData2: PDouble;
+		LenFactorData2: QWord;
 		PtrSubInterpolationCounts: PCardinal;
 		LenSubInterpolationCounts: QWord;
-		PtrOverrideInterpolationData: PLib3MFHatchOverrideInterpolationData;
-		LenOverrideInterpolationData: QWord;
+		PtrModificationInterpolationData: PLib3MFHatchModificationInterpolationData;
+		LenModificationInterpolationData: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22451,21 +22431,21 @@ implementation
 		else
 			PtrHatchData := nil;
 		
-		LenScalingData1 := Length(AScalingData1);
-		if LenScalingData1 > $FFFFFFFF then
+		LenFactorData1 := Length(AFactorData1);
+		if LenFactorData1 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData1 > 0 then
-			PtrScalingData1 := @AScalingData1[0]
+		if LenFactorData1 > 0 then
+			PtrFactorData1 := @AFactorData1[0]
 		else
-			PtrScalingData1 := nil;
+			PtrFactorData1 := nil;
 		
-		LenScalingData2 := Length(AScalingData2);
-		if LenScalingData2 > $FFFFFFFF then
+		LenFactorData2 := Length(AFactorData2);
+		if LenFactorData2 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData2 > 0 then
-			PtrScalingData2 := @AScalingData2[0]
+		if LenFactorData2 > 0 then
+			PtrFactorData2 := @AFactorData2[0]
 		else
-			PtrScalingData2 := nil;
+			PtrFactorData2 := nil;
 		
 		LenSubInterpolationCounts := Length(ASubInterpolationCounts);
 		if LenSubInterpolationCounts > $FFFFFFFF then
@@ -22475,15 +22455,15 @@ implementation
 		else
 			PtrSubInterpolationCounts := nil;
 		
-		LenOverrideInterpolationData := Length(AOverrideInterpolationData);
-		if LenOverrideInterpolationData > $FFFFFFFF then
+		LenModificationInterpolationData := Length(AModificationInterpolationData);
+		if LenModificationInterpolationData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenOverrideInterpolationData > 0 then
-			PtrOverrideInterpolationData := @AOverrideInterpolationData[0]
+		if LenModificationInterpolationData > 0 then
+			PtrModificationInterpolationData := @AModificationInterpolationData[0]
 		else
-			PtrOverrideInterpolationData := nil;
+			PtrModificationInterpolationData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData1), PtrScalingData1, QWord(LenScalingData2), PtrScalingData2, QWord(LenSubInterpolationCounts), PtrSubInterpolationCounts, QWord(LenOverrideInterpolationData), PtrOverrideInterpolationData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenFactorData1), PtrFactorData1, QWord(LenFactorData2), PtrFactorData2, QWord(LenSubInterpolationCounts), PtrSubInterpolationCounts, QWord(LenModificationInterpolationData), PtrModificationInterpolationData));
 	end;
 
 	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscrete(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D);
@@ -22502,12 +22482,12 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithConstantOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithConstantFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrHatchData: PLib3MFDiscreteHatch2D;
 		LenHatchData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22517,25 +22497,25 @@ implementation
 		else
 			PtrHatchData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenFactorData), PtrFactorData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithLinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithLinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AFactorData1: TDoubleDynArray; const AFactorData2: TDoubleDynArray);
 	var
 		PtrHatchData: PLib3MFDiscreteHatch2D;
 		LenHatchData: QWord;
-		PtrScalingData1: PDouble;
-		LenScalingData1: QWord;
-		PtrScalingData2: PDouble;
-		LenScalingData2: QWord;
+		PtrFactorData1: PDouble;
+		LenFactorData1: QWord;
+		PtrFactorData2: PDouble;
+		LenFactorData2: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22545,26 +22525,26 @@ implementation
 		else
 			PtrHatchData := nil;
 		
-		LenScalingData1 := Length(AScalingData1);
-		if LenScalingData1 > $FFFFFFFF then
+		LenFactorData1 := Length(AFactorData1);
+		if LenFactorData1 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData1 > 0 then
-			PtrScalingData1 := @AScalingData1[0]
+		if LenFactorData1 > 0 then
+			PtrFactorData1 := @AFactorData1[0]
 		else
-			PtrScalingData1 := nil;
+			PtrFactorData1 := nil;
 		
-		LenScalingData2 := Length(AScalingData2);
-		if LenScalingData2 > $FFFFFFFF then
+		LenFactorData2 := Length(AFactorData2);
+		if LenFactorData2 > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData2 > 0 then
-			PtrScalingData2 := @AScalingData2[0]
+		if LenFactorData2 > 0 then
+			PtrFactorData2 := @AFactorData2[0]
 		else
-			PtrScalingData2 := nil;
+			PtrFactorData2 := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData1), PtrScalingData1, QWord(LenScalingData2), PtrScalingData2));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenFactorData1), PtrFactorData1, QWord(LenFactorData2), PtrFactorData2));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithNonlinearOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AOverrideInterpolationData: ArrayOfLib3MFHatchOverrideInterpolationData);
+	procedure TLib3MFToolpathLayerData.WriteHatchDataDiscreteWithNonlinearFactors(const AProfileID: Cardinal; const APartID: Cardinal; const AHatchData: ArrayOfLib3MFDiscreteHatch2D; const AScalingData1: TDoubleDynArray; const AScalingData2: TDoubleDynArray; const ASubInterpolationCounts: TCardinalDynArray; const AModificationInterpolationData: ArrayOfLib3MFHatchModificationInterpolationData);
 	var
 		PtrHatchData: PLib3MFDiscreteHatch2D;
 		LenHatchData: QWord;
@@ -22574,8 +22554,8 @@ implementation
 		LenScalingData2: QWord;
 		PtrSubInterpolationCounts: PCardinal;
 		LenSubInterpolationCounts: QWord;
-		PtrOverrideInterpolationData: PLib3MFHatchOverrideInterpolationData;
-		LenOverrideInterpolationData: QWord;
+		PtrModificationInterpolationData: PLib3MFHatchModificationInterpolationData;
+		LenModificationInterpolationData: QWord;
 	begin
 		LenHatchData := Length(AHatchData);
 		if LenHatchData > $FFFFFFFF then
@@ -22609,15 +22589,15 @@ implementation
 		else
 			PtrSubInterpolationCounts := nil;
 		
-		LenOverrideInterpolationData := Length(AOverrideInterpolationData);
-		if LenOverrideInterpolationData > $FFFFFFFF then
+		LenModificationInterpolationData := Length(AModificationInterpolationData);
+		if LenModificationInterpolationData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenOverrideInterpolationData > 0 then
-			PtrOverrideInterpolationData := @AOverrideInterpolationData[0]
+		if LenModificationInterpolationData > 0 then
+			PtrModificationInterpolationData := @AModificationInterpolationData[0]
 		else
-			PtrOverrideInterpolationData := nil;
+			PtrModificationInterpolationData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData1), PtrScalingData1, QWord(LenScalingData2), PtrScalingData2, QWord(LenSubInterpolationCounts), PtrSubInterpolationCounts, QWord(LenOverrideInterpolationData), PtrOverrideInterpolationData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc(FHandle, AProfileID, APartID, QWord(LenHatchData), PtrHatchData, QWord(LenScalingData1), PtrScalingData1, QWord(LenScalingData2), PtrScalingData2, QWord(LenSubInterpolationCounts), PtrSubInterpolationCounts, QWord(LenModificationInterpolationData), PtrModificationInterpolationData));
 	end;
 
 	procedure TLib3MFToolpathLayerData.WriteLoopInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D);
@@ -22652,12 +22632,12 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteLoopDiscreteFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteLoopInModelUnitsWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteLoopInModelUnitsWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrPointData: PLib3MFPosition2D;
 		LenPointData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenPointData := Length(APointData);
 		if LenPointData > $FFFFFFFF then
@@ -22667,23 +22647,23 @@ implementation
 		else
 			PtrPointData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenFactorData), PtrFactorData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WriteLoopDiscreteWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WriteLoopDiscreteWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrPointData: PLib3MFDiscretePosition2D;
 		LenPointData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenPointData := Length(APointData);
 		if LenPointData > $FFFFFFFF then
@@ -22693,15 +22673,15 @@ implementation
 		else
 			PtrPointData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenFactorData), PtrFactorData));
 	end;
 
 	procedure TLib3MFToolpathLayerData.WritePolylineInModelUnits(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D);
@@ -22720,12 +22700,12 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineInModelUnitsFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WritePolylineInModelUnitsWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WritePolylineInModelUnitsWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFPosition2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrPointData: PLib3MFPosition2D;
 		LenPointData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenPointData := Length(APointData);
 		if LenPointData > $FFFFFFFF then
@@ -22735,15 +22715,15 @@ implementation
 		else
 			PtrPointData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenFactorData), PtrFactorData));
 	end;
 
 	procedure TLib3MFToolpathLayerData.WritePolylineDiscrete(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D);
@@ -22762,12 +22742,12 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineDiscreteFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData));
 	end;
 
-	procedure TLib3MFToolpathLayerData.WritePolylineDiscreteWithOverrides(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AScalingData: TDoubleDynArray);
+	procedure TLib3MFToolpathLayerData.WritePolylineDiscreteWithFactors(const AProfileID: Cardinal; const APartID: Cardinal; const APointData: ArrayOfLib3MFDiscretePosition2D; const AFactorData: TDoubleDynArray);
 	var
 		PtrPointData: PLib3MFDiscretePosition2D;
 		LenPointData: QWord;
-		PtrScalingData: PDouble;
-		LenScalingData: QWord;
+		PtrFactorData: PDouble;
+		LenFactorData: QWord;
 	begin
 		LenPointData := Length(APointData);
 		if LenPointData > $FFFFFFFF then
@@ -22777,15 +22757,15 @@ implementation
 		else
 			PtrPointData := nil;
 		
-		LenScalingData := Length(AScalingData);
-		if LenScalingData > $FFFFFFFF then
+		LenFactorData := Length(AFactorData);
+		if LenFactorData > $FFFFFFFF then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenScalingData > 0 then
-			PtrScalingData := @AScalingData[0]
+		if LenFactorData > 0 then
+			PtrFactorData := @AFactorData[0]
 		else
-			PtrScalingData := nil;
+			PtrFactorData := nil;
 		
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenScalingData), PtrScalingData));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc(FHandle, AProfileID, APartID, QWord(LenPointData), PtrPointData, QWord(LenFactorData), PtrFactorData));
 	end;
 
 	function TLib3MFToolpathLayerData.AddCustomData(const ANameSpace: String; const ADataName: String): TLib3MFCustomDOMTree;
@@ -25208,13 +25188,13 @@ implementation
 		FLib3MFToolpathProfile_RemoveParameterFunc := LoadFunction('lib3mf_toolpathprofile_removeparameter');
 		FLib3MFToolpathProfile_GetModifierCountFunc := LoadFunction('lib3mf_toolpathprofile_getmodifiercount');
 		FLib3MFToolpathProfile_GetModifierNameByIndexFunc := LoadFunction('lib3mf_toolpathprofile_getmodifiernamebyindex');
+		FLib3MFToolpathProfile_GetModifierTypeByIndexFunc := LoadFunction('lib3mf_toolpathprofile_getmodifiertypebyindex');
 		FLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc := LoadFunction('lib3mf_toolpathprofile_getmodifiernamespacebyindex');
 		FLib3MFToolpathProfile_HasModifierFunc := LoadFunction('lib3mf_toolpathprofile_hasmodifier');
 		FLib3MFToolpathProfile_GetModifierInformationByIndexFunc := LoadFunction('lib3mf_toolpathprofile_getmodifierinformationbyindex');
 		FLib3MFToolpathProfile_GetModifierInformationByNameFunc := LoadFunction('lib3mf_toolpathprofile_getmodifierinformationbyname');
 		FLib3MFToolpathProfile_SetModifierFunc := LoadFunction('lib3mf_toolpathprofile_setmodifier');
 		FLib3MFToolpathProfile_RemoveModifierFunc := LoadFunction('lib3mf_toolpathprofile_removemodifier');
-		FLib3MFToolpathProfile_EvaluateDoubleValueFunc := LoadFunction('lib3mf_toolpathprofile_evaluatedoublevalue');
 		FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc := LoadFunction('lib3mf_toolpathlayerreader_getlayerdatauuid');
 		FLib3MFToolpathLayerReader_GetCustomDataCountFunc := LoadFunction('lib3mf_toolpathlayerreader_getcustomdatacount');
 		FLib3MFToolpathLayerReader_GetCustomDataFunc := LoadFunction('lib3mf_toolpathlayerreader_getcustomdata');
@@ -25239,17 +25219,16 @@ implementation
 		FLib3MFToolpathLayerReader_GetSegmentDefaultProfileUUIDFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentdefaultprofileuuid');
 		FLib3MFToolpathLayerReader_GetSegmentDefaultProfileIDFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentdefaultprofileid');
 		FLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc := LoadFunction('lib3mf_toolpathlayerreader_getprofileuuidbylocalprofileid');
-		FLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_segmenthasoverridefactors');
-		FLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc := LoadFunction('lib3mf_toolpathlayerreader_segmenthasuniformprofile');
+		FLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_segmenthasmodificationfactors');
 		FLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentpointdatainmodelunits');
 		FLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentpointdatadiscrete');
-		FLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentpointoverridefactors');
+		FLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors');
 		FLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmenthatchdatainmodelunits');
 		FLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmenthatchdatadiscrete');
-		FLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors');
-		FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation');
-		FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation');
-		FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation');
+		FLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc := LoadFunction('lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors');
+		FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation');
+		FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation');
+		FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc := LoadFunction('lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation');
 		FLib3MFToolpathLayerData_GetLayerDataUUIDFunc := LoadFunction('lib3mf_toolpathlayerdata_getlayerdatauuid');
 		FLib3MFToolpathLayerData_RegisterProfileFunc := LoadFunction('lib3mf_toolpathlayerdata_registerprofile');
 		FLib3MFToolpathLayerData_RegisterBuildItemFunc := LoadFunction('lib3mf_toolpathlayerdata_registerbuilditem');
@@ -25257,24 +25236,22 @@ implementation
 		FLib3MFToolpathLayerData_ClearSegmentAttributesFunc := LoadFunction('lib3mf_toolpathlayerdata_clearsegmentattributes');
 		FLib3MFToolpathLayerData_SetLaserIndexFunc := LoadFunction('lib3mf_toolpathlayerdata_setlaserindex');
 		FLib3MFToolpathLayerData_ClearLaserIndexFunc := LoadFunction('lib3mf_toolpathlayerdata_clearlaserindex');
-		FLib3MFToolpathLayerData_SetOverrideFractionFunc := LoadFunction('lib3mf_toolpathlayerdata_setoverridefraction');
-		FLib3MFToolpathLayerData_GetOverrideFractionFunc := LoadFunction('lib3mf_toolpathlayerdata_getoverridefraction');
 		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunits');
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides');
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides');
-		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides');
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors');
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors');
+		FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors');
 		FLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscrete');
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides');
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides');
-		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides');
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors');
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors');
+		FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors');
 		FLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopinmodelunits');
 		FLib3MFToolpathLayerData_WriteLoopDiscreteFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopdiscrete');
-		FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides');
-		FLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides');
+		FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors');
+		FLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writeloopdiscretewithfactors');
 		FLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylineinmodelunits');
-		FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides');
+		FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors');
 		FLib3MFToolpathLayerData_WritePolylineDiscreteFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylinediscrete');
-		FLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides');
+		FLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc := LoadFunction('lib3mf_toolpathlayerdata_writepolylinediscretewithfactors');
 		FLib3MFToolpathLayerData_AddCustomDataFunc := LoadFunction('lib3mf_toolpathlayerdata_addcustomdata');
 		FLib3MFToolpathLayerData_FinishFunc := LoadFunction('lib3mf_toolpathlayerdata_finish');
 		FLib3MFToolpath_GetUUIDFunc := LoadFunction('lib3mf_toolpath_getuuid');
@@ -27148,6 +27125,9 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_getmodifiernamebyindex'), @FLib3MFToolpathProfile_GetModifierNameByIndexFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_getmodifiertypebyindex'), @FLib3MFToolpathProfile_GetModifierTypeByIndexFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_getmodifiernamespacebyindex'), @FLib3MFToolpathProfile_GetModifierNameSpaceByIndexFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
@@ -27164,9 +27144,6 @@ implementation
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_removemodifier'), @FLib3MFToolpathProfile_RemoveModifierFunc);
-		if AResult <> LIB3MF_SUCCESS then
-			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_evaluatedoublevalue'), @FLib3MFToolpathProfile_EvaluateDoubleValueFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getlayerdatauuid'), @FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc);
@@ -27241,10 +27218,7 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getprofileuuidbylocalprofileid'), @FLib3MFToolpathLayerReader_GetProfileUUIDByLocalProfileIDFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_segmenthasoverridefactors'), @FLib3MFToolpathLayerReader_SegmentHasOverrideFactorsFunc);
-		if AResult <> LIB3MF_SUCCESS then
-			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_segmenthasuniformprofile'), @FLib3MFToolpathLayerReader_SegmentHasUniformProfileFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_segmenthasmodificationfactors'), @FLib3MFToolpathLayerReader_SegmentHasModificationFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentpointdatainmodelunits'), @FLib3MFToolpathLayerReader_GetSegmentPointDataInModelUnitsFunc);
@@ -27253,7 +27227,7 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentpointdatadiscrete'), @FLib3MFToolpathLayerReader_GetSegmentPointDataDiscreteFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentpointoverridefactors'), @FLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors'), @FLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmenthatchdatainmodelunits'), @FLib3MFToolpathLayerReader_GetSegmentHatchDataInModelUnitsFunc);
@@ -27262,16 +27236,16 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmenthatchdatadiscrete'), @FLib3MFToolpathLayerReader_GetSegmentHatchDataDiscreteFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors'), @FLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors'), @FLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation'), @FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation'), @FLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation'), @FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation'), @FLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation'), @FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation'), @FLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_getlayerdatauuid'), @FLib3MFToolpathLayerData_GetLayerDataUUIDFunc);
@@ -27295,34 +27269,28 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_clearlaserindex'), @FLib3MFToolpathLayerData_ClearLaserIndexFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_setoverridefraction'), @FLib3MFToolpathLayerData_SetOverrideFractionFunc);
-		if AResult <> LIB3MF_SUCCESS then
-			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_getoverridefraction'), @FLib3MFToolpathLayerData_GetOverrideFractionFunc);
-		if AResult <> LIB3MF_SUCCESS then
-			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunits'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors'), @FLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscrete'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors'), @FLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopinmodelunits'), @FLib3MFToolpathLayerData_WriteLoopInModelUnitsFunc);
@@ -27331,22 +27299,22 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopdiscrete'), @FLib3MFToolpathLayerData_WriteLoopDiscreteFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides'), @FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors'), @FLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides'), @FLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writeloopdiscretewithfactors'), @FLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylineinmodelunits'), @FLib3MFToolpathLayerData_WritePolylineInModelUnitsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides'), @FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors'), @FLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylinediscrete'), @FLib3MFToolpathLayerData_WritePolylineDiscreteFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides'), @FLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_writepolylinediscretewithfactors'), @FLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathlayerdata_addcustomdata'), @FLib3MFToolpathLayerData_AddCustomDataFunc);

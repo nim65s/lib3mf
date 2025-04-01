@@ -609,13 +609,13 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_ToolpathProfile_RemoveParameter = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierCount = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierNameByIndex = NULL;
+	pWrapperTable->m_ToolpathProfile_GetModifierTypeByIndex = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierNameSpaceByIndex = NULL;
 	pWrapperTable->m_ToolpathProfile_HasModifier = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierInformationByIndex = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierInformationByName = NULL;
 	pWrapperTable->m_ToolpathProfile_SetModifier = NULL;
 	pWrapperTable->m_ToolpathProfile_RemoveModifier = NULL;
-	pWrapperTable->m_ToolpathProfile_EvaluateDoubleValue = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetLayerDataUUID = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetCustomDataCount = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetCustomData = NULL;
@@ -640,17 +640,16 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentDefaultProfileUUID = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentDefaultProfileID = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetProfileUUIDByLocalProfileID = NULL;
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors = NULL;
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile = NULL;
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointDataInModelUnits = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointDataDiscrete = NULL;
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors = NULL;
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentHatchDataInModelUnits = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetSegmentHatchDataDiscrete = NULL;
-	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors = NULL;
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation = NULL;
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation = NULL;
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation = NULL;
+	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors = NULL;
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation = NULL;
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation = NULL;
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation = NULL;
 	pWrapperTable->m_ToolpathLayerData_GetLayerDataUUID = NULL;
 	pWrapperTable->m_ToolpathLayerData_RegisterProfile = NULL;
 	pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = NULL;
@@ -658,24 +657,22 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_ToolpathLayerData_ClearSegmentAttributes = NULL;
 	pWrapperTable->m_ToolpathLayerData_SetLaserIndex = NULL;
 	pWrapperTable->m_ToolpathLayerData_ClearLaserIndex = NULL;
-	pWrapperTable->m_ToolpathLayerData_SetOverrideFraction = NULL;
-	pWrapperTable->m_ToolpathLayerData_GetOverrideFraction = NULL;
 	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnits = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors = NULL;
 	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscrete = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors = NULL;
 	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnits = NULL;
 	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscrete = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides = NULL;
-	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors = NULL;
+	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors = NULL;
 	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnits = NULL;
-	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides = NULL;
+	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors = NULL;
 	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscrete = NULL;
-	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides = NULL;
+	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors = NULL;
 	pWrapperTable->m_ToolpathLayerData_AddCustomData = NULL;
 	pWrapperTable->m_ToolpathLayerData_Finish = NULL;
 	pWrapperTable->m_Toolpath_GetUUID = NULL;
@@ -5959,6 +5956,15 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_ToolpathProfile_GetModifierTypeByIndex = (PLib3MFToolpathProfile_GetModifierTypeByIndexPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getmodifiertypebyindex");
+	#else // _WIN32
+	pWrapperTable->m_ToolpathProfile_GetModifierTypeByIndex = (PLib3MFToolpathProfile_GetModifierTypeByIndexPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getmodifiertypebyindex");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_ToolpathProfile_GetModifierTypeByIndex == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_ToolpathProfile_GetModifierNameSpaceByIndex = (PLib3MFToolpathProfile_GetModifierNameSpaceByIndexPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getmodifiernamespacebyindex");
 	#else // _WIN32
 	pWrapperTable->m_ToolpathProfile_GetModifierNameSpaceByIndex = (PLib3MFToolpathProfile_GetModifierNameSpaceByIndexPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getmodifiernamespacebyindex");
@@ -6010,15 +6016,6 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_ToolpathProfile_RemoveModifier == NULL)
-		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
-	pWrapperTable->m_ToolpathProfile_EvaluateDoubleValue = (PLib3MFToolpathProfile_EvaluateDoubleValuePtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_evaluatedoublevalue");
-	#else // _WIN32
-	pWrapperTable->m_ToolpathProfile_EvaluateDoubleValue = (PLib3MFToolpathProfile_EvaluateDoubleValuePtr) dlsym(hLibrary, "lib3mf_toolpathprofile_evaluatedoublevalue");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathProfile_EvaluateDoubleValue == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6238,21 +6235,12 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors = (PLib3MFToolpathLayerReader_SegmentHasOverrideFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_segmenthasoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors = (PLib3MFToolpathLayerReader_SegmentHasModificationFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_segmenthasmodificationfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors = (PLib3MFToolpathLayerReader_SegmentHasOverrideFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_segmenthasoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors = (PLib3MFToolpathLayerReader_SegmentHasModificationFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_segmenthasmodificationfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors == NULL)
-		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile = (PLib3MFToolpathLayerReader_SegmentHasUniformProfilePtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_segmenthasuniformprofile");
-	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile = (PLib3MFToolpathLayerReader_SegmentHasUniformProfilePtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_segmenthasuniformprofile");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6274,12 +6262,12 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors = (PLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors = (PLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors = (PLib3MFToolpathLayerReader_GetSegmentPointOverrideFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors = (PLib3MFToolpathLayerReader_GetSegmentPointModificationFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6301,39 +6289,39 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors = (PLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors = (PLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors = (PLib3MFToolpathLayerReader_GetLinearSegmentHatchOverrideFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors");
+	pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors = (PLib3MFToolpathLayerReader_GetLinearSegmentHatchModificationFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation = (PLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation = (PLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation = (PLib3MFToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation = (PLib3MFToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation = (PLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation = (PLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation = (PLib3MFToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation = (PLib3MFToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation = (PLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation = (PLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation = (PLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation");
+	pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation = (PLib3MFToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolationPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation == NULL)
+	if (pWrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6400,24 +6388,6 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_SetOverrideFraction = (PLib3MFToolpathLayerData_SetOverrideFractionPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_setoverridefraction");
-	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_SetOverrideFraction = (PLib3MFToolpathLayerData_SetOverrideFractionPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_setoverridefraction");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_SetOverrideFraction == NULL)
-		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_GetOverrideFraction = (PLib3MFToolpathLayerData_GetOverrideFractionPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_getoverridefraction");
-	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_GetOverrideFraction = (PLib3MFToolpathLayerData_GetOverrideFractionPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_getoverridefraction");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_GetOverrideFraction == NULL)
-		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
 	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnits = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunits");
 	#else // _WIN32
 	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnits = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunits");
@@ -6427,30 +6397,30 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6463,30 +6433,30 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithConstantFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithLinearFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors = (PLib3MFToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6508,21 +6478,21 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides = (PLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors = (PLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides = (PLib3MFToolpathLayerData_WriteLoopInModelUnitsWithOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors = (PLib3MFToolpathLayerData_WriteLoopInModelUnitsWithFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides = (PLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors = (PLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writeloopdiscretewithfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides = (PLib3MFToolpathLayerData_WriteLoopDiscreteWithOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors = (PLib3MFToolpathLayerData_WriteLoopDiscreteWithFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writeloopdiscretewithfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6535,12 +6505,12 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides = (PLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors = (PLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides = (PLib3MFToolpathLayerData_WritePolylineInModelUnitsWithOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors = (PLib3MFToolpathLayerData_WritePolylineInModelUnitsWithFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6553,12 +6523,12 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides = (PLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors = (PLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_writepolylinediscretewithfactors");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides = (PLib3MFToolpathLayerData_WritePolylineDiscreteWithOverridesPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides");
+	pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors = (PLib3MFToolpathLayerData_WritePolylineDiscreteWithFactorsPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_writepolylinediscretewithfactors");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides == NULL)
+	if (pWrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -13256,6 +13226,15 @@ Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifiernamebyindex(Lib3MFHandle li
 }
 
 
+Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifiertypebyindex(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nIndex, eLib3MFToolpathProfileModificationType * pModifierType)
+{
+	if (libraryHandle == 0) 
+		return LIB3MF_ERROR_INVALIDCAST;
+	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_ToolpathProfile_GetModifierTypeByIndex (pToolpathProfile, nIndex, pModifierType);
+}
+
+
 Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifiernamespacebyindex(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nNameSpaceBufferSize, Lib3MF_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer)
 {
 	if (libraryHandle == 0) 
@@ -13274,30 +13253,30 @@ Lib3MFResult CCall_lib3mf_toolpathprofile_hasmodifier(Lib3MFHandle libraryHandle
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nNameSpaceNameBufferSize, Lib3MF_uint32* pNameSpaceNameNeededChars, char * pNameSpaceNameBuffer, const Lib3MF_uint32 nValueNameBufferSize, Lib3MF_uint32* pValueNameNeededChars, char * pValueNameBuffer, eLib3MFToolpathProfileOverrideFactor * pOverrideFactor, Lib3MF_double * pDeltaValue0, Lib3MF_double * pDeltaValue1)
+Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nNameSpaceNameBufferSize, Lib3MF_uint32* pNameSpaceNameNeededChars, char * pNameSpaceNameBuffer, const Lib3MF_uint32 nValueNameBufferSize, Lib3MF_uint32* pValueNameNeededChars, char * pValueNameBuffer, eLib3MFToolpathProfileModificationType * pModifierType, eLib3MFToolpathProfileModificationFactor * pModificationFactor, Lib3MF_double * pMinValue, Lib3MF_double * pMaxValue)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex (pToolpathProfile, nIndex, nNameSpaceNameBufferSize, pNameSpaceNameNeededChars, pNameSpaceNameBuffer, nValueNameBufferSize, pValueNameNeededChars, pValueNameBuffer, pOverrideFactor, pDeltaValue0, pDeltaValue1);
+	return wrapperTable->m_ToolpathProfile_GetModifierInformationByIndex (pToolpathProfile, nIndex, nNameSpaceNameBufferSize, pNameSpaceNameNeededChars, pNameSpaceNameBuffer, nValueNameBufferSize, pValueNameNeededChars, pValueNameBuffer, pModifierType, pModificationFactor, pMinValue, pMaxValue);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifierinformationbyname(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileOverrideFactor * pOverrideFactor, Lib3MF_double * pDeltaValue0, Lib3MF_double * pDeltaValue1)
+Lib3MFResult CCall_lib3mf_toolpathprofile_getmodifierinformationbyname(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType * pModifierType, eLib3MFToolpathProfileModificationFactor * pModificationFactor, Lib3MF_double * pMinValue, Lib3MF_double * pMaxValue)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathProfile_GetModifierInformationByName (pToolpathProfile, pNameSpaceName, pValueName, pOverrideFactor, pDeltaValue0, pDeltaValue1);
+	return wrapperTable->m_ToolpathProfile_GetModifierInformationByName (pToolpathProfile, pNameSpaceName, pValueName, pModifierType, pModificationFactor, pMinValue, pMaxValue);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathprofile_setmodifier(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_double dDeltaValue0, Lib3MF_double dDeltaValue1)
+Lib3MFResult CCall_lib3mf_toolpathprofile_setmodifier(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathProfile_SetModifier (pToolpathProfile, pNameSpaceName, pValueName, eOverrideFactor, dDeltaValue0, dDeltaValue1);
+	return wrapperTable->m_ToolpathProfile_SetModifier (pToolpathProfile, pNameSpaceName, pValueName, eModifierType, eModificationFactor, dMinValue, dMaxValue);
 }
 
 
@@ -13307,15 +13286,6 @@ Lib3MFResult CCall_lib3mf_toolpathprofile_removemodifier(Lib3MFHandle libraryHan
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
 	return wrapperTable->m_ToolpathProfile_RemoveModifier (pToolpathProfile, pNameSpaceName, pValueName);
-}
-
-
-Lib3MFResult CCall_lib3mf_toolpathprofile_evaluatedoublevalue(Lib3MFHandle libraryHandle, Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dFactorF, Lib3MF_double dFactorG, Lib3MF_double dFactorH, Lib3MF_double * pEvaluationResult)
-{
-	if (libraryHandle == 0) 
-		return LIB3MF_ERROR_INVALIDCAST;
-	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathProfile_EvaluateDoubleValue (pToolpathProfile, pNameSpaceName, pValueName, dFactorF, dFactorG, dFactorH, pEvaluationResult);
 }
 
 
@@ -13535,21 +13505,12 @@ Lib3MFResult CCall_lib3mf_toolpathlayerreader_getprofileuuidbylocalprofileid(Lib
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_segmenthasoverridefactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, bool * pHasOverrides)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_segmenthasmodificationfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileModificationFactor eModificationFactor, bool * pHasModificationFactors)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_SegmentHasOverrideFactors (pToolpathLayerReader, nSegmentIndex, eOverrideFactor, pHasOverrides);
-}
-
-
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_segmenthasuniformprofile(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, bool * pHasUniformProfile)
-{
-	if (libraryHandle == 0) 
-		return LIB3MF_ERROR_INVALIDCAST;
-	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_SegmentHasUniformProfile (pToolpathLayerReader, nSegmentIndex, pHasUniformProfile);
+	return wrapperTable->m_ToolpathLayerReader_SegmentHasModificationFactors (pToolpathLayerReader, nSegmentIndex, eModificationFactor, pHasModificationFactors);
 }
 
 
@@ -13571,12 +13532,12 @@ Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentpointdatadiscrete(Lib3MF
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentpointoverridefactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double * pFactorValuesBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileModificationFactor eModificationFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double * pFactorValuesBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_GetSegmentPointOverrideFactors (pToolpathLayerReader, nSegmentIndex, eOverrideFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
+	return wrapperTable->m_ToolpathLayerReader_GetSegmentPointModificationFactors (pToolpathLayerReader, nSegmentIndex, eModificationFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
 }
 
 
@@ -13598,39 +13559,39 @@ Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmenthatchdatadiscrete(Lib3MF
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatch2DOverrides * pFactorValuesBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileModificationFactor eModificationFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatch2DFactors * pFactorValuesBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchOverrideFactors (pToolpathLayerReader, nSegmentIndex, eOverrideFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
+	return wrapperTable->m_ToolpathLayerReader_GetLinearSegmentHatchModificationFactors (pToolpathLayerReader, nSegmentIndex, eModificationFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, bool * pHasOverrideInterpolation)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, bool * pHasModificationInterpolation)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchOverrideInterpolation (pToolpathLayerReader, nSegmentIndex, pHasOverrideInterpolation);
+	return wrapperTable->m_ToolpathLayerReader_SegmentHasNonlinearHatchModificationInterpolation (pToolpathLayerReader, nSegmentIndex, pHasModificationInterpolation);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, Lib3MF_uint32 nHatchIndex, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatchOverrideInterpolationData * pFactorValuesBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, Lib3MF_uint32 nHatchIndex, eLib3MFToolpathProfileModificationFactor eModificationFactor, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatchModificationInterpolationData * pFactorValuesBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchOverrideInterpolation (pToolpathLayerReader, nSegmentIndex, nHatchIndex, eOverrideFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
+	return wrapperTable->m_ToolpathLayerReader_GetSegmentNonlinearHatchModificationInterpolation (pToolpathLayerReader, nSegmentIndex, nHatchIndex, eModificationFactor, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32 * pCountArrayBuffer, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatchOverrideInterpolationData * pFactorValuesBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nSegmentIndex, eLib3MFToolpathProfileModificationFactor eModificationFactor, const Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32 * pCountArrayBuffer, const Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, sLib3MFHatchModificationInterpolationData * pFactorValuesBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesOverrideInterpolation (pToolpathLayerReader, nSegmentIndex, eOverrideFactor, nCountArrayBufferSize, pCountArrayNeededCount, pCountArrayBuffer, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
+	return wrapperTable->m_ToolpathLayerReader_GetSegmentAllNonlinearHatchesModificationInterpolation (pToolpathLayerReader, nSegmentIndex, eModificationFactor, nCountArrayBufferSize, pCountArrayNeededCount, pCountArrayBuffer, nFactorValuesBufferSize, pFactorValuesNeededCount, pFactorValuesBuffer);
 }
 
 
@@ -13697,24 +13658,6 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_clearlaserindex(Lib3MFHandle library
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_setoverridefraction(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nValue)
-{
-	if (libraryHandle == 0) 
-		return LIB3MF_ERROR_INVALIDCAST;
-	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_SetOverrideFraction (pToolpathLayerData, nValue);
-}
-
-
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_getoverridefraction(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 * pValue)
-{
-	if (libraryHandle == 0) 
-		return LIB3MF_ERROR_INVALIDCAST;
-	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_GetOverrideFraction (pToolpathLayerData, pValue);
-}
-
-
 Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunits(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer)
 {
 	if (libraryHandle == 0) 
@@ -13724,30 +13667,30 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunits(Lib3MFHan
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithConstantFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithLinearFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorData1BufferSize, pFactorData1Buffer, nFactorData2BufferSize, pFactorData2Buffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const sLib3MFHatchOverrideInterpolationData * pOverrideInterpolationDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFHatch2D * pHatchDataBuffer, Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer, Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, Lib3MF_uint64 nModificationInterpolationDataBufferSize, const sLib3MFHatchModificationInterpolationData * pModificationInterpolationDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer, nSubInterpolationCountsBufferSize, pSubInterpolationCountsBuffer, nOverrideInterpolationDataBufferSize, pOverrideInterpolationDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataInModelUnitsWithNonlinearFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorData1BufferSize, pFactorData1Buffer, nFactorData2BufferSize, pFactorData2Buffer, nSubInterpolationCountsBufferSize, pSubInterpolationCountsBuffer, nModificationInterpolationDataBufferSize, pModificationInterpolationDataBuffer);
 }
 
 
@@ -13760,30 +13703,30 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscrete(Lib3MFHandle 
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithConstantFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithLinearFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorData1BufferSize, pFactorData1Buffer, nFactorData2BufferSize, pFactorData2Buffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const sLib3MFHatchOverrideInterpolationData * pOverrideInterpolationDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nHatchDataBufferSize, const sLib3MFDiscreteHatch2D * pHatchDataBuffer, Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, Lib3MF_uint64 nModificationInterpolationDataBufferSize, const sLib3MFHatchModificationInterpolationData * pModificationInterpolationDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearOverrides (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer, nSubInterpolationCountsBufferSize, pSubInterpolationCountsBuffer, nOverrideInterpolationDataBufferSize, pOverrideInterpolationDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteHatchDataDiscreteWithNonlinearFactors (pToolpathLayerData, nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer, nSubInterpolationCountsBufferSize, pSubInterpolationCountsBuffer, nModificationInterpolationDataBufferSize, pModificationInterpolationDataBuffer);
 }
 
 
@@ -13805,21 +13748,21 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_writeloopdiscrete(Lib3MFHandle libra
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFPosition2D * pPointDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFPosition2D * pPointDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithOverrides (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteLoopInModelUnitsWithFactors (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFDiscretePosition2D * pPointDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writeloopdiscretewithfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFDiscretePosition2D * pPointDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithOverrides (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WriteLoopDiscreteWithFactors (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 
@@ -13832,12 +13775,12 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylineinmodelunits(Lib3MFHand
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFPosition2D * pPointDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFPosition2D * pPointDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithOverrides (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WritePolylineInModelUnitsWithFactors (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 
@@ -13850,12 +13793,12 @@ Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylinediscrete(Lib3MFHandle l
 }
 
 
-Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFDiscretePosition2D * pPointDataBuffer, Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer)
+Lib3MFResult CCall_lib3mf_toolpathlayerdata_writepolylinediscretewithfactors(Lib3MFHandle libraryHandle, Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const sLib3MFDiscretePosition2D * pPointDataBuffer, Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIB3MF_ERROR_INVALIDCAST;
 	sLib3MFDynamicWrapperTable * wrapperTable = (sLib3MFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithOverrides (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	return wrapperTable->m_ToolpathLayerData_WritePolylineDiscreteWithFactors (pToolpathLayerData, nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
 

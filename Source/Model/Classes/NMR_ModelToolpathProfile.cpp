@@ -31,8 +31,10 @@ NMR_ModelToolpathProfile.cpp defines the Model Toolpath Profile.
 --*/
 
 #include "Model/Classes/NMR_ModelToolpathProfile.h"
+#include "Model/Classes/NMR_ModelConstants.h"
 #include "Common/NMR_Exception.h"
 #include "Common/NMR_StringUtils.h"
+
 #include <sstream>
 #include <algorithm>
 
@@ -79,8 +81,8 @@ namespace NMR {
 
 
 
-	CModelToolpathProfileModifier::CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue0, double dDeltaValue1, eModelToolpathProfileOverrideFactor overrideFactor)
-		: m_pValue (pValue), m_dDeltaValue0 (dDeltaValue0), m_dDeltaValue1(dDeltaValue1), m_OverrideFactor (overrideFactor)
+	CModelToolpathProfileModifier::CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, Lib3MF::eToolpathProfileModificationType modificationType, double dMinimumValue, double dMaximumValue, Lib3MF::eToolpathProfileModificationFactor modificationFactor)
+		: m_pValue (pValue), m_dMinimumValue (dMinimumValue), m_dMaximumValue(dMaximumValue), m_ModificationFactor(modificationFactor), m_eModificationType (modificationType)
 	{
 		if (pValue.get() == nullptr)
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
@@ -99,30 +101,29 @@ namespace NMR {
 
 	double CModelToolpathProfileModifier::evaluate(double dFactorF, double dFactorG, double dFactorH)
 	{
-
 		double dBaseValue = m_pValue->getBaseDoubleValue();
 
-		switch (m_OverrideFactor) {
-			case eModelToolpathProfileOverrideFactor::pfFactorF: 
+		switch (m_ModificationFactor) {
+			case Lib3MF::eToolpathProfileModificationFactor::FactorF:
 				if (dFactorF <= 0.0)
 					dFactorF = 0.0;
 				if (dFactorF >= 1.0)
 					dFactorF = 1.0;
-				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorF)) + m_dDeltaValue1 * dFactorF;
+				return (m_dMinimumValue * (1.0 - dFactorF)) + m_dMaximumValue * dFactorF;
 			
-			case eModelToolpathProfileOverrideFactor::pfFactorG:
+			case Lib3MF::eToolpathProfileModificationFactor::FactorG:
 				if (dFactorG <= 0.0)
 					dFactorG = 0.0;
 				if (dFactorG >= 1.0)
 					dFactorG = 1.0;
-				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorG)) + m_dDeltaValue1 * dFactorG;
+				return (m_dMinimumValue * (1.0 - dFactorG)) + m_dMaximumValue * dFactorG;
 
-			case eModelToolpathProfileOverrideFactor::pfFactorH:
+			case Lib3MF::eToolpathProfileModificationFactor::FactorH:
 				if (dFactorH <= 0.0)
 					dFactorH = 0.0;
 				if (dFactorH >= 1.0)
 					dFactorH = 1.0;
-				return dBaseValue + (m_dDeltaValue0 * (1.0 - dFactorH)) + m_dDeltaValue1 * dFactorH;
+				return (m_dMinimumValue * (1.0 - dFactorH)) + m_dMaximumValue * dFactorH;
 
 			default:
 				return dBaseValue;
@@ -139,19 +140,41 @@ namespace NMR {
 		return m_pValue->getNameSpace();
 	}
 
-	double CModelToolpathProfileModifier::getDeltaValue0()
+	double CModelToolpathProfileModifier::getMinimumValue()
 	{
-		return m_dDeltaValue0;
+		return m_dMinimumValue;
 	}
 
-	double CModelToolpathProfileModifier::getDeltaValue1()
+	double CModelToolpathProfileModifier::getMaximumValue()
 	{
-		return m_dDeltaValue1;
+		return m_dMaximumValue;
 	}
 
-	eModelToolpathProfileOverrideFactor CModelToolpathProfileModifier::getOverrideFactor()
+	Lib3MF::eToolpathProfileModificationType CModelToolpathProfileModifier::getModificationType()
 	{
-		return m_OverrideFactor;
+		return m_eModificationType;
+	}
+
+	std::string CModelToolpathProfileModifier::getModificationTypeString()
+	{
+		switch (m_eModificationType) {
+            case Lib3MF::eToolpathProfileModificationType::NoModification:
+                return XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_NONE;
+			case Lib3MF::eToolpathProfileModificationType::ConstantModification:
+				return XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_CONSTANT;
+			case Lib3MF::eToolpathProfileModificationType::LinearModification:
+				return XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_LINEAR;
+			case Lib3MF::eToolpathProfileModificationType::NonlinearModification:
+				return XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_NONLINEAR;
+
+			default:
+				throw CNMRException(NMR_ERROR_TOOLPATH_INVALIDPROFILEMODIFIERTYPE);
+		}
+	}
+
+	Lib3MF::eToolpathProfileModificationFactor CModelToolpathProfileModifier::getModificationFactor()
+	{
+		return m_ModificationFactor;
 	}
 
 
@@ -210,6 +233,15 @@ namespace NMR {
 
 		return m_ModifierList.at(nIndex)->getName();
 	}
+
+	Lib3MF::eToolpathProfileModificationType CModelToolpathProfile::getModifierType(const uint32_t nIndex)
+	{
+		if (nIndex >= m_ModifierList.size())
+			throw CNMRException(NMR_ERROR_INVALIDMODIFIERINDEX);
+
+		return m_ModifierList.at(nIndex)->getModificationType();
+	}
+
 
 	std::string CModelToolpathProfile::getModifierNameSpace(const uint32_t nIndex)
 	{
@@ -335,7 +367,7 @@ namespace NMR {
 		return iIter->second;
 	}
 
-	void CModelToolpathProfile::addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta0, double dDelta1, eModelToolpathProfileOverrideFactor overrideFactor)
+	void CModelToolpathProfile::addModifier(const std::string& sNameSpace, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType modifierType, double dMinimum, double dMaximum, Lib3MF::eToolpathProfileModificationFactor modificationFactor)
 	{
 		auto key = std::make_pair(sNameSpace, sValueName);
 		auto iValueIter = m_ValueMap.find(key);
@@ -348,7 +380,7 @@ namespace NMR {
 		if (iModifierIter != m_ModifierMap.end())
 			throw CNMRException(NMR_ERROR_DUPLICATEPROFILEMODIFIER);
 
-		auto pModifier = std::make_shared<CModelToolpathProfileModifier>(pValue, dDelta0, dDelta1, overrideFactor);
+		auto pModifier = std::make_shared<CModelToolpathProfileModifier>(pValue, modifierType, dMinimum, dMaximum, modificationFactor);
 
 		m_ModifierMap.insert (std::make_pair (key, pModifier));
 		m_ModifierList.push_back (pModifier);

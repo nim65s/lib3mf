@@ -42,14 +42,17 @@ NMR_ModelReaderNode_Toolpath1905_ToolpathModifier.h covers the official 3MF Tool
 
 namespace NMR {
 
-	CModelReaderNode_Toolpath1905_ToolpathModifier::CModelReaderNode_Toolpath1905_ToolpathModifier(_In_ CModel * pModel, _In_ PModelWarnings pWarnings)
-		: CModelReaderNode(pWarnings), 
+	CModelReaderNode_Toolpath1905_ToolpathModifier::CModelReaderNode_Toolpath1905_ToolpathModifier(_In_ CModel* pModel, _In_ PModelWarnings pWarnings)
+		: CModelReaderNode(pWarnings),
 		m_bHasAttribute(false),
-		m_bHasDelta0 (false),
-		m_dDelta0 (0.0),
-		m_bHasDelta1 (false),
-		m_dDelta1 (0.0),
-		m_OverrideFactor (NMR::eModelToolpathProfileOverrideFactor::pfNone),
+		m_bHasMinimum(false),
+		m_bHasMaximum(false),
+		m_dMinimum(0.0),
+		m_dMaximum(0.0),
+          m_ModificationFactor(
+              Lib3MF::eToolpathProfileModificationFactor::Unknown),
+          m_ModificationType(
+              Lib3MF::eToolpathProfileModificationType::NoModification),
 		m_pModel(pModel)
 
 	{
@@ -77,6 +80,25 @@ namespace NMR {
 		__NMRASSERT(pAttributeName);
 		__NMRASSERT(pAttributeValue);
 
+		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE) == 0) {
+			if (m_ModificationType != Lib3MF::eToolpathProfileModificationType::NoModification)
+				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERTYPE);
+
+			if (strcmp(pAttributeValue, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_CONSTANT) == 0) {
+				m_ModificationType = Lib3MF::eToolpathProfileModificationType::ConstantModification;
+			} else if (strcmp(pAttributeValue, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_LINEAR) == 0) {
+				m_ModificationType = Lib3MF::eToolpathProfileModificationType::LinearModification;
+			} else if (strcmp(pAttributeValue, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE_NONLINEAR) == 0) {
+				m_ModificationType = Lib3MF::eToolpathProfileModificationType::NonlinearModification;
+			}
+			else {
+				throw CNMRException(NMR_ERROR_INVALIDMODIFIERTYPE);
+			}
+
+
+			
+		}
+		
 
 		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_ATTRIBUTE) == 0) {
 			if (m_bHasAttribute)
@@ -86,46 +108,46 @@ namespace NMR {
 			m_bHasAttribute = true;
 		}
 
-		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA0) == 0) {
-			if (m_bHasDelta0)
+		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_MINIMUM) == 0) {
+			if (m_bHasMinimum)
 				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERDELTA);
 
-			m_dDelta0 = fnStringToFloat(pAttributeValue);
-			if (std::isnan(m_dDelta0))
+			m_dMinimum = fnStringToFloat(pAttributeValue);
+			if (std::isnan(m_dMinimum))
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
-			if (fabs(m_dDelta0) > XML_3MF_MAXIMUMPROFILEDELTA)
+			if (fabs(m_dMinimum) > XML_3MF_MAXIMUMPROFILEDELTA)
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
 
-			m_bHasDelta0 = true;
+			m_bHasMinimum = true;
 		}
 
 		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR) == 0) {
 
-			if (m_OverrideFactor != NMR::eModelToolpathProfileOverrideFactor::pfNone)
+			if (m_ModificationFactor != Lib3MF::eToolpathProfileModificationFactor::Unknown)
 				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERFACTOR);
 
 			if (strcmp(pAttributeValue, "f") == 0) {
-				m_OverrideFactor = NMR::eModelToolpathProfileOverrideFactor::pfFactorF;
+				m_ModificationFactor = Lib3MF::eToolpathProfileModificationFactor::FactorF;
 			} else if (strcmp(pAttributeValue, "g") == 0) {
-				m_OverrideFactor = NMR::eModelToolpathProfileOverrideFactor::pfFactorG;
+				m_ModificationFactor = Lib3MF::eToolpathProfileModificationFactor::FactorG;
 			} else if (strcmp(pAttributeValue, "h") == 0) {
-				m_OverrideFactor = NMR::eModelToolpathProfileOverrideFactor::pfFactorH;
+				m_ModificationFactor = Lib3MF::eToolpathProfileModificationFactor::FactorH;
 			} else 
 				throw CNMRException(NMR_ERROR_INVALIDOVERRIDEFACTOR);
 
 		}
 
-		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA1) == 0) {
-			if (m_bHasDelta1)
+		if (strcmp(pAttributeName, XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_MAXIMUM) == 0) {
+			if (m_bHasMaximum)
 				throw CNMRException(NMR_ERROR_DUPLICATEMODIFIERDELTA);
 
-			m_dDelta1 = fnStringToFloat(pAttributeValue);
-			if (std::isnan(m_dDelta1))
+			m_dMaximum = fnStringToFloat(pAttributeValue);
+			if (std::isnan(m_dMaximum))
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
-			if (fabs(m_dDelta1) > XML_3MF_MAXIMUMPROFILEDELTA)
+			if (fabs(m_dMaximum) > XML_3MF_MAXIMUMPROFILEDELTA)
 				throw CNMRException(NMR_ERROR_INVALIDTOOLPATHPROFILEDELTA);
 
-			m_bHasDelta1 = true;
+			m_bHasMaximum = true;
 		}
 
 
@@ -154,9 +176,17 @@ namespace NMR {
 		if (m_sAttribute.empty())
 			throw CNMRException(NMR_ERROR_EMPTYMODIFIERPROFILEATTRIBUTE);
 
+		if (!m_bHasMinimum)
+			throw CNMRException(NMR_ERROR_MISSINGPROFILEMODIFIERMINIMUM);
+		if (!m_bHasMaximum)
+			throw CNMRException(NMR_ERROR_MISSINGPROFILEMODIFIERMINIMUM);
+		if (m_ModificationType == Lib3MF::eToolpathProfileModificationType::NoModification)
+			throw CNMRException(NMR_ERROR_MISSINGPROFILEMODIFIERTYPE);
+
+
 		size_t nPos = m_sAttribute.find(":");
 		if (nPos == std::string::npos) {
-			pProfile->addModifier("", m_sAttribute, m_dDelta0, m_dDelta1, m_OverrideFactor);
+			pProfile->addModifier("", m_sAttribute, m_ModificationType, m_dMinimum, m_dMaximum, m_ModificationFactor);
 		}
 		else {
 			std::string sNameSpacePrefix = m_sAttribute.substr(0, nPos);
@@ -165,7 +195,7 @@ namespace NMR {
 			if (!pXMLReader->GetNamespaceURI(sNameSpacePrefix, sNameSpace))
 				throw CNMRException(NMR_ERROR_INVALIDPROFILEMODIFIERNAMESPACE);
 
-			pProfile->addModifier(sNameSpace, sValueName, m_dDelta0, m_dDelta1, m_OverrideFactor);
+			pProfile->addModifier(sNameSpace, sValueName, m_ModificationType, m_dMinimum, m_dMaximum, m_ModificationFactor);
 		}
 
 		

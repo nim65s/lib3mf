@@ -518,12 +518,19 @@ typedef enum eLib3MFToolpathAttributeType {
   eToolpathAttributeTypeDouble = 2
 } eLib3MFToolpathAttributeType;
 
-typedef enum eLib3MFToolpathProfileOverrideFactor {
-  eToolpathProfileOverrideFactorUnknown = 0,
-  eToolpathProfileOverrideFactorFactorF = 1,
-  eToolpathProfileOverrideFactorFactorG = 2,
-  eToolpathProfileOverrideFactorFactorH = 3
-} eLib3MFToolpathProfileOverrideFactor;
+typedef enum eLib3MFToolpathProfileModificationFactor {
+  eToolpathProfileModificationFactorUnknown = 0,
+  eToolpathProfileModificationFactorFactorF = 1,
+  eToolpathProfileModificationFactorFactorG = 2,
+  eToolpathProfileModificationFactorFactorH = 3
+} eLib3MFToolpathProfileModificationFactor;
+
+typedef enum eLib3MFToolpathProfileModificationType {
+  eToolpathProfileModificationTypeNoModification = 0,
+  eToolpathProfileModificationTypeConstantModification = 1,
+  eToolpathProfileModificationTypeLinearModification = 2,
+  eToolpathProfileModificationTypeNonlinearModification = 3
+} eLib3MFToolpathProfileModificationType;
 
 typedef enum eLib3MFCompositionMethod {
   eCompositionMethodWeightedSum = 0,
@@ -731,9 +738,14 @@ typedef union {
 } structEnumLib3MFToolpathAttributeType;
 
 typedef union {
-  eLib3MFToolpathProfileOverrideFactor m_enum;
+  eLib3MFToolpathProfileModificationFactor m_enum;
   int m_code;
-} structEnumLib3MFToolpathProfileOverrideFactor;
+} structEnumLib3MFToolpathProfileModificationFactor;
+
+typedef union {
+  eLib3MFToolpathProfileModificationType m_enum;
+  int m_code;
+} structEnumLib3MFToolpathProfileModificationType;
 
 typedef union {
   eLib3MFCompositionMethod m_enum;
@@ -818,20 +830,15 @@ typedef struct sLib3MFHatch2D {
     Lib3MF_int32 m_Tag;
 } sLib3MFHatch2D;
 
-typedef struct sLib3MFHatch2DOverrides {
-    Lib3MF_double m_Point1Override;
-    Lib3MF_double m_Point2Override;
-} sLib3MFHatch2DOverrides;
+typedef struct sLib3MFHatch2DFactors {
+    Lib3MF_double m_Point1Factor;
+    Lib3MF_double m_Point2Factor;
+} sLib3MFHatch2DFactors;
 
-typedef struct sLib3MFHatchOverrideInterpolationIndices {
-    Lib3MF_uint32 m_StartIndex;
-    Lib3MF_uint32 m_ValueCount;
-} sLib3MFHatchOverrideInterpolationIndices;
-
-typedef struct sLib3MFHatchOverrideInterpolationData {
+typedef struct sLib3MFHatchModificationInterpolationData {
     Lib3MF_double m_Parameter;
-    Lib3MF_double m_Override;
-} sLib3MFHatchOverrideInterpolationData;
+    Lib3MF_double m_Factor;
+} sLib3MFHatchModificationInterpolationData;
 
 typedef struct sLib3MFDiscreteHatch2D {
     Lib3MF_int32 m_Point1Coordinates[2];

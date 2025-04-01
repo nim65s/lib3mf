@@ -285,6 +285,31 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -6469,6 +6494,13 @@ public:
 	virtual std::string GetModifierNameByIndex(const Lib3MF_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathProfile::GetModifierTypeByIndex - Returns the type of a modifier by its index.
+	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
+	* @return Returns the type of the modifier.
+	*/
+	virtual Lib3MF::eToolpathProfileModificationType GetModifierTypeByIndex(const Lib3MF_uint32 nIndex) = 0;
+
+	/**
 	* IToolpathProfile::GetModifierNameSpaceByIndex - Returns the NameSpace of a modifier by its index.
 	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
 	* @return Returns the namespace of the modifier.
@@ -6488,31 +6520,34 @@ public:
 	* @param[in] nIndex - Index of modifier (0-based). Call will fail if an invalid index is given.
 	* @param[out] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[out] sValueName - Parameter key string.
-	* @param[out] eOverrideFactor - which type of override factor to use.
-	* @param[out] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] eModifierType - Returns the type of the modifier.
+	* @param[out] eModificationFactor - which type of modification factor to use.
+	* @param[out] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	virtual void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, Lib3MF::eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1) = 0;
+	virtual void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, Lib3MF::eToolpathProfileModificationType & eModifierType, Lib3MF::eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue) = 0;
 
 	/**
 	* IToolpathProfile::GetModifierInformationByName - Returns modifier by name.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
-	* @param[out] eOverrideFactor - which type of override factor to use.
-	* @param[out] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[out] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[out] eModifierType - Returns the type of the modifier.
+	* @param[out] eModificationFactor - which type of modification factor to use.
+	* @param[out] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[out] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	virtual void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, Lib3MF::eToolpathProfileOverrideFactor & eOverrideFactor, Lib3MF_double & dDeltaValue0, Lib3MF_double & dDeltaValue1) = 0;
+	virtual void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, Lib3MF::eToolpathProfileModificationType & eModifierType, Lib3MF::eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue) = 0;
 
 	/**
 	* IToolpathProfile::SetModifier - Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
-	* @param[in] eOverrideFactor - which type of override factor to use.
-	* @param[in] dDeltaValue0 - Delta value if Factor is equal 0.
-	* @param[in] dDeltaValue1 - Delta value if Factor is equal 1.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	virtual void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, const Lib3MF_double dDeltaValue0, const Lib3MF_double dDeltaValue1) = 0;
+	virtual void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) = 0;
 
 	/**
 	* IToolpathProfile::RemoveModifier - Removes a modifier, if it exists.
@@ -6520,17 +6555,6 @@ public:
 	* @param[in] sValueName - Parameter key string.
 	*/
 	virtual void RemoveModifier(const std::string & sNameSpaceName, const std::string & sValueName) = 0;
-
-	/**
-	* IToolpathProfile::EvaluateDoubleValue - Evaluates a double parameter, taking an optional modifier into account. Fails if neither a parameter nor a modifier exists with this name/namespace.
-	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
-	* @param[in] sValueName - Parameter key string.
-	* @param[in] dFactorF - F Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorG - G Factor value (will be clipped between 0.0 and 1.0)
-	* @param[in] dFactorH - H Factor value (will be clipped between 0.0 and 1.0)
-	* @return Evaluation result.
-	*/
-	virtual Lib3MF_double EvaluateDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dFactorF, const Lib3MF_double dFactorG, const Lib3MF_double dFactorH) = 0;
 
 };
 
@@ -6730,19 +6754,12 @@ public:
 	virtual std::string GetProfileUUIDByLocalProfileID(const Lib3MF_uint32 nLocalProfileID) = 0;
 
 	/**
-	* IToolpathLayerReader::SegmentHasOverrideFactors - Retrieves if the segment has specific override factors attached.
+	* IToolpathLayerReader::SegmentHasModificationFactors - Retrieves if the segment has specific modification factors attached.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
-	* @return Returns true, if the segment has attached any override factors of the given type, false otherwise.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
+	* @return Returns true, if the segment has attached any modification factors of the given type, false otherwise.
 	*/
-	virtual bool SegmentHasOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor) = 0;
-
-	/**
-	* IToolpathLayerReader::SegmentHasUniformProfile - Returns if the segment has a uniform profile. If it is uniform, then the default profile applies to the whole segment. If it is not uniform, the type specific retrieval functions have to be used (or the file has to be rejected). Returns false for delay and sync segments. The call is equivalent to SegmentHasOverrideFactors returning false with any possible type (F, G, H).
-	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
-	* @return If true, the segment has a uniform profile ID.
-	*/
-	virtual bool SegmentHasUniformProfile(const Lib3MF_uint32 nSegmentIndex) = 0;
+	virtual bool SegmentHasModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor) = 0;
 
 	/**
 	* IToolpathLayerReader::GetSegmentPointDataInModelUnits - Retrieves the assigned segment point list. Fails if segment type is not loop or polyline.
@@ -6763,14 +6780,14 @@ public:
 	virtual void GetSegmentPointDataDiscrete(const Lib3MF_uint32 nSegmentIndex, Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sDiscretePosition2D * pPointDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerReader::GetSegmentPointOverrideFactors - Retrieves the assigned segment override factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
+	* IToolpathLayerReader::GetSegmentPointModificationFactors - Retrieves the assigned segment modification factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesBufferSize - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - double buffer of An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[out] pFactorValuesBuffer - double buffer of An target modification factor for each point of the segment. In case of Polyline, the first array value describes the modification for the initial jump. In case of Loop, the first array value describes the modification for the inital jump and the last closing mark movement of the polyline.
 	*/
-	virtual void GetSegmentPointOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double * pFactorValuesBuffer) = 0;
+	virtual void GetSegmentPointModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double * pFactorValuesBuffer) = 0;
 
 	/**
 	* IToolpathLayerReader::GetSegmentHatchDataInModelUnits - Retrieves the assigned segment hatch list. Converts any polyline or loop into hatches. Returns an empty array for delay and sync elements.
@@ -6791,45 +6808,45 @@ public:
 	virtual void GetSegmentHatchDataDiscrete(const Lib3MF_uint32 nSegmentIndex, Lib3MF_uint64 nHatchDataBufferSize, Lib3MF_uint64* pHatchDataNeededCount, Lib3MF::sDiscreteHatch2D * pHatchDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerReader::GetLinearSegmentHatchOverrideFactors - Retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
+	* IToolpathLayerReader::GetLinearSegmentHatchModificationFactors - Retrieves the assigned segment modification factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesBufferSize - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - Hatch2DOverrides buffer of An target override factor for each point of the segment. In case of Polyline, the first array value describes the override for the initial jump. In case of Loop, the first array value describes the override for the inital jump and the last closing mark movement of the polyline.
+	* @param[out] pFactorValuesBuffer - Hatch2DFactors buffer of Two modification factors for each hatch of the segment. 
 	*/
-	virtual void GetLinearSegmentHatchOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatch2DOverrides * pFactorValuesBuffer) = 0;
+	virtual void GetLinearSegmentHatchModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatch2DFactors * pFactorValuesBuffer) = 0;
 
 	/**
-	* IToolpathLayerReader::SegmentHasNonlinearHatchOverrideInterpolation - Checks if the segment has any sub-hatch override interpolation values. Returns false, if segment type is not hatch.
+	* IToolpathLayerReader::SegmentHasNonlinearHatchModificationInterpolation - Checks if the segment has any sub-hatch modification interpolation values. Returns false, if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @return Returns true, if the segment has non-linear interpolation overrides.
+	* @return Returns true, if the segment has non-linear interpolation modifications.
 	*/
-	virtual bool SegmentHasNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex) = 0;
+	virtual bool SegmentHasNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex) = 0;
 
 	/**
-	* IToolpathLayerReader::GetSegmentNonlinearHatchOverrideInterpolation - Retrieves the sub-hatch override interpolation values for a single hatch. Fails if segment type is not hatch.
+	* IToolpathLayerReader::GetSegmentNonlinearHatchModificationInterpolation - Retrieves the sub-hatch modification interpolation values for a single hatch. Fails if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
 	* @param[in] nHatchIndex - Hatch Index in Segment. Must be between 0 and HatchCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nFactorValuesBufferSize - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - HatchOverrideInterpolationData buffer of Array of interpolation data for the hatch.
+	* @param[out] pFactorValuesBuffer - HatchModificationInterpolationData buffer of Array of interpolation data for the hatch.
 	*/
-	virtual void GetSegmentNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchOverrideInterpolationData * pFactorValuesBuffer) = 0;
+	virtual void GetSegmentNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchModificationInterpolationData * pFactorValuesBuffer) = 0;
 
 	/**
-	* IToolpathLayerReader::GetSegmentAllNonlinearHatchesOverrideInterpolation - Retrieves the sub-hatch override interpolation values for all hatches of a segment. Fails if segment type is not hatch.
+	* IToolpathLayerReader::GetSegmentAllNonlinearHatchesModificationInterpolation - Retrieves the sub-hatch modification interpolation values for all hatches of a segment. Fails if segment type is not hatch.
 	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and SegmentCount - 1.
-	* @param[in] eOverrideFactor - Which override factor value to retrieve (F, G or H). Returns an array of 0.0, if override factor type is unknown or not given.
+	* @param[in] eModificationFactor - Which modification factor value to retrieve (F, G or H). Returns an array of 0.0, if modification factor type is unknown or not given.
 	* @param[in] nCountArrayBufferSize - Number of elements in buffer
 	* @param[out] pCountArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pCountArrayBuffer - uint32 buffer of Array how many Interpolation values exist for each hatch. Will contain number of hatches elements.
 	* @param[in] nFactorValuesBufferSize - Number of elements in buffer
 	* @param[out] pFactorValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pFactorValuesBuffer - HatchOverrideInterpolationData buffer of Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements.
+	* @param[out] pFactorValuesBuffer - HatchModificationInterpolationData buffer of Array of interpolation data for the full segment, in hatch order. Will contain the sum of CountArray elements.
 	*/
-	virtual void GetSegmentAllNonlinearHatchesOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32 * pCountArrayBuffer, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchOverrideInterpolationData * pFactorValuesBuffer) = 0;
+	virtual void GetSegmentAllNonlinearHatchesModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32 * pCountArrayBuffer, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchModificationInterpolationData * pFactorValuesBuffer) = 0;
 
 };
 
@@ -6896,18 +6913,6 @@ public:
 	virtual void ClearLaserIndex() = 0;
 
 	/**
-	* IToolpathLayerData::SetOverrideFraction - Sets the denominator for the scaling factor all subsequent segments. Default is 1000.
-	* @param[in] nValue - The value of factor denominator. MUST a positive integer.
-	*/
-	virtual void SetOverrideFraction(const Lib3MF_uint32 nValue) = 0;
-
-	/**
-	* IToolpathLayerData::GetOverrideFraction - Returns the current denominator for the scaling factor all subsequent segments. Default is 1000.
-	* @return The value of factor denominator.
-	*/
-	virtual Lib3MF_uint32 GetOverrideFraction() = 0;
-
-	/**
 	* IToolpathLayerData::WriteHatchDataInModelUnits - writes hatch data to the layer in model units.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
@@ -6917,45 +6922,45 @@ public:
 	virtual void WriteHatchDataInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides - writes hatch data to the layer in model units with constant profile overrides per hatch.
+	* IToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors - writes hatch data to the layer in model units with constant profile modification factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - The hatch data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile modification scale factors (f). MUST have the same cardinality as HatchData.
 	*/
-	virtual void WriteHatchDataInModelUnitsWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WriteHatchDataInModelUnitsWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides - writes hatch data to the layer in model units with linearly ramped profile overrides per hatch.
+	* IToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors - writes hatch data to the layer in model units with linearly ramped profile modification fators per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] nScalingData1BufferSize - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2BufferSize - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pHatchDataBuffer - The hatch data in model units. Array MUST NOT be empty.
+	* @param[in] nFactorData1BufferSize - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2BufferSize - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	*/
-	virtual void WriteHatchDataInModelUnitsWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer) = 0;
+	virtual void WriteHatchDataInModelUnitsWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides - writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
+	* IToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors - writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. A Profile override ID of 0 inherits the profile of the segment.
-	* @param[in] nScalingData1BufferSize - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2BufferSize - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pHatchDataBuffer - The hatch data in model units. Array MUST NOT be empty. 
+	* @param[in] nFactorData1BufferSize - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2BufferSize - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nSubInterpolationCountsBufferSize - Number of elements in buffer
 	* @param[in] pSubInterpolationCountsBuffer - Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nOverrideInterpolationDataBufferSize - Number of elements in buffer
-	* @param[in] pOverrideInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] nModificationInterpolationDataBufferSize - Number of elements in buffer
+	* @param[in] pModificationInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	*/
-	virtual void WriteHatchDataInModelUnitsWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData * pOverrideInterpolationDataBuffer) = 0;
+	virtual void WriteHatchDataInModelUnitsWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData * pModificationInterpolationDataBuffer) = 0;
 
 	/**
 	* IToolpathLayerData::WriteHatchDataDiscrete - writes hatch data to the layer in toolpath units.
@@ -6967,45 +6972,45 @@ public:
 	virtual void WriteHatchDataDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides - writes hatch data to the layer in toolpath units with constant profile overrides per hatch.
+	* IToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors - writes hatch data to the layer in toolpath units with constant profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors (f). MUST have the same cardinality as HatchData.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile factors scale factors (f). MUST have the same cardinality as HatchData.
 	*/
-	virtual void WriteHatchDataDiscreteWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WriteHatchDataDiscreteWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides - writes hatch data to the layer in toolpath units with linearly ramped profile overrides per hatch.
+	* IToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors - writes hatch data to the layer in toolpath units with linearly ramped profile factors per hatch.
+	* @param[in] nProfileID - The toolpath profile to use
+	* @param[in] nPartID - The toolpath part to use
+	* @param[in] nHatchDataBufferSize - Number of elements in buffer
+	* @param[in] pHatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
+	* @param[in] nFactorData1BufferSize - Number of elements in buffer
+	* @param[in] pFactorData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] nFactorData2BufferSize - Number of elements in buffer
+	* @param[in] pFactorData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	*/
+	virtual void WriteHatchDataDiscreteWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double * pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double * pFactorData2Buffer) = 0;
+
+	/**
+	* IToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors - writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
 	* @param[in] nProfileID - The toolpath profile to use
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
 	* @param[in] pHatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
 	* @param[in] nScalingData1BufferSize - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pScalingData1Buffer - The profile modification scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nScalingData2BufferSize - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
-	*/
-	virtual void WriteHatchDataDiscreteWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer) = 0;
-
-	/**
-	* IToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides - writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
-	* @param[in] nProfileID - The toolpath profile to use
-	* @param[in] nPartID - The toolpath part to use
-	* @param[in] nHatchDataBufferSize - Number of elements in buffer
-	* @param[in] pHatchDataBuffer - The hatch data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingData1BufferSize - Number of elements in buffer
-	* @param[in] pScalingData1Buffer - The profile override scale factors (f) for the start point of each hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nScalingData2BufferSize - Number of elements in buffer
-	* @param[in] pScalingData2Buffer - The profile override scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
+	* @param[in] pScalingData2Buffer - The profile modification scale factors (f) for the end point of each hatch. MUST have the same cardinality as HatchData.
 	* @param[in] nSubInterpolationCountsBufferSize - Number of elements in buffer
 	* @param[in] pSubInterpolationCountsBuffer - Determines the number of subinterpolation points per hatch. MUST have the same cardinality as HatchData.
-	* @param[in] nOverrideInterpolationDataBufferSize - Number of elements in buffer
-	* @param[in] pOverrideInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
+	* @param[in] nModificationInterpolationDataBufferSize - Number of elements in buffer
+	* @param[in] pModificationInterpolationDataBuffer - Aggregate Array of interpolation points for all hatches. Sequentially in order of the hatches. For each hatch, the parameter values MUST be strictly increasing, and cannot be 0 or 1.
 	*/
-	virtual void WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData * pOverrideInterpolationDataBuffer) = 0;
+	virtual void WriteHatchDataDiscreteWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D * pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double * pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double * pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32 * pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData * pModificationInterpolationDataBuffer) = 0;
 
 	/**
 	* IToolpathLayerData::WriteLoopInModelUnits - writes loop data to the layer in model units.
@@ -7026,26 +7031,26 @@ public:
 	virtual void WriteLoopDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteLoopInModelUnitsWithOverrides - writes loop data to the layer in model units with profile overrides.
+	* IToolpathLayerData::WriteLoopInModelUnitsWithFactors - writes loop data to the layer in model units with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[in] pPointDataBuffer - The point data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	virtual void WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WriteLoopInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WriteLoopDiscreteWithOverrides - writes loop data to the layer in toolpath units with profile overrides..
+	* IToolpathLayerData::WriteLoopDiscreteWithFactors - writes loop data to the layer in toolpath units with profile modification factors..
 	* @param[in] nProfileID - The toolpath profile to use. Loop Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[in] pPointDataBuffer - The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile modification scale factors for F. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	virtual void WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WriteLoopDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
 	* IToolpathLayerData::WritePolylineInModelUnits - writes polyline data to the layer.
@@ -7057,15 +7062,15 @@ public:
 	virtual void WritePolylineInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WritePolylineInModelUnitsWithOverrides - writes polyline data to the layer with profile overrides.
+	* IToolpathLayerData::WritePolylineInModelUnitsWithFactors - writes polyline data to the layer with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[in] pPointDataBuffer - The point data in model units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	virtual void WritePolylineInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WritePolylineInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
 	* IToolpathLayerData::WritePolylineDiscrete - writes polyline data to the layer.
@@ -7077,15 +7082,15 @@ public:
 	virtual void WritePolylineDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer) = 0;
 
 	/**
-	* IToolpathLayerData::WritePolylineDiscreteWithOverrides - writes polyline data to the layer with profile overrides.
+	* IToolpathLayerData::WritePolylineDiscreteWithFactors - writes polyline data to the layer with profile modification factors.
 	* @param[in] nProfileID - The toolpath profile to use. Polyline Profiles can not be overridden by point.
 	* @param[in] nPartID - The toolpath part to use
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[in] pPointDataBuffer - The point data in toolpath units. Array MUST NOT be empty.
-	* @param[in] nScalingDataBufferSize - Number of elements in buffer
-	* @param[in] pScalingDataBuffer - The profile override scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData. A Profile override ID of 0 inherits the profile of the segment.
+	* @param[in] nFactorDataBufferSize - Number of elements in buffer
+	* @param[in] pFactorDataBuffer - The profile modification scale factors. If empty, no factors are written. MUST otherwise have the same cardinality as PointData.
 	*/
-	virtual void WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double * pScalingDataBuffer) = 0;
+	virtual void WritePolylineDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D * pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double * pFactorDataBuffer) = 0;
 
 	/**
 	* IToolpathLayerData::AddCustomData - Adds a custom data DOM tree to the layer. Layer MUST not be finished when changing the DOM tree.

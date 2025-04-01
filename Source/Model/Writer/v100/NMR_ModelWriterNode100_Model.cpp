@@ -1372,16 +1372,17 @@ namespace NMR {
 							}
 						}
 
-						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA0, (float) modifier->getDeltaValue0 ());
-						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_DELTA1, (float)modifier->getDeltaValue1());
-						switch (modifier->getOverrideFactor()) {
-							case NMR::eModelToolpathProfileOverrideFactor::pfFactorF:
+						writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_TYPE, modifier->getModificationTypeString());
+						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_MINIMUM, (float) modifier->getMinimumValue ());
+						writeFloatAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_MAXIMUM, (float)modifier->getMaximumValue());
+						switch (modifier->getModificationFactor()) {
+							case Lib3MF::eToolpathProfileModificationFactor::FactorF:
 								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "f");
 								break;
-							case NMR::eModelToolpathProfileOverrideFactor::pfFactorG:
+							case Lib3MF::eToolpathProfileModificationFactor::FactorG:
 								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "g");
 								break;
-							case NMR::eModelToolpathProfileOverrideFactor::pfFactorH:
+							case Lib3MF::eToolpathProfileModificationFactor::FactorH:
 								writeStringAttribute(XML_3MF_ATTRIBUTE_TOOLPATHMODIFIER_FACTOR, "h");
 								break;
 

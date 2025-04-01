@@ -43,6 +43,8 @@ NMR_ModelToolpathProfile.h defines the Model Toolpath Profile.
 #include <string>
 #include <list>
 
+#include "lib3mf_types.hpp"
+
 namespace NMR {
 
 	class CModelToolpathProfileValue {
@@ -65,23 +67,18 @@ namespace NMR {
 
 	typedef std::shared_ptr<CModelToolpathProfileValue> PModelToolpathProfileValue;
 
-	enum class eModelToolpathProfileOverrideFactor {
-		pfNone = 0,
-		pfFactorF = 1,
-		pfFactorG = 2,
-		pfFactorH = 3
-	};
-
 	class CModelToolpathProfileModifier {
 	private:
+		Lib3MF::eToolpathProfileModificationType m_eModificationType;
+		Lib3MF::eToolpathProfileModificationFactor m_ModificationFactor;
+
 		PModelToolpathProfileValue m_pValue;
-		double m_dDeltaValue0;
-		double m_dDeltaValue1;
-		eModelToolpathProfileOverrideFactor m_OverrideFactor;
+		double m_dMinimumValue;
+		double m_dMaximumValue;
 
 	public:
 
-		CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, double dDeltaValue0, double dDeltaValue1, eModelToolpathProfileOverrideFactor overrideFactor);
+		CModelToolpathProfileModifier(PModelToolpathProfileValue pValue, Lib3MF::eToolpathProfileModificationType modificationType, double dMinimumValue, double dMaximumValue, Lib3MF::eToolpathProfileModificationFactor modificationFactor);
 
 		virtual ~CModelToolpathProfileModifier();
 
@@ -93,11 +90,16 @@ namespace NMR {
 
 		std::string getNameSpace();
 
-		double getDeltaValue0();
+		double getMinimumValue();
 
-		double getDeltaValue1();
+		double getMaximumValue();
 
-		eModelToolpathProfileOverrideFactor getOverrideFactor ();
+		Lib3MF::eToolpathProfileModificationType getModificationType ();		
+
+		Lib3MF::eToolpathProfileModificationFactor getModificationFactor ();
+
+		std::string getModificationTypeString();
+
 	};
 
 	typedef std::shared_ptr<CModelToolpathProfileModifier> PModelToolpathProfileModifier;
@@ -106,6 +108,7 @@ namespace NMR {
 	private:
 		std::string m_sUUID;
 		std::string m_sName;
+
 
 		std::vector<PModelToolpathProfileValue> m_ValueList;
 		std::map<std::pair<std::string, std::string>, PModelToolpathProfileValue> m_ValueMap;
@@ -133,10 +136,11 @@ namespace NMR {
 		void removeParameter(const std::string& sNameSpace, const std::string& sValueName);
 		PModelToolpathProfileValue findParameter (const std::string& sNameSpace, const std::string& sValueName, bool bMustExist);
 
-		void addModifier(const std::string& sNameSpace, const std::string& sValueName, double dDelta0, double dDelta1, eModelToolpathProfileOverrideFactor overrideFactor);
+		void addModifier(const std::string& sNameSpace, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType modifierType, double dMinimum, double dMaximum, Lib3MF::eToolpathProfileModificationFactor modificationFactor);
 
 		uint32_t getModifierCount();
 		std::string getModifierName(const uint32_t nIndex);
+		Lib3MF::eToolpathProfileModificationType getModifierType(const uint32_t nIndex);
 		std::string getModifierNameSpace(const uint32_t nIndex);
 		PModelToolpathProfileModifier getModifier(const uint32_t nIndex);
 		void removeModifier(const std::string& sNameSpace, const std::string& sValueName);

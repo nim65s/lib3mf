@@ -240,14 +240,24 @@ const (
 	ToolpathAttributeType_Double = 2
 )
 
-// ToolpathProfileOverrideFactor represents a Lib3MF enum.
-type ToolpathProfileOverrideFactor int
+// ToolpathProfileModificationFactor represents a Lib3MF enum.
+type ToolpathProfileModificationFactor int
 
 const (
-	ToolpathProfileOverrideFactor_Unknown = 0
-	ToolpathProfileOverrideFactor_FactorF = 1
-	ToolpathProfileOverrideFactor_FactorG = 2
-	ToolpathProfileOverrideFactor_FactorH = 3
+	ToolpathProfileModificationFactor_Unknown = 0
+	ToolpathProfileModificationFactor_FactorF = 1
+	ToolpathProfileModificationFactor_FactorG = 2
+	ToolpathProfileModificationFactor_FactorH = 3
+)
+
+// ToolpathProfileModificationType represents a Lib3MF enum.
+type ToolpathProfileModificationType int
+
+const (
+	ToolpathProfileModificationType_NoModification = 0
+	ToolpathProfileModificationType_ConstantModification = 1
+	ToolpathProfileModificationType_LinearModification = 2
+	ToolpathProfileModificationType_NonlinearModification = 3
 )
 
 // CompositionMethod represents a Lib3MF enum.
@@ -420,22 +430,16 @@ type Hatch2D struct {
 	Tag int32
 }
 
-// Hatch2DOverrides represents a Lib3MF struct.
-type Hatch2DOverrides struct {
-	Point1Override float64
-	Point2Override float64
+// Hatch2DFactors represents a Lib3MF struct.
+type Hatch2DFactors struct {
+	Point1Factor float64
+	Point2Factor float64
 }
 
-// HatchOverrideInterpolationIndices represents a Lib3MF struct.
-type HatchOverrideInterpolationIndices struct {
-	StartIndex uint32
-	ValueCount uint32
-}
-
-// HatchOverrideInterpolationData represents a Lib3MF struct.
-type HatchOverrideInterpolationData struct {
+// HatchModificationInterpolationData represents a Lib3MF struct.
+type HatchModificationInterpolationData struct {
 	Parameter float64
-	Override float64
+	Factor float64
 }
 
 // DiscreteHatch2D represents a Lib3MF struct.
@@ -8011,6 +8015,16 @@ func (inst ToolpathProfile) GetModifierNameByIndex(index uint32) (string, error)
 	return string(buffername[:(filledinname-1)]), nil
 }
 
+// GetModifierTypeByIndex returns the type of a modifier by its index.
+func (inst ToolpathProfile) GetModifierTypeByIndex(index uint32) (ToolpathProfileModificationType, error) {
+	var modifierType C.eLib3MFToolpathProfileModificationType
+	ret := C.CCall_lib3mf_toolpathprofile_getmodifiertypebyindex(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(index), &modifierType)
+	if ret != 0 {
+		return 0, makeError(uint32(ret))
+	}
+	return ToolpathProfileModificationType(modifierType), nil
+}
+
 // GetModifierNameSpaceByIndex returns the NameSpace of a modifier by its index.
 func (inst ToolpathProfile) GetModifierNameSpaceByIndex(index uint32) (string, error) {
 	var neededfornameSpace C.uint32_t
@@ -8039,44 +8053,46 @@ func (inst ToolpathProfile) HasModifier(nameSpaceName string, valueName string) 
 }
 
 // GetModifierInformationByIndex returns modifier by index.
-func (inst ToolpathProfile) GetModifierInformationByIndex(index uint32) (string, string, ToolpathProfileOverrideFactor, float64, float64, error) {
+func (inst ToolpathProfile) GetModifierInformationByIndex(index uint32) (string, string, ToolpathProfileModificationType, ToolpathProfileModificationFactor, float64, float64, error) {
 	var neededfornameSpaceName C.uint32_t
 	var filledinnameSpaceName C.uint32_t
 	var neededforvalueName C.uint32_t
 	var filledinvalueName C.uint32_t
-	var overrideFactor C.eLib3MFToolpathProfileOverrideFactor
-	var deltaValue0 C.double
-	var deltaValue1 C.double
-	ret := C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(index), 0, &neededfornameSpaceName, nil, 0, &neededforvalueName, nil, &overrideFactor, &deltaValue0, &deltaValue1)
+	var modifierType C.eLib3MFToolpathProfileModificationType
+	var modificationFactor C.eLib3MFToolpathProfileModificationFactor
+	var minValue C.double
+	var maxValue C.double
+	ret := C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(index), 0, &neededfornameSpaceName, nil, 0, &neededforvalueName, nil, &modifierType, &modificationFactor, &minValue, &maxValue)
 	if ret != 0 {
-		return "", "", 0, 0, 0, makeError(uint32(ret))
+		return "", "", 0, 0, 0, 0, makeError(uint32(ret))
 	}
 	bufferSizenameSpaceName := neededfornameSpaceName
 	buffernameSpaceName := make([]byte, bufferSizenameSpaceName)
 	bufferSizevalueName := neededforvalueName
 	buffervalueName := make([]byte, bufferSizevalueName)
-	ret = C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(index), bufferSizenameSpaceName, &filledinnameSpaceName, (*C.char)(unsafe.Pointer(&buffernameSpaceName[0])), bufferSizevalueName, &filledinvalueName, (*C.char)(unsafe.Pointer(&buffervalueName[0])), &overrideFactor, &deltaValue0, &deltaValue1)
+	ret = C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyindex(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(index), bufferSizenameSpaceName, &filledinnameSpaceName, (*C.char)(unsafe.Pointer(&buffernameSpaceName[0])), bufferSizevalueName, &filledinvalueName, (*C.char)(unsafe.Pointer(&buffervalueName[0])), &modifierType, &modificationFactor, &minValue, &maxValue)
 	if ret != 0 {
-		return "", "", 0, 0, 0, makeError(uint32(ret))
+		return "", "", 0, 0, 0, 0, makeError(uint32(ret))
 	}
-	return string(buffernameSpaceName[:(filledinnameSpaceName-1)]), string(buffervalueName[:(filledinvalueName-1)]), ToolpathProfileOverrideFactor(overrideFactor), float64(deltaValue0), float64(deltaValue1), nil
+	return string(buffernameSpaceName[:(filledinnameSpaceName-1)]), string(buffervalueName[:(filledinvalueName-1)]), ToolpathProfileModificationType(modifierType), ToolpathProfileModificationFactor(modificationFactor), float64(minValue), float64(maxValue), nil
 }
 
 // GetModifierInformationByName returns modifier by name.
-func (inst ToolpathProfile) GetModifierInformationByName(nameSpaceName string, valueName string) (ToolpathProfileOverrideFactor, float64, float64, error) {
-	var overrideFactor C.eLib3MFToolpathProfileOverrideFactor
-	var deltaValue0 C.double
-	var deltaValue1 C.double
-	ret := C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyname(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), &overrideFactor, &deltaValue0, &deltaValue1)
+func (inst ToolpathProfile) GetModifierInformationByName(nameSpaceName string, valueName string) (ToolpathProfileModificationType, ToolpathProfileModificationFactor, float64, float64, error) {
+	var modifierType C.eLib3MFToolpathProfileModificationType
+	var modificationFactor C.eLib3MFToolpathProfileModificationFactor
+	var minValue C.double
+	var maxValue C.double
+	ret := C.CCall_lib3mf_toolpathprofile_getmodifierinformationbyname(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), &modifierType, &modificationFactor, &minValue, &maxValue)
 	if ret != 0 {
-		return 0, 0, 0, makeError(uint32(ret))
+		return 0, 0, 0, 0, makeError(uint32(ret))
 	}
-	return ToolpathProfileOverrideFactor(overrideFactor), float64(deltaValue0), float64(deltaValue1), nil
+	return ToolpathProfileModificationType(modifierType), ToolpathProfileModificationFactor(modificationFactor), float64(minValue), float64(maxValue), nil
 }
 
 // SetModifier adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
-func (inst ToolpathProfile) SetModifier(nameSpaceName string, valueName string, overrideFactor ToolpathProfileOverrideFactor, deltaValue0 float64, deltaValue1 float64) error {
-	ret := C.CCall_lib3mf_toolpathprofile_setmodifier(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), C.double(deltaValue0), C.double(deltaValue1))
+func (inst ToolpathProfile) SetModifier(nameSpaceName string, valueName string, modifierType ToolpathProfileModificationType, modificationFactor ToolpathProfileModificationFactor, minValue float64, maxValue float64) error {
+	ret := C.CCall_lib3mf_toolpathprofile_setmodifier(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.eLib3MFToolpathProfileModificationType(modifierType), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), C.double(minValue), C.double(maxValue))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8090,16 +8106,6 @@ func (inst ToolpathProfile) RemoveModifier(nameSpaceName string, valueName strin
 		return makeError(uint32(ret))
 	}
 	return nil
-}
-
-// EvaluateDoubleValue evaluates a double parameter, taking an optional modifier into account. Fails if neither a parameter nor a modifier exists with this name/namespace.
-func (inst ToolpathProfile) EvaluateDoubleValue(nameSpaceName string, valueName string, factorF float64, factorG float64, factorH float64) (float64, error) {
-	var evaluationResult C.double
-	ret := C.CCall_lib3mf_toolpathprofile_evaluatedoublevalue(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.double(factorF), C.double(factorG), C.double(factorH), &evaluationResult)
-	if ret != 0 {
-		return 0, makeError(uint32(ret))
-	}
-	return float64(evaluationResult), nil
 }
 
 
@@ -8408,24 +8414,14 @@ func (inst ToolpathLayerReader) GetProfileUUIDByLocalProfileID(localProfileID ui
 	return string(bufferprofileUUID[:(filledinprofileUUID-1)]), nil
 }
 
-// SegmentHasOverrideFactors retrieves if the segment has specific override factors attached.
-func (inst ToolpathLayerReader) SegmentHasOverrideFactors(segmentIndex uint32, overrideFactor ToolpathProfileOverrideFactor) (bool, error) {
-	var hasOverrides C.bool
-	ret := C.CCall_lib3mf_toolpathlayerreader_segmenthasoverridefactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), &hasOverrides)
+// SegmentHasModificationFactors retrieves if the segment has specific modification factors attached.
+func (inst ToolpathLayerReader) SegmentHasModificationFactors(segmentIndex uint32, modificationFactor ToolpathProfileModificationFactor) (bool, error) {
+	var hasModificationFactors C.bool
+	ret := C.CCall_lib3mf_toolpathlayerreader_segmenthasmodificationfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), &hasModificationFactors)
 	if ret != 0 {
 		return false, makeError(uint32(ret))
 	}
-	return bool(hasOverrides), nil
-}
-
-// SegmentHasUniformProfile returns if the segment has a uniform profile. If it is uniform, then the default profile applies to the whole segment. If it is not uniform, the type specific retrieval functions have to be used (or the file has to be rejected). Returns false for delay and sync segments. The call is equivalent to SegmentHasOverrideFactors returning false with any possible type (F, G, H).
-func (inst ToolpathLayerReader) SegmentHasUniformProfile(segmentIndex uint32) (bool, error) {
-	var hasUniformProfile C.bool
-	ret := C.CCall_lib3mf_toolpathlayerreader_segmenthasuniformprofile(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), &hasUniformProfile)
-	if ret != 0 {
-		return false, makeError(uint32(ret))
-	}
-	return bool(hasUniformProfile), nil
+	return bool(hasModificationFactors), nil
 }
 
 // GetSegmentPointDataInModelUnits retrieves the assigned segment point list. Fails if segment type is not loop or polyline.
@@ -8462,17 +8458,17 @@ func (inst ToolpathLayerReader) GetSegmentPointDataDiscrete(segmentIndex uint32,
 	return pointData[:int(neededforpointData)], nil
 }
 
-// GetSegmentPointOverrideFactors retrieves the assigned segment override factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
-func (inst ToolpathLayerReader) GetSegmentPointOverrideFactors(segmentIndex uint32, overrideFactor ToolpathProfileOverrideFactor, factorValues []float64) ([]float64, error) {
+// GetSegmentPointModificationFactors retrieves the assigned segment modification factors. Fails if segment type is not loop or polyline. The values are per point, meaning that gradients are given through linear ramping on the polyline vectors.
+func (inst ToolpathLayerReader) GetSegmentPointModificationFactors(segmentIndex uint32, modificationFactor ToolpathProfileModificationFactor, factorValues []float64) ([]float64, error) {
 	var neededforfactorValues C.uint64_t
-	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentpointoverridefactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), 0, &neededforfactorValues, nil)
+	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), 0, &neededforfactorValues, nil)
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
 	if len(factorValues) < int(neededforfactorValues) {
 	 factorValues = append(factorValues, make([]float64, int(neededforfactorValues)-len(factorValues))...)
 	}
-	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentpointoverridefactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), neededforfactorValues, nil, (*C.double)(unsafe.Pointer(&factorValues[0])))
+	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentpointmodificationfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), neededforfactorValues, nil, (*C.double)(unsafe.Pointer(&factorValues[0])))
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
@@ -8513,55 +8509,55 @@ func (inst ToolpathLayerReader) GetSegmentHatchDataDiscrete(segmentIndex uint32,
 	return hatchData[:int(neededforhatchData)], nil
 }
 
-// GetLinearSegmentHatchOverrideFactors retrieves the assigned segment override factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
-func (inst ToolpathLayerReader) GetLinearSegmentHatchOverrideFactors(segmentIndex uint32, overrideFactor ToolpathProfileOverrideFactor, factorValues []Hatch2DOverrides) ([]Hatch2DOverrides, error) {
+// GetLinearSegmentHatchModificationFactors retrieves the assigned segment modification factors. Fails if segment type is not hatch. The call will return two values per hatch, one per hatch point.
+func (inst ToolpathLayerReader) GetLinearSegmentHatchModificationFactors(segmentIndex uint32, modificationFactor ToolpathProfileModificationFactor, factorValues []Hatch2DFactors) ([]Hatch2DFactors, error) {
 	var neededforfactorValues C.uint64_t
-	ret := C.CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), 0, &neededforfactorValues, nil)
+	ret := C.CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), 0, &neededforfactorValues, nil)
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
 	if len(factorValues) < int(neededforfactorValues) {
-	 factorValues = append(factorValues, make([]Hatch2DOverrides, int(neededforfactorValues)-len(factorValues))...)
+	 factorValues = append(factorValues, make([]Hatch2DFactors, int(neededforfactorValues)-len(factorValues))...)
 	}
-	ret = C.CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchoverridefactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), neededforfactorValues, nil, (*C.sLib3MFHatch2DOverrides)(unsafe.Pointer(&factorValues[0])))
+	ret = C.CCall_lib3mf_toolpathlayerreader_getlinearsegmenthatchmodificationfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), neededforfactorValues, nil, (*C.sLib3MFHatch2DFactors)(unsafe.Pointer(&factorValues[0])))
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
 	return factorValues[:int(neededforfactorValues)], nil
 }
 
-// SegmentHasNonlinearHatchOverrideInterpolation checks if the segment has any sub-hatch override interpolation values. Returns false, if segment type is not hatch.
-func (inst ToolpathLayerReader) SegmentHasNonlinearHatchOverrideInterpolation(segmentIndex uint32) (bool, error) {
-	var hasOverrideInterpolation C.bool
-	ret := C.CCall_lib3mf_toolpathlayerreader_segmenthasnonlinearhatchoverrideinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), &hasOverrideInterpolation)
+// SegmentHasNonlinearHatchModificationInterpolation checks if the segment has any sub-hatch modification interpolation values. Returns false, if segment type is not hatch.
+func (inst ToolpathLayerReader) SegmentHasNonlinearHatchModificationInterpolation(segmentIndex uint32) (bool, error) {
+	var hasModificationInterpolation C.bool
+	ret := C.CCall_lib3mf_toolpathlayerreader_segmenthasnonlinearhatchmodificationinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), &hasModificationInterpolation)
 	if ret != 0 {
 		return false, makeError(uint32(ret))
 	}
-	return bool(hasOverrideInterpolation), nil
+	return bool(hasModificationInterpolation), nil
 }
 
-// GetSegmentNonlinearHatchOverrideInterpolation retrieves the sub-hatch override interpolation values for a single hatch. Fails if segment type is not hatch.
-func (inst ToolpathLayerReader) GetSegmentNonlinearHatchOverrideInterpolation(segmentIndex uint32, hatchIndex uint32, overrideFactor ToolpathProfileOverrideFactor, factorValues []HatchOverrideInterpolationData) ([]HatchOverrideInterpolationData, error) {
+// GetSegmentNonlinearHatchModificationInterpolation retrieves the sub-hatch modification interpolation values for a single hatch. Fails if segment type is not hatch.
+func (inst ToolpathLayerReader) GetSegmentNonlinearHatchModificationInterpolation(segmentIndex uint32, hatchIndex uint32, modificationFactor ToolpathProfileModificationFactor, factorValues []HatchModificationInterpolationData) ([]HatchModificationInterpolationData, error) {
 	var neededforfactorValues C.uint64_t
-	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.uint32_t(hatchIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), 0, &neededforfactorValues, nil)
+	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.uint32_t(hatchIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), 0, &neededforfactorValues, nil)
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
 	if len(factorValues) < int(neededforfactorValues) {
-	 factorValues = append(factorValues, make([]HatchOverrideInterpolationData, int(neededforfactorValues)-len(factorValues))...)
+	 factorValues = append(factorValues, make([]HatchModificationInterpolationData, int(neededforfactorValues)-len(factorValues))...)
 	}
-	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchoverrideinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.uint32_t(hatchIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), neededforfactorValues, nil, (*C.sLib3MFHatchOverrideInterpolationData)(unsafe.Pointer(&factorValues[0])))
+	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentnonlinearhatchmodificationinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.uint32_t(hatchIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), neededforfactorValues, nil, (*C.sLib3MFHatchModificationInterpolationData)(unsafe.Pointer(&factorValues[0])))
 	if ret != 0 {
 		return nil, makeError(uint32(ret))
 	}
 	return factorValues[:int(neededforfactorValues)], nil
 }
 
-// GetSegmentAllNonlinearHatchesOverrideInterpolation retrieves the sub-hatch override interpolation values for all hatches of a segment. Fails if segment type is not hatch.
-func (inst ToolpathLayerReader) GetSegmentAllNonlinearHatchesOverrideInterpolation(segmentIndex uint32, overrideFactor ToolpathProfileOverrideFactor, countArray []uint32, factorValues []HatchOverrideInterpolationData) ([]uint32, []HatchOverrideInterpolationData, error) {
+// GetSegmentAllNonlinearHatchesModificationInterpolation retrieves the sub-hatch modification interpolation values for all hatches of a segment. Fails if segment type is not hatch.
+func (inst ToolpathLayerReader) GetSegmentAllNonlinearHatchesModificationInterpolation(segmentIndex uint32, modificationFactor ToolpathProfileModificationFactor, countArray []uint32, factorValues []HatchModificationInterpolationData) ([]uint32, []HatchModificationInterpolationData, error) {
 	var neededforcountArray C.uint64_t
 	var neededforfactorValues C.uint64_t
-	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), 0, &neededforcountArray, nil, 0, &neededforfactorValues, nil)
+	ret := C.CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), 0, &neededforcountArray, nil, 0, &neededforfactorValues, nil)
 	if ret != 0 {
 		return nil, nil, makeError(uint32(ret))
 	}
@@ -8569,9 +8565,9 @@ func (inst ToolpathLayerReader) GetSegmentAllNonlinearHatchesOverrideInterpolati
 	 countArray = append(countArray, make([]uint32, int(neededforcountArray)-len(countArray))...)
 	}
 	if len(factorValues) < int(neededforfactorValues) {
-	 factorValues = append(factorValues, make([]HatchOverrideInterpolationData, int(neededforfactorValues)-len(factorValues))...)
+	 factorValues = append(factorValues, make([]HatchModificationInterpolationData, int(neededforfactorValues)-len(factorValues))...)
 	}
-	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesoverrideinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileOverrideFactor(overrideFactor), neededforcountArray, nil, (*C.uint32_t)(unsafe.Pointer(&countArray[0])), neededforfactorValues, nil, (*C.sLib3MFHatchOverrideInterpolationData)(unsafe.Pointer(&factorValues[0])))
+	ret = C.CCall_lib3mf_toolpathlayerreader_getsegmentallnonlinearhatchesmodificationinterpolation(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(segmentIndex), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), neededforcountArray, nil, (*C.uint32_t)(unsafe.Pointer(&countArray[0])), neededforfactorValues, nil, (*C.sLib3MFHatchModificationInterpolationData)(unsafe.Pointer(&factorValues[0])))
 	if ret != 0 {
 		return nil, nil, makeError(uint32(ret))
 	}
@@ -8661,25 +8657,6 @@ func (inst ToolpathLayerData) ClearLaserIndex() error {
 	return nil
 }
 
-// SetOverrideFraction sets the denominator for the scaling factor all subsequent segments. Default is 1000.
-func (inst ToolpathLayerData) SetOverrideFraction(value uint32) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_setoverridefraction(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(value))
-	if ret != 0 {
-		return makeError(uint32(ret))
-	}
-	return nil
-}
-
-// GetOverrideFraction returns the current denominator for the scaling factor all subsequent segments. Default is 1000.
-func (inst ToolpathLayerData) GetOverrideFraction() (uint32, error) {
-	var value C.uint32_t
-	ret := C.CCall_lib3mf_toolpathlayerdata_getoverridefraction(inst.wrapperRef.LibraryHandle, inst.Ref, &value)
-	if ret != 0 {
-		return 0, makeError(uint32(ret))
-	}
-	return uint32(value), nil
-}
-
 // WriteHatchDataInModelUnits writes hatch data to the layer in model units.
 func (inst ToolpathLayerData) WriteHatchDataInModelUnits(profileID uint32, partID uint32, hatchData []Hatch2D) error {
 	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunits(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])))
@@ -8689,27 +8666,27 @@ func (inst ToolpathLayerData) WriteHatchDataInModelUnits(profileID uint32, partI
 	return nil
 }
 
-// WriteHatchDataInModelUnitsWithConstantOverrides writes hatch data to the layer in model units with constant profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithConstantOverrides(profileID uint32, partID uint32, hatchData []Hatch2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WriteHatchDataInModelUnitsWithConstantFactors writes hatch data to the layer in model units with constant profile modification factors per hatch.
+func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithConstantFactors(profileID uint32, partID uint32, hatchData []Hatch2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithconstantfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
 }
 
-// WriteHatchDataInModelUnitsWithLinearOverrides writes hatch data to the layer in model units with linearly ramped profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithLinearOverrides(profileID uint32, partID uint32, hatchData []Hatch2D, scalingData1 []float64, scalingData2 []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData1)), (*C.double)(unsafe.Pointer(&scalingData1[0])), C.uint64_t(len(scalingData2)), (*C.double)(unsafe.Pointer(&scalingData2[0])))
+// WriteHatchDataInModelUnitsWithLinearFactors writes hatch data to the layer in model units with linearly ramped profile modification fators per hatch.
+func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithLinearFactors(profileID uint32, partID uint32, hatchData []Hatch2D, factorData1 []float64, factorData2 []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithlinearfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(factorData1)), (*C.double)(unsafe.Pointer(&factorData1[0])), C.uint64_t(len(factorData2)), (*C.double)(unsafe.Pointer(&factorData2[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
 }
 
-// WriteHatchDataInModelUnitsWithNonlinearOverrides writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithNonlinearOverrides(profileID uint32, partID uint32, hatchData []Hatch2D, scalingData1 []float64, scalingData2 []float64, subInterpolationCounts []uint32, overrideInterpolationData []HatchOverrideInterpolationData) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData1)), (*C.double)(unsafe.Pointer(&scalingData1[0])), C.uint64_t(len(scalingData2)), (*C.double)(unsafe.Pointer(&scalingData2[0])), C.uint64_t(len(subInterpolationCounts)), (*C.uint32_t)(unsafe.Pointer(&subInterpolationCounts[0])), C.uint64_t(len(overrideInterpolationData)), (*C.sLib3MFHatchOverrideInterpolationData)(unsafe.Pointer(&overrideInterpolationData[0])))
+// WriteHatchDataInModelUnitsWithNonlinearFactors writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
+func (inst ToolpathLayerData) WriteHatchDataInModelUnitsWithNonlinearFactors(profileID uint32, partID uint32, hatchData []Hatch2D, factorData1 []float64, factorData2 []float64, subInterpolationCounts []uint32, modificationInterpolationData []HatchModificationInterpolationData) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatainmodelunitswithnonlinearfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(factorData1)), (*C.double)(unsafe.Pointer(&factorData1[0])), C.uint64_t(len(factorData2)), (*C.double)(unsafe.Pointer(&factorData2[0])), C.uint64_t(len(subInterpolationCounts)), (*C.uint32_t)(unsafe.Pointer(&subInterpolationCounts[0])), C.uint64_t(len(modificationInterpolationData)), (*C.sLib3MFHatchModificationInterpolationData)(unsafe.Pointer(&modificationInterpolationData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8725,27 +8702,27 @@ func (inst ToolpathLayerData) WriteHatchDataDiscrete(profileID uint32, partID ui
 	return nil
 }
 
-// WriteHatchDataDiscreteWithConstantOverrides writes hatch data to the layer in toolpath units with constant profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataDiscreteWithConstantOverrides(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WriteHatchDataDiscreteWithConstantFactors writes hatch data to the layer in toolpath units with constant profile factors per hatch.
+func (inst ToolpathLayerData) WriteHatchDataDiscreteWithConstantFactors(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithconstantfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
 }
 
-// WriteHatchDataDiscreteWithLinearOverrides writes hatch data to the layer in toolpath units with linearly ramped profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataDiscreteWithLinearOverrides(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, scalingData1 []float64, scalingData2 []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData1)), (*C.double)(unsafe.Pointer(&scalingData1[0])), C.uint64_t(len(scalingData2)), (*C.double)(unsafe.Pointer(&scalingData2[0])))
+// WriteHatchDataDiscreteWithLinearFactors writes hatch data to the layer in toolpath units with linearly ramped profile factors per hatch.
+func (inst ToolpathLayerData) WriteHatchDataDiscreteWithLinearFactors(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, factorData1 []float64, factorData2 []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithlinearfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(factorData1)), (*C.double)(unsafe.Pointer(&factorData1[0])), C.uint64_t(len(factorData2)), (*C.double)(unsafe.Pointer(&factorData2[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
 }
 
-// WriteHatchDataDiscreteWithNonlinearOverrides writes hatch data to the layer in toolpath units with non-linearly ramped profile overrides per hatch.
-func (inst ToolpathLayerData) WriteHatchDataDiscreteWithNonlinearOverrides(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, scalingData1 []float64, scalingData2 []float64, subInterpolationCounts []uint32, overrideInterpolationData []HatchOverrideInterpolationData) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData1)), (*C.double)(unsafe.Pointer(&scalingData1[0])), C.uint64_t(len(scalingData2)), (*C.double)(unsafe.Pointer(&scalingData2[0])), C.uint64_t(len(subInterpolationCounts)), (*C.uint32_t)(unsafe.Pointer(&subInterpolationCounts[0])), C.uint64_t(len(overrideInterpolationData)), (*C.sLib3MFHatchOverrideInterpolationData)(unsafe.Pointer(&overrideInterpolationData[0])))
+// WriteHatchDataDiscreteWithNonlinearFactors writes hatch data to the layer in toolpath units with non-linearly ramped profile factors per hatch.
+func (inst ToolpathLayerData) WriteHatchDataDiscreteWithNonlinearFactors(profileID uint32, partID uint32, hatchData []DiscreteHatch2D, scalingData1 []float64, scalingData2 []float64, subInterpolationCounts []uint32, modificationInterpolationData []HatchModificationInterpolationData) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writehatchdatadiscretewithnonlinearfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(hatchData)), (*C.sLib3MFDiscreteHatch2D)(unsafe.Pointer(&hatchData[0])), C.uint64_t(len(scalingData1)), (*C.double)(unsafe.Pointer(&scalingData1[0])), C.uint64_t(len(scalingData2)), (*C.double)(unsafe.Pointer(&scalingData2[0])), C.uint64_t(len(subInterpolationCounts)), (*C.uint32_t)(unsafe.Pointer(&subInterpolationCounts[0])), C.uint64_t(len(modificationInterpolationData)), (*C.sLib3MFHatchModificationInterpolationData)(unsafe.Pointer(&modificationInterpolationData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8770,18 +8747,18 @@ func (inst ToolpathLayerData) WriteLoopDiscrete(profileID uint32, partID uint32,
 	return nil
 }
 
-// WriteLoopInModelUnitsWithOverrides writes loop data to the layer in model units with profile overrides.
-func (inst ToolpathLayerData) WriteLoopInModelUnitsWithOverrides(profileID uint32, partID uint32, pointData []Position2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writeloopinmodelunitswithoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFPosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WriteLoopInModelUnitsWithFactors writes loop data to the layer in model units with profile modification factors.
+func (inst ToolpathLayerData) WriteLoopInModelUnitsWithFactors(profileID uint32, partID uint32, pointData []Position2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writeloopinmodelunitswithfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFPosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
 }
 
-// WriteLoopDiscreteWithOverrides writes loop data to the layer in toolpath units with profile overrides..
-func (inst ToolpathLayerData) WriteLoopDiscreteWithOverrides(profileID uint32, partID uint32, pointData []DiscretePosition2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writeloopdiscretewithoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFDiscretePosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WriteLoopDiscreteWithFactors writes loop data to the layer in toolpath units with profile modification factors..
+func (inst ToolpathLayerData) WriteLoopDiscreteWithFactors(profileID uint32, partID uint32, pointData []DiscretePosition2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writeloopdiscretewithfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFDiscretePosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8797,9 +8774,9 @@ func (inst ToolpathLayerData) WritePolylineInModelUnits(profileID uint32, partID
 	return nil
 }
 
-// WritePolylineInModelUnitsWithOverrides writes polyline data to the layer with profile overrides.
-func (inst ToolpathLayerData) WritePolylineInModelUnitsWithOverrides(profileID uint32, partID uint32, pointData []Position2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writepolylineinmodelunitswithoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFPosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WritePolylineInModelUnitsWithFactors writes polyline data to the layer with profile modification factors.
+func (inst ToolpathLayerData) WritePolylineInModelUnitsWithFactors(profileID uint32, partID uint32, pointData []Position2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writepolylineinmodelunitswithfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFPosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8815,9 +8792,9 @@ func (inst ToolpathLayerData) WritePolylineDiscrete(profileID uint32, partID uin
 	return nil
 }
 
-// WritePolylineDiscreteWithOverrides writes polyline data to the layer with profile overrides.
-func (inst ToolpathLayerData) WritePolylineDiscreteWithOverrides(profileID uint32, partID uint32, pointData []DiscretePosition2D, scalingData []float64) error {
-	ret := C.CCall_lib3mf_toolpathlayerdata_writepolylinediscretewithoverrides(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFDiscretePosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(scalingData)), (*C.double)(unsafe.Pointer(&scalingData[0])))
+// WritePolylineDiscreteWithFactors writes polyline data to the layer with profile modification factors.
+func (inst ToolpathLayerData) WritePolylineDiscreteWithFactors(profileID uint32, partID uint32, pointData []DiscretePosition2D, factorData []float64) error {
+	ret := C.CCall_lib3mf_toolpathlayerdata_writepolylinediscretewithfactors(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(profileID), C.uint32_t(partID), C.uint64_t(len(pointData)), (*C.sLib3MFDiscretePosition2D)(unsafe.Pointer(&pointData[0])), C.uint64_t(len(factorData)), (*C.double)(unsafe.Pointer(&factorData[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}

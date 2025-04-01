@@ -111,20 +111,21 @@ ICustomDOMTree* CToolpathLayerData::AddCustomData(const std::string& sNameSpace,
 
 void CToolpathLayerData::WriteHatchDataInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer)
 {
-	WriteHatchDataInModelUnitsWithLinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, 0, nullptr, 0, nullptr);
+	WriteHatchDataInModelUnitsWithLinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, 0, nullptr, 0, nullptr);
 }
 
-void CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WriteHatchDataInModelUnitsWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) 
 {
-	WriteHatchDataInModelUnitsWithLinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingDataBufferSize, pScalingDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	WriteHatchDataInModelUnitsWithLinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorDataBufferSize, pFactorDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 }
 
-void CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer)
+
+void CToolpathLayerData::WriteHatchDataInModelUnitsWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer) 
 {
-	WriteHatchDataInModelUnitsWithNonlinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer, 0, nullptr, 0, nullptr);
+	WriteHatchDataInModelUnitsWithNonlinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorData1BufferSize, pFactorData1Buffer, nFactorData2BufferSize, pFactorData2Buffer, 0, nullptr, 0, nullptr);
 }
 
-void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer)
+void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData* pModificationInterpolationDataBuffer) 
 {
 	if (nHatchDataBufferSize == 0)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDHATCHCOUNT);
@@ -135,10 +136,10 @@ void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(const 
 	if (pHatchDataBuffer == nullptr)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDPARAM);
 
-	auto nScalingDataF1BufferSize = nScalingData1BufferSize;
-	auto nScalingDataF2BufferSize = nScalingData2BufferSize;
-	auto pScalingDataF1Buffer = pScalingData1Buffer;
-	auto pScalingDataF2Buffer = pScalingData2Buffer;
+	auto nScalingDataF1BufferSize = nFactorData1BufferSize;
+	auto nScalingDataF2BufferSize = nFactorData2BufferSize;
+	auto pScalingDataF1Buffer = pFactorData1Buffer;
+	auto pScalingDataF2Buffer = pFactorData2Buffer;
 
 	if (nScalingDataF1BufferSize == 0)
 		pScalingDataF1Buffer = nullptr;
@@ -211,28 +212,28 @@ void CToolpathLayerData::WriteHatchDataInModelUnitsWithNonlinearOverrides(const 
 	if (nTagCount > 0)
 		pTagValues = TagValues.data();
 
-	m_pLayerData->WriteHatchData(nProfileID, nPartID, nHatchCount, X1Values.data(), Y1Values.data(), X2Values.data(), Y2Values.data(), pTagValues, pScalingDataF1Buffer, pScalingDataF2Buffer, pSubInterpolationCountsBuffer, nOverrideInterpolationDataBufferSize, pOverrideInterpolationDataBuffer);
+	m_pLayerData->WriteHatchData(nProfileID, nPartID, nHatchCount, X1Values.data(), Y1Values.data(), X2Values.data(), Y2Values.data(), pTagValues, pScalingDataF1Buffer, pScalingDataF2Buffer, pSubInterpolationCountsBuffer, nModificationInterpolationDataBufferSize, pModificationInterpolationDataBuffer);
 
 }
 
 void CToolpathLayerData::WriteHatchDataDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer)
 {
-	WriteHatchDataDiscreteWithLinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, 0, nullptr, 0, nullptr);
+	WriteHatchDataDiscreteWithLinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, 0, nullptr, 0, nullptr);
 }
 
 
-void CToolpathLayerData::WriteHatchDataDiscreteWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WriteHatchDataDiscreteWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) 
 {
-	WriteHatchDataDiscreteWithLinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingDataBufferSize, pScalingDataBuffer, nScalingDataBufferSize, pScalingDataBuffer);
+	WriteHatchDataDiscreteWithLinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorDataBufferSize, pFactorDataBuffer, nFactorDataBufferSize, pFactorDataBuffer);
 
 }
 
-void CToolpathLayerData::WriteHatchDataDiscreteWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer)
+void CToolpathLayerData::WriteHatchDataDiscreteWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer)
 {
-	WriteHatchDataDiscreteWithNonlinearOverrides(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nScalingData1BufferSize, pScalingData1Buffer, nScalingData2BufferSize, pScalingData2Buffer, 0, nullptr, 0, nullptr);
+	WriteHatchDataDiscreteWithNonlinearFactors(nProfileID, nPartID, nHatchDataBufferSize, pHatchDataBuffer, nFactorData1BufferSize, pFactorData1Buffer, nFactorData2BufferSize, pFactorData2Buffer, 0, nullptr, 0, nullptr);
 }
 
-void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer) 
+void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData* pModificationInterpolationDataBuffer) 
 {
 
 	if (nHatchDataBufferSize == 0)
@@ -263,10 +264,10 @@ void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA);
 	}
 
-	if (nOverrideInterpolationDataBufferSize == 0)
-		pOverrideInterpolationDataBuffer = nullptr;
-	if (pOverrideInterpolationDataBuffer != nullptr) {
-		if (nHatchDataBufferSize != nOverrideInterpolationDataBufferSize)
+	if (nModificationInterpolationDataBufferSize == 0)
+		pModificationInterpolationDataBuffer = nullptr;
+	if (pModificationInterpolationDataBuffer != nullptr) {
+		if (nHatchDataBufferSize != nModificationInterpolationDataBufferSize)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA);
 	}
 
@@ -320,7 +321,7 @@ void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3
 	if (nTagCount > 0)
 		pTagValues = TagValues.data();
 
-	m_pLayerData->WriteHatchData(nProfileID, nPartID, nHatchCount, X1Values.data(), Y1Values.data(), X2Values.data(), Y2Values.data(), pTagValues, pScalingDataF1Buffer, pScalingDataF2Buffer, pSubInterpolationCountsBuffer, nOverrideInterpolationDataBufferSize, pOverrideInterpolationDataBuffer);
+	m_pLayerData->WriteHatchData(nProfileID, nPartID, nHatchCount, X1Values.data(), Y1Values.data(), X2Values.data(), Y2Values.data(), pTagValues, pScalingDataF1Buffer, pScalingDataF2Buffer, pSubInterpolationCountsBuffer, nModificationInterpolationDataBufferSize, pModificationInterpolationDataBuffer);
 
 }
 
@@ -330,21 +331,21 @@ void CToolpathLayerData::WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3
 
 void CToolpathLayerData::WriteLoopInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer)
 {
-	WriteLoopInModelUnitsWithOverrides(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
+	WriteLoopInModelUnitsWithFactors(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
 }
 
 
-void CToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WriteLoopInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer)
 {
 	if (nPointDataBufferSize == 0)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 	if (nPointDataBufferSize > LIB3MF_MAXTOOLPATHPOINTCOUNT)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 
-	if (nScalingDataBufferSize == 0)
-		pScalingDataBuffer = nullptr;
-	if (pScalingDataBuffer != nullptr) {
-		if (nScalingDataBufferSize != nPointDataBufferSize)
+	if (nFactorDataBufferSize == 0)
+		pFactorDataBuffer = nullptr;
+	if (pFactorDataBuffer != nullptr) {
+		if (nFactorDataBufferSize != nPointDataBufferSize)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA);
 	}
 
@@ -373,26 +374,26 @@ void CToolpathLayerData::WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 
 		pPointData++;
 	}
 
-	m_pLayerData->WriteLoop(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pScalingDataBuffer, nullptr, nullptr);
+	m_pLayerData->WriteLoop(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pFactorDataBuffer, nullptr, nullptr);
 
 }
 
 void CToolpathLayerData::WriteLoopDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer)
 {
-	WriteLoopDiscreteWithOverrides(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
+	WriteLoopDiscreteWithFactors(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
 }
 
-void CToolpathLayerData::WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WriteLoopDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer)
 {
 	if (nPointDataBufferSize == 0)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 	if (nPointDataBufferSize > LIB3MF_MAXTOOLPATHPOINTCOUNT)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 
-	if (nScalingDataBufferSize == 0)
-		pScalingDataBuffer = nullptr;
-	if (pScalingDataBuffer != nullptr) {
-		if (nScalingDataBufferSize != nPointDataBufferSize)
+	if (nFactorDataBufferSize == 0)
+		pFactorDataBuffer = nullptr;
+	if (pFactorDataBuffer != nullptr) {
+		if (nFactorDataBufferSize != nPointDataBufferSize)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA);
 	}
 
@@ -422,16 +423,16 @@ void CToolpathLayerData::WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nPro
 		pPointData++;
 	}
 
-	m_pLayerData->WriteLoop(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pScalingDataBuffer, nullptr, nullptr);
+	m_pLayerData->WriteLoop(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pFactorDataBuffer, nullptr, nullptr);
 
 }
 
 void CToolpathLayerData::WritePolylineInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer)
 {
-	WritePolylineInModelUnitsWithOverrides(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
+	WritePolylineInModelUnitsWithFactors(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
 }
 
-void CToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WritePolylineInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) 
 {
 
 	if (nPointDataBufferSize == 0)
@@ -439,10 +440,10 @@ void CToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const Lib3MF_uin
 	if (nPointDataBufferSize > LIB3MF_MAXTOOLPATHPOINTCOUNT)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 
-	if (nScalingDataBufferSize == 0)
-		pScalingDataBuffer = nullptr;
-	if (pScalingDataBuffer != nullptr) {
-		if (nScalingDataBufferSize != nPointDataBufferSize)
+	if (nFactorDataBufferSize == 0)
+		pFactorDataBuffer = nullptr;
+	if (pFactorDataBuffer != nullptr) {
+		if (nFactorDataBufferSize != nPointDataBufferSize)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA);
 	}
 
@@ -473,16 +474,16 @@ void CToolpathLayerData::WritePolylineInModelUnitsWithOverrides(const Lib3MF_uin
 		pPointData++;
 	}
 
-	m_pLayerData->WritePolyline(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pScalingDataBuffer, nullptr, nullptr);
+	m_pLayerData->WritePolyline(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pFactorDataBuffer, nullptr, nullptr);
 }
 
 
 void CToolpathLayerData::WritePolylineDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer)
 {
-	WritePolylineDiscreteWithOverrides(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
+	WritePolylineDiscreteWithFactors(nProfileID, nPartID, nPointDataBufferSize, pPointDataBuffer, 0, nullptr);
 }
 
-void CToolpathLayerData::WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer)
+void CToolpathLayerData::WritePolylineDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer)
 {
 
 	if (nPointDataBufferSize == 0)
@@ -490,10 +491,10 @@ void CToolpathLayerData::WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 
 	if (nPointDataBufferSize > LIB3MF_MAXTOOLPATHPOINTCOUNT)
 		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_INVALIDPOINTCOUNT);
 
-	if (nScalingDataBufferSize == 0)
-		pScalingDataBuffer = nullptr;
-	if (pScalingDataBuffer != nullptr) {
-		if (nScalingDataBufferSize != nPointDataBufferSize)
+	if (nFactorDataBufferSize == 0)
+		pFactorDataBuffer = nullptr;
+	if (pFactorDataBuffer != nullptr) {
+		if (nFactorDataBufferSize != nPointDataBufferSize)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA);
 	}
 
@@ -523,7 +524,7 @@ void CToolpathLayerData::WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 
 		pPointData++;
 	}
 
-	m_pLayerData->WritePolyline(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pScalingDataBuffer, nullptr, nullptr);
+	m_pLayerData->WritePolyline(nProfileID, nPartID, nPointCount, XValues.data(), YValues.data(), nullptr, pFactorDataBuffer, nullptr, nullptr);
 }
 
 
@@ -560,14 +561,4 @@ void CToolpathLayerData::ClearLaserIndex()
 	m_pLayerData->setCurrentLaserIndex(0);
 }
 
-
-void CToolpathLayerData::SetOverrideFraction(const Lib3MF_uint32 nValue)
-{
-	m_pLayerData->setOverrideFraction(nValue);
-}
-
-Lib3MF_uint32 CToolpathLayerData::GetOverrideFraction()
-{
-	return m_pLayerData->getOverrideFraction ();
-}
 

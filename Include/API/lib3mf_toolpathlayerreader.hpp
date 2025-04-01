@@ -116,27 +116,25 @@ public:
 
 	std::string GetProfileUUIDByLocalProfileID(const Lib3MF_uint32 nLocalProfileID) override;
 
-	bool SegmentHasUniformProfile(const Lib3MF_uint32 nIndex) override;
-
-	bool SegmentHasOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor) override;
-
 	void GetSegmentPointDataInModelUnits(const Lib3MF_uint32 nIndex, Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sPosition2D * pPointDataBuffer) override;
 
 	void GetSegmentPointDataDiscrete(const Lib3MF_uint32 nIndex, Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sDiscretePosition2D* pPointDataBuffer) override;
 
-	void GetSegmentPointOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double* pFactorValuesBuffer) override;
+	void GetSegmentPointModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF_double* pFactorValuesBuffer) override;
+
+	bool SegmentHasModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor) override;
 
 	void GetSegmentHatchDataInModelUnits(const Lib3MF_uint32 nIndex, Lib3MF_uint64 nHatchDataBufferSize, Lib3MF_uint64* pHatchDataNeededCount, Lib3MF::sHatch2D* pHatchDataBuffer) override;
 
 	void GetSegmentHatchDataDiscrete(const Lib3MF_uint32 nIndex, Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sDiscreteHatch2D* pPointDataBuffer) override;
 
-	void GetLinearSegmentHatchOverrideFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatch2DOverrides* pFactorValuesBuffer) override;
+	void GetLinearSegmentHatchModificationFactors(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatch2DFactors* pFactorValuesBuffer) override;
 
-	bool SegmentHasNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex)  override;
+	bool SegmentHasNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex) override;
 
-	void GetSegmentNonlinearHatchOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchOverrideInterpolationData* pFactorValuesBuffer)  override;
+	void GetSegmentNonlinearHatchModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF_uint32 nHatchIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchModificationInterpolationData* pFactorValuesBuffer) override;
 
-	void GetSegmentAllNonlinearHatchesOverrideInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileOverrideFactor eOverrideFactor, Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32* pCountArrayBuffer, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchOverrideInterpolationData* pFactorValuesBuffer) override;
+	void GetSegmentAllNonlinearHatchesModificationInterpolation(const Lib3MF_uint32 nSegmentIndex, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, Lib3MF_uint64 nCountArrayBufferSize, Lib3MF_uint64* pCountArrayNeededCount, Lib3MF_uint32* pCountArrayBuffer, Lib3MF_uint64 nFactorValuesBufferSize, Lib3MF_uint64* pFactorValuesNeededCount, Lib3MF::sHatchModificationInterpolationData* pFactorValuesBuffer) override;
 
 
 };

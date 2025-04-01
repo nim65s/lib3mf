@@ -1979,4 +1979,76 @@ Toolpath errors (0xBXXX)
 // Override interpolation overflow
 #define NMR_ERROR_OVERRIDEINTERPOLATIONOVERFLOW 0xB036
 
+// Missing profile modifier minimum
+#define NMR_ERROR_MISSINGPROFILEMODIFIERMINIMUM 0xB037
+
+// Missing profile modifier maximum
+#define NMR_ERROR_MISSINGPROFILEMODIFIERMAXIMUM 0xB038
+
+// Missing profile modifier type
+#define NMR_ERROR_MISSINGPROFILEMODIFIERTYPE 0xB039
+
+// Invalid profile modifier type
+#define NMR_ERROR_TOOLPATH_INVALIDPROFILEMODIFIERTYPE 0xB040
+
+// Duplicate profile modifier type	
+#define NMR_ERROR_DUPLICATEMODIFIERTYPE 0xB041
+
+// Invalid profile modifier type	
+#define NMR_ERROR_INVALIDMODIFIERTYPE 0xB042
+
+// Duplicate profile scale factor f1
+#define NMR_ERROR_DUPLICATESCALEFACTORF1 0xB043
+
+// Duplicate profile scale factor f2
+#define NMR_ERROR_DUPLICATESCALEFACTORF2 0xB044
+
+// Duplicate profile scale factor g1
+#define NMR_ERROR_DUPLICATESCALEFACTORG1 0xB045
+
+// Duplicate profile scale factor g2
+#define NMR_ERROR_DUPLICATESCALEFACTORG2 0xB046
+
+// Duplicate profile scale factor h1
+#define NMR_ERROR_DUPLICATESCALEFACTORH1 0xB047
+
+// Duplicate profile scale factor h2
+#define NMR_ERROR_DUPLICATESCALEFACTORH2 0xB048
+
+// Missing profile scale factor f1
+#define NMR_ERROR_MISSINGSCALEFACTORF1 0xB049
+
+// Missing profile scale factor f2
+#define NMR_ERROR_MISSINGSCALEFACTORF2 0xB04A
+
+// Missing profile scale factor g1
+#define NMR_ERROR_MISSINGSCALEFACTORG1 0xB04B
+
+// Missing profile scale factor g2
+#define NMR_ERROR_MISSINGSCALEFACTORG2 0xB04C
+
+// Missing profile scale factor h1
+#define NMR_ERROR_MISSINGSCALEFACTORH1 0xB04D
+
+// Missing profile scale factor h2
+#define NMR_ERROR_MISSINGSCALEFACTORH2 0xB04E
+
+// Duplicate profile scale factor f
+#define NMR_ERROR_DUPLICATESCALEFACTORF 0xB04F
+
+// Duplicate profile scale factor g
+#define NMR_ERROR_DUPLICATESCALEFACTORG 0xB050
+
+// Duplicate profile scale factor h
+#define NMR_ERROR_DUPLICATESCALEFACTORH 0xB051
+
+// Missing profile scale factor f
+#define NMR_ERROR_MISSINGSCALEFACTORF 0xB052
+
+// Missing profile scale factor g
+#define NMR_ERROR_MISSINGSCALEFACTORG 0xB053
+
+// Missing profile scale factor h
+#define NMR_ERROR_MISSINGSCALEFACTORH 0xB054
+
 #endif // __NMR_ERRORCONST

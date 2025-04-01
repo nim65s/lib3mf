@@ -2575,13 +2575,13 @@ private:
 	static void RemoveParameter(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierCount(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierNameByIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetModifierTypeByIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierNameSpaceByIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void HasModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierInformationByIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierInformationByName(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void SetModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void RemoveModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void EvaluateDoubleValue(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:
 	CLib3MFToolpathProfile();
@@ -2623,17 +2623,16 @@ private:
 	static void GetSegmentDefaultProfileUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSegmentDefaultProfileID(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetProfileUUIDByLocalProfileID(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void SegmentHasOverrideFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void SegmentHasUniformProfile(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void SegmentHasModificationFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSegmentPointDataInModelUnits(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSegmentPointDataDiscrete(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetSegmentPointOverrideFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetSegmentPointModificationFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSegmentHatchDataInModelUnits(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSegmentHatchDataDiscrete(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetLinearSegmentHatchOverrideFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void SegmentHasNonlinearHatchOverrideInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetSegmentNonlinearHatchOverrideInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetSegmentAllNonlinearHatchesOverrideInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetLinearSegmentHatchModificationFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void SegmentHasNonlinearHatchModificationInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetSegmentNonlinearHatchModificationInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetSegmentAllNonlinearHatchesModificationInterpolation(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:
 	CLib3MFToolpathLayerReader();
@@ -2658,24 +2657,22 @@ private:
 	static void ClearSegmentAttributes(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void SetLaserIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void ClearLaserIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void SetOverrideFraction(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetOverrideFraction(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WriteHatchDataInModelUnits(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataInModelUnitsWithConstantOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataInModelUnitsWithLinearOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataInModelUnitsWithNonlinearOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataInModelUnitsWithConstantFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataInModelUnitsWithLinearFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataInModelUnitsWithNonlinearFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WriteHatchDataDiscrete(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataDiscreteWithConstantOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataDiscreteWithLinearOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteHatchDataDiscreteWithNonlinearOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataDiscreteWithConstantFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataDiscreteWithLinearFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteHatchDataDiscreteWithNonlinearFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WriteLoopInModelUnits(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WriteLoopDiscrete(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteLoopInModelUnitsWithOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WriteLoopDiscreteWithOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteLoopInModelUnitsWithFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WriteLoopDiscreteWithFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WritePolylineInModelUnits(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WritePolylineInModelUnitsWithOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WritePolylineInModelUnitsWithFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void WritePolylineDiscrete(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void WritePolylineDiscreteWithOverrides(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void WritePolylineDiscreteWithFactors(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void AddCustomData(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void Finish(const v8::FunctionCallbackInfo<v8::Value>& args);
 

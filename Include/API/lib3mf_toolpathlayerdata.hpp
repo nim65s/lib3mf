@@ -79,46 +79,41 @@ public:
 
 	void ClearLaserIndex() override;
 
-	void SetOverrideFraction(const Lib3MF_uint32 nValue) override;
-
-	Lib3MF_uint32 GetOverrideFraction() override;
-
 	Lib3MF_uint32 RegisterProfile(IToolpathProfile* pProfile) override;
 
 	Lib3MF_uint32 RegisterBuildItem(IBuildItem* pBuildItem) override;
 
 	void WriteHatchDataInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer) override;
 
-	void WriteHatchDataInModelUnitsWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer) override;
+	void WriteHatchDataInModelUnitsWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
 
-	void WriteHatchDataInModelUnitsWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer) override;
+	void WriteHatchDataInModelUnitsWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer) override;
 
-	void WriteHatchDataInModelUnitsWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer) override;
+	void WriteHatchDataInModelUnitsWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData* pModificationInterpolationDataBuffer) override;
 
 	void WriteHatchDataDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer) override;
 
-	void WriteHatchDataDiscreteWithConstantOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer) override;
+	void WriteHatchDataDiscreteWithConstantFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
 
-	void WriteHatchDataDiscreteWithLinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer) override;
+	void WriteHatchDataDiscreteWithLinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nFactorData1BufferSize, const Lib3MF_double* pFactorData1Buffer, const Lib3MF_uint64 nFactorData2BufferSize, const Lib3MF_double* pFactorData2Buffer) override;
 
-	void WriteHatchDataDiscreteWithNonlinearOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nOverrideInterpolationDataBufferSize, const Lib3MF::sHatchOverrideInterpolationData* pOverrideInterpolationDataBuffer) override;
+	void WriteHatchDataDiscreteWithNonlinearFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nHatchDataBufferSize, const Lib3MF::sDiscreteHatch2D* pHatchDataBuffer, const Lib3MF_uint64 nScalingData1BufferSize, const Lib3MF_double* pScalingData1Buffer, const Lib3MF_uint64 nScalingData2BufferSize, const Lib3MF_double* pScalingData2Buffer, const Lib3MF_uint64 nSubInterpolationCountsBufferSize, const Lib3MF_uint32* pSubInterpolationCountsBuffer, const Lib3MF_uint64 nModificationInterpolationDataBufferSize, const Lib3MF::sHatchModificationInterpolationData* pModificationInterpolationDataBuffer) override;
 
 	void WriteLoopInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer) override;
 
-	void WriteLoopInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer) override;
-
 	void WriteLoopDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer) override;
 
-	void WriteLoopDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer) override;
+	void WriteLoopInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
+
+	void WriteLoopDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
 
 	void WritePolylineInModelUnits(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer) override;
 
-	void WritePolylineInModelUnitsWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double* pScalingDataBuffer) override;
+	void WritePolylineInModelUnitsWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
 
 	void WritePolylineDiscrete(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer) override;
 
-	void WritePolylineDiscreteWithOverrides(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nScalingDataBufferSize, const Lib3MF_double
-		* pScalingDataBuffer) override;
+	void WritePolylineDiscreteWithFactors(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sDiscretePosition2D* pPointDataBuffer, const Lib3MF_uint64 nFactorDataBufferSize, const Lib3MF_double* pFactorDataBuffer) override;
 
 	void Finish() override;
 

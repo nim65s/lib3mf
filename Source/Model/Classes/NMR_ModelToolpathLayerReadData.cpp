@@ -69,6 +69,7 @@ namespace NMR {
 
 		m_pCurrentSegment = m_Segments.allocData();
 		m_pCurrentSegment->m_eType = eType;
+		m_pCurrentSegment->m_nFlags = 0;
 		m_pCurrentSegment->m_nPartID = nPartID;
 		m_pCurrentSegment->m_nProfileID = nProfileID;
 		m_pCurrentSegment->m_nStartPoint = m_Points.getCount ();
@@ -98,7 +99,7 @@ namespace NMR {
 		m_pCurrentSegment = nullptr;
 	}
 
-	void CModelToolpathLayerReadData::addDiscretePoint(nfInt32 nX, nfInt32 nY, nfInt32 nTag, nfDouble nFactorF, nfDouble nFactorG, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount)
+	void CModelToolpathLayerReadData::addDiscretePoint(nfInt32 nX, nfInt32 nY, nfInt32 nTag, bool bHasFactorF, nfDouble nFactorF, bool bHasFactorG, nfDouble nFactorG, bool bHasFactorH, nfDouble nFactorH, uint32_t nOverrideStart, uint32_t nOverrideCount)
 	{
 		if (m_pCurrentSegment == nullptr)
 			throw CNMRException(NMR_ERROR_LAYERSEGMENTNOTOPEN);
@@ -107,11 +108,28 @@ namespace NMR {
 		pVec->m_nX = nX;
 		pVec->m_nY = nY;
 		pVec->m_nTag = nTag;
+		pVec->m_nFlags = 0;
 		pVec->m_nFactorF = nFactorF;
 		pVec->m_nFactorG = nFactorG;
 		pVec->m_nFactorH = nFactorH;
 		pVec->m_nOverrideStart = nOverrideStart;
 		pVec->m_nOverrideCount = nOverrideCount;
+
+		if (bHasFactorF) {
+			pVec->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORF;
+			m_pCurrentSegment->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORF;
+		}
+
+		if (bHasFactorG) {
+			pVec->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORG;
+			m_pCurrentSegment->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORG;
+		}
+
+		if (bHasFactorH) {
+			pVec->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORH;
+			m_pCurrentSegment->m_nFlags |= TOOLPATHREADSEGMENTFLAG_HASFACTORH;
+		}
+
 	}
 
 	uint32_t CModelToolpathLayerReadData::getGlobalOverrideInterpolationCount()
@@ -183,6 +201,31 @@ namespace NMR {
 		__NMRASSERT(pSegment != nullptr);
 
 		return pSegment->m_nOverrideInterpolationCount;
+
+	}
+
+	bool CModelToolpathLayerReadData::segmentHasModificationFactors(nfUint32 nSegmentIndex, Lib3MF::eToolpathProfileModificationFactor modificationFactor)
+	{
+		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
+		__NMRASSERT(pSegment != nullptr);
+
+		switch (modificationFactor)
+		{
+		case Lib3MF::eToolpathProfileModificationFactor::FactorF:
+			return ((pSegment->m_nFlags & TOOLPATHREADSEGMENTFLAG_HASFACTORF) != 0);
+			
+		case Lib3MF::eToolpathProfileModificationFactor::FactorG:
+			return ((pSegment->m_nFlags & TOOLPATHREADSEGMENTFLAG_HASFACTORG) != 0);
+
+		case Lib3MF::eToolpathProfileModificationFactor::FactorH:
+			return ((pSegment->m_nFlags & TOOLPATHREADSEGMENTFLAG_HASFACTORH) != 0); 
+
+		default:
+			return false;
+		}
+
+
+		
 
 	}
 
@@ -399,74 +442,6 @@ namespace NMR {
 	double CModelToolpathLayerReadData::getUnits()
 	{
 		return m_pModelToolpath->getUnitFactor();
-	}
-
-	bool CModelToolpathLayerReadData::segmentHasUniformProfile(nfUint32 nSegmentIndex)
-	{
-		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
-		__NMRASSERT(pSegment != nullptr);
-
-		if ((pSegment->m_eType == NMR::eModelToolpathSegmentType::LoopSegment) ||
-			(pSegment->m_eType == NMR::eModelToolpathSegmentType::PolylineSegment) ||
-			(pSegment->m_eType == NMR::eModelToolpathSegmentType::HatchSegment)) {
-
-			for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_nPointCount; nPointIndex++) {
-				auto & point = m_Points.getDataRef(pSegment->m_nStartPoint + nPointIndex);
-				if (point.m_nFactorF != 0)
-					return false;
-				if (point.m_nFactorG != 0)
-					return false;
-				if (point.m_nFactorH != 0)
-					return false;
-			}
-		
-		}
-
-		return true;
-
-	}
-
-	bool CModelToolpathLayerReadData::segmentHasOverrideFactors(nfUint32 nSegmentIndex, NMR::eModelToolpathProfileOverrideFactor overrideFactor)
-	{
-		TOOLPATHREADSEGMENT* pSegment = m_Segments.getData(nSegmentIndex);
-		__NMRASSERT(pSegment != nullptr);
-
-		if ((pSegment->m_eType == NMR::eModelToolpathSegmentType::LoopSegment) ||
-			(pSegment->m_eType == NMR::eModelToolpathSegmentType::PolylineSegment) ||
-			(pSegment->m_eType == NMR::eModelToolpathSegmentType::HatchSegment)) {
-
-			switch (overrideFactor) {
-
-				case NMR::eModelToolpathProfileOverrideFactor::pfFactorF:
-					for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_nPointCount; nPointIndex++) {
-						auto& point = m_Points.getDataRef(pSegment->m_nStartPoint + nPointIndex);
-						if (point.m_nFactorF != 0)
-							return true;
-					}
-					return false;
-	
-				case NMR::eModelToolpathProfileOverrideFactor::pfFactorG:
-					for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_nPointCount; nPointIndex++) {
-						auto& point = m_Points.getDataRef(pSegment->m_nStartPoint + nPointIndex);
-						if (point.m_nFactorG != 0)
-							return true;
-					}
-					return false;
-
-				case NMR::eModelToolpathProfileOverrideFactor::pfFactorH:
-					for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_nPointCount; nPointIndex++) {
-						auto& point = m_Points.getDataRef(pSegment->m_nStartPoint + nPointIndex);
-						if (point.m_nFactorH != 0)
-							return true;
-					}
-					return false;
-
-			}
-
-		}
-
-		return false;
-
 	}
 
 
