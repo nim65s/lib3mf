@@ -94,6 +94,10 @@ public:
 
 	void RemoveRelationToRead (const std::string & sRelationShipType);
 
+	void AddSupportedCustomNamespace(const std::string& sNameSpace) override;
+
+	void RemoveSupportedCustomNamespace(const std::string& sNameSpace) override;
+
 	void SetStrictModeActive (const bool bStrictModeActive);
 
 	bool GetStrictModeActive ();

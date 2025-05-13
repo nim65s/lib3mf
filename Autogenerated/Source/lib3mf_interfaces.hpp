@@ -619,11 +619,25 @@ public:
 	virtual void AssignBinaryStream(IBase* pInstance, IBinaryStream* pBinaryStream) = 0;
 
 	/**
-	* IWriter::RegisterCustomNamespace - Registers a custom 3MF Namespace. Fails if Prefix is already registered.
+	* IWriter::RegisterCustomNamespace - Registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.
 	* @param[in] sPrefix - Prefix to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
 	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
 	*/
 	virtual void RegisterCustomNamespace(const std::string & sPrefix, const std::string & sNameSpace) = 0;
+
+	/**
+	* IWriter::SetCustomNamespaceRequired - Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	* @param[in] sPrefix - Prefix to change value for. Fails if prefix does not exist.
+	* @param[in] bShallBeRequired - True, if the namespace shall be required. False if not.
+	*/
+	virtual void SetCustomNamespaceRequired(const std::string & sPrefix, const bool bShallBeRequired) = 0;
+
+	/**
+	* IWriter::GetCustomNamespaceRequired - Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	* @param[in] sPrefix - Prefix to return value. Fails if prefix does not exist.
+	* @return Returns true, if the namespace shall be required. False if not. Default is not required.
+	*/
+	virtual bool GetCustomNamespaceRequired(const std::string & sPrefix) = 0;
 
 };
 
@@ -728,6 +742,18 @@ public:
 	* @param[in] sRelationShipType - String of the relationship type
 	*/
 	virtual void RemoveRelationToRead(const std::string & sRelationShipType) = 0;
+
+	/**
+	* IReader::AddSupportedCustomNamespace - Signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.
+	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	*/
+	virtual void AddSupportedCustomNamespace(const std::string & sNameSpace) = 0;
+
+	/**
+	* IReader::RemoveSupportedCustomNamespace - Reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.
+	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	*/
+	virtual void RemoveSupportedCustomNamespace(const std::string & sNameSpace) = 0;
 
 	/**
 	* IReader::SetStrictModeActive - Activates (deactivates) the strict mode of the reader.
@@ -6539,7 +6565,7 @@ public:
 	virtual void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, Lib3MF::eToolpathProfileModificationType & eModifierType, Lib3MF::eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue) = 0;
 
 	/**
-	* IToolpathProfile::SetModifier - Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	* IToolpathProfile::AddModifier - Adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
 	* @param[in] eModifierType - Returns the type of the modifier.
@@ -6547,7 +6573,18 @@ public:
 	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	virtual void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) = 0;
+	virtual void AddModifier(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) = 0;
+
+	/**
+	* IToolpathProfile::ChangeModifier - Changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Parameter key string.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	*/
+	virtual void ChangeModifier(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) = 0;
 
 	/**
 	* IToolpathProfile::RemoveModifier - Removes a modifier, if it exists.

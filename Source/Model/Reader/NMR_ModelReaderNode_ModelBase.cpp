@@ -52,8 +52,9 @@ A model reader node is an abstract base class for all XML nodes of a 3MF Model S
 namespace NMR {
 
 	CModelReaderNode_ModelBase::CModelReaderNode_ModelBase(_In_ CModel * pModel, _In_ PModelWarnings pWarnings, const std::string sPath,
-		_In_ PProgressMonitor pProgressMonitor)
-		: CModelReaderNode(pWarnings, pProgressMonitor), m_bIgnoreBuild(false), m_bIgnoreMetaData(false), m_bHaveWarnedAboutV093(false)
+		_In_ PProgressMonitor pProgressMonitor, const std::set<std::string>& supportedCustomNamespaces)
+		: CModelReaderNode(pWarnings, pProgressMonitor), m_bIgnoreBuild(false), m_bIgnoreMetaData(false), m_bHaveWarnedAboutV093(false),
+		  m_SupportedCustomNamespaces (supportedCustomNamespaces)
 	{
 		__NMRASSERT(pModel);
 		m_pModel = pModel;
@@ -90,7 +91,11 @@ namespace NMR {
 				strcmp(sExtensionURI.c_str(), XML_3MF_NAMESPACE_IMPLICITSPEC) != 0			
 				 )
 			{
-				m_pWarnings->addWarning(NMR_ERROR_REQUIREDEXTENSIONNOTSUPPORTED, mrwInvalidMandatoryValue);
+
+				// Check if supported extension might come from the consumer application...
+				auto iCustomIter = m_SupportedCustomNamespaces.find(sExtensionURI);
+				if (iCustomIter == m_SupportedCustomNamespaces.end ())
+					m_pWarnings->addWarning(NMR_ERROR_REQUIREDEXTENSIONNOTSUPPORTED, mrwInvalidMandatoryValue);
 			}
 		}
 	}

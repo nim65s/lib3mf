@@ -56,7 +56,7 @@ namespace NMR {
 
 	CModelReader_Slice1507_SliceRefModel::CModelReader_Slice1507_SliceRefModel(
 			_In_ CModel *pModel, _In_ PModelWarnings pWarnings, _In_z_ std::string sSliceRefPath)
-			: CModelReaderNode_ModelBase(pModel, pWarnings, sSliceRefPath.c_str(), nullptr)
+			: CModelReaderNode_ModelBase(pModel, pWarnings, sSliceRefPath.c_str(), nullptr, std::set<std::string> ())
 	{
 		m_sSliceRefPath = sSliceRefPath;
 	}

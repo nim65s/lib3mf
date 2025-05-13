@@ -73,6 +73,8 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_Writer_CreateBinaryStream = NULL;
 	pWrapperTable->m_Writer_AssignBinaryStream = NULL;
 	pWrapperTable->m_Writer_RegisterCustomNamespace = NULL;
+	pWrapperTable->m_Writer_SetCustomNamespaceRequired = NULL;
+	pWrapperTable->m_Writer_GetCustomNamespaceRequired = NULL;
 	pWrapperTable->m_PersistentReaderSource_GetSourceType = NULL;
 	pWrapperTable->m_PersistentReaderSource_InvalidateSourceData = NULL;
 	pWrapperTable->m_PersistentReaderSource_SourceDataIsValid = NULL;
@@ -83,6 +85,8 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_Reader_SetProgressCallback = NULL;
 	pWrapperTable->m_Reader_AddRelationToRead = NULL;
 	pWrapperTable->m_Reader_RemoveRelationToRead = NULL;
+	pWrapperTable->m_Reader_AddSupportedCustomNamespace = NULL;
+	pWrapperTable->m_Reader_RemoveSupportedCustomNamespace = NULL;
 	pWrapperTable->m_Reader_SetStrictModeActive = NULL;
 	pWrapperTable->m_Reader_GetStrictModeActive = NULL;
 	pWrapperTable->m_Reader_GetWarning = NULL;
@@ -614,7 +618,8 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_ToolpathProfile_HasModifier = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierInformationByIndex = NULL;
 	pWrapperTable->m_ToolpathProfile_GetModifierInformationByName = NULL;
-	pWrapperTable->m_ToolpathProfile_SetModifier = NULL;
+	pWrapperTable->m_ToolpathProfile_AddModifier = NULL;
+	pWrapperTable->m_ToolpathProfile_ChangeModifier = NULL;
 	pWrapperTable->m_ToolpathProfile_RemoveModifier = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetLayerDataUUID = NULL;
 	pWrapperTable->m_ToolpathLayerReader_GetCustomDataCount = NULL;
@@ -1132,6 +1137,24 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_Writer_SetCustomNamespaceRequired = (PLib3MFWriter_SetCustomNamespaceRequiredPtr) GetProcAddress(hLibrary, "lib3mf_writer_setcustomnamespacerequired");
+	#else // _WIN32
+	pWrapperTable->m_Writer_SetCustomNamespaceRequired = (PLib3MFWriter_SetCustomNamespaceRequiredPtr) dlsym(hLibrary, "lib3mf_writer_setcustomnamespacerequired");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Writer_SetCustomNamespaceRequired == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Writer_GetCustomNamespaceRequired = (PLib3MFWriter_GetCustomNamespaceRequiredPtr) GetProcAddress(hLibrary, "lib3mf_writer_getcustomnamespacerequired");
+	#else // _WIN32
+	pWrapperTable->m_Writer_GetCustomNamespaceRequired = (PLib3MFWriter_GetCustomNamespaceRequiredPtr) dlsym(hLibrary, "lib3mf_writer_getcustomnamespacerequired");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Writer_GetCustomNamespaceRequired == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_PersistentReaderSource_GetSourceType = (PLib3MFPersistentReaderSource_GetSourceTypePtr) GetProcAddress(hLibrary, "lib3mf_persistentreadersource_getsourcetype");
 	#else // _WIN32
 	pWrapperTable->m_PersistentReaderSource_GetSourceType = (PLib3MFPersistentReaderSource_GetSourceTypePtr) dlsym(hLibrary, "lib3mf_persistentreadersource_getsourcetype");
@@ -1219,6 +1242,24 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_Reader_RemoveRelationToRead == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Reader_AddSupportedCustomNamespace = (PLib3MFReader_AddSupportedCustomNamespacePtr) GetProcAddress(hLibrary, "lib3mf_reader_addsupportedcustomnamespace");
+	#else // _WIN32
+	pWrapperTable->m_Reader_AddSupportedCustomNamespace = (PLib3MFReader_AddSupportedCustomNamespacePtr) dlsym(hLibrary, "lib3mf_reader_addsupportedcustomnamespace");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Reader_AddSupportedCustomNamespace == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Reader_RemoveSupportedCustomNamespace = (PLib3MFReader_RemoveSupportedCustomNamespacePtr) GetProcAddress(hLibrary, "lib3mf_reader_removesupportedcustomnamespace");
+	#else // _WIN32
+	pWrapperTable->m_Reader_RemoveSupportedCustomNamespace = (PLib3MFReader_RemoveSupportedCustomNamespacePtr) dlsym(hLibrary, "lib3mf_reader_removesupportedcustomnamespace");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Reader_RemoveSupportedCustomNamespace == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -6001,12 +6042,21 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_ToolpathProfile_SetModifier = (PLib3MFToolpathProfile_SetModifierPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setmodifier");
+	pWrapperTable->m_ToolpathProfile_AddModifier = (PLib3MFToolpathProfile_AddModifierPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_addmodifier");
 	#else // _WIN32
-	pWrapperTable->m_ToolpathProfile_SetModifier = (PLib3MFToolpathProfile_SetModifierPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setmodifier");
+	pWrapperTable->m_ToolpathProfile_AddModifier = (PLib3MFToolpathProfile_AddModifierPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_addmodifier");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_ToolpathProfile_SetModifier == NULL)
+	if (pWrapperTable->m_ToolpathProfile_AddModifier == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_ToolpathProfile_ChangeModifier = (PLib3MFToolpathProfile_ChangeModifierPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_changemodifier");
+	#else // _WIN32
+	pWrapperTable->m_ToolpathProfile_ChangeModifier = (PLib3MFToolpathProfile_ChangeModifierPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_changemodifier");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_ToolpathProfile_ChangeModifier == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

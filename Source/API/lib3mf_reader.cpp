@@ -182,6 +182,17 @@ void CReader::RemoveRelationToRead (const std::string & sRelationShipType)
 	reader().removeRelationToRead(sRelationShipType);
 }
 
+void CReader::AddSupportedCustomNamespace(const std::string& sNameSpace)
+{
+	reader().addSupportedCustomNamespace(sNameSpace);
+}
+
+void CReader::RemoveSupportedCustomNamespace(const std::string& sNameSpace)
+{
+	reader().removeSupportedCustomNamespace(sNameSpace);
+}
+
+
 void CReader::SetStrictModeActive (const bool bStrictModeActive)
 {
 	if (bStrictModeActive)

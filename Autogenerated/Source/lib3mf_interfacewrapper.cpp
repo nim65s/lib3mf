@@ -1044,6 +1044,80 @@ Lib3MFResult lib3mf_writer_registercustomnamespace(Lib3MF_Writer pWriter, const 
 	}
 }
 
+Lib3MFResult lib3mf_writer_setcustomnamespacerequired(Lib3MF_Writer pWriter, const char * pPrefix, bool bShallBeRequired)
+{
+	IBase* pIBaseClass = (IBase *)pWriter;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pWriter, "Writer", "SetCustomNamespaceRequired");
+			pJournalEntry->addStringParameter("Prefix", pPrefix);
+			pJournalEntry->addBooleanParameter("ShallBeRequired", bShallBeRequired);
+		}
+		if (pPrefix == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		std::string sPrefix(pPrefix);
+		IWriter* pIWriter = dynamic_cast<IWriter*>(pIBaseClass);
+		if (!pIWriter)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		pIWriter->SetCustomNamespaceRequired(sPrefix, bShallBeRequired);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
+Lib3MFResult lib3mf_writer_getcustomnamespacerequired(Lib3MF_Writer pWriter, const char * pPrefix, bool * pIsRequired)
+{
+	IBase* pIBaseClass = (IBase *)pWriter;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pWriter, "Writer", "GetCustomNamespaceRequired");
+			pJournalEntry->addStringParameter("Prefix", pPrefix);
+		}
+		if (pPrefix == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		if (pIsRequired == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		std::string sPrefix(pPrefix);
+		IWriter* pIWriter = dynamic_cast<IWriter*>(pIBaseClass);
+		if (!pIWriter)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		*pIsRequired = pIWriter->GetCustomNamespaceRequired(sPrefix);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->addBooleanResult("IsRequired", *pIsRequired);
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for PersistentReaderSource
@@ -1374,6 +1448,76 @@ Lib3MFResult lib3mf_reader_removerelationtoread(Lib3MF_Reader pReader, const cha
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
 		
 		pIReader->RemoveRelationToRead(sRelationShipType);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
+Lib3MFResult lib3mf_reader_addsupportedcustomnamespace(Lib3MF_Reader pReader, const char * pNameSpace)
+{
+	IBase* pIBaseClass = (IBase *)pReader;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pReader, "Reader", "AddSupportedCustomNamespace");
+			pJournalEntry->addStringParameter("NameSpace", pNameSpace);
+		}
+		if (pNameSpace == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
+		IReader* pIReader = dynamic_cast<IReader*>(pIBaseClass);
+		if (!pIReader)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		pIReader->AddSupportedCustomNamespace(sNameSpace);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
+Lib3MFResult lib3mf_reader_removesupportedcustomnamespace(Lib3MF_Reader pReader, const char * pNameSpace)
+{
+	IBase* pIBaseClass = (IBase *)pReader;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pReader, "Reader", "RemoveSupportedCustomNamespace");
+			pJournalEntry->addStringParameter("NameSpace", pNameSpace);
+		}
+		if (pNameSpace == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		std::string sNameSpace(pNameSpace);
+		IReader* pIReader = dynamic_cast<IReader*>(pIBaseClass);
+		if (!pIReader)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		pIReader->RemoveSupportedCustomNamespace(sNameSpace);
 
 		if (pJournalEntry.get() != nullptr) {
 			pJournalEntry->writeSuccess();
@@ -22308,14 +22452,14 @@ Lib3MFResult lib3mf_toolpathprofile_getmodifierinformationbyname(Lib3MF_Toolpath
 	}
 }
 
-Lib3MFResult lib3mf_toolpathprofile_setmodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue)
+Lib3MFResult lib3mf_toolpathprofile_addmodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathProfile;
 
 	PLib3MFInterfaceJournalEntry pJournalEntry;
 	try {
 		if (m_GlobalJournal.get() != nullptr)  {
-			pJournalEntry = m_GlobalJournal->beginClassMethod(pToolpathProfile, "ToolpathProfile", "SetModifier");
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pToolpathProfile, "ToolpathProfile", "AddModifier");
 			pJournalEntry->addStringParameter("NameSpaceName", pNameSpaceName);
 			pJournalEntry->addStringParameter("ValueName", pValueName);
 			pJournalEntry->addEnumParameter("ModifierType", "ToolpathProfileModificationType", (Lib3MF_int32)(eModifierType));
@@ -22333,7 +22477,50 @@ Lib3MFResult lib3mf_toolpathprofile_setmodifier(Lib3MF_ToolpathProfile pToolpath
 		if (!pIToolpathProfile)
 			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
 		
-		pIToolpathProfile->SetModifier(sNameSpaceName, sValueName, eModifierType, eModificationFactor, dMinValue, dMaxValue);
+		pIToolpathProfile->AddModifier(sNameSpaceName, sValueName, eModifierType, eModificationFactor, dMinValue, dMaxValue);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
+Lib3MFResult lib3mf_toolpathprofile_changemodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathProfile;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pToolpathProfile, "ToolpathProfile", "ChangeModifier");
+			pJournalEntry->addStringParameter("NameSpaceName", pNameSpaceName);
+			pJournalEntry->addStringParameter("ValueName", pValueName);
+			pJournalEntry->addEnumParameter("ModifierType", "ToolpathProfileModificationType", (Lib3MF_int32)(eModifierType));
+			pJournalEntry->addEnumParameter("ModificationFactor", "ToolpathProfileModificationFactor", (Lib3MF_int32)(eModificationFactor));
+			pJournalEntry->addDoubleParameter("MinValue", dMinValue);
+			pJournalEntry->addDoubleParameter("MaxValue", dMaxValue);
+		}
+		if (pNameSpaceName == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		if (pValueName == nullptr)
+			throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		std::string sNameSpaceName(pNameSpaceName);
+		std::string sValueName(pValueName);
+		IToolpathProfile* pIToolpathProfile = dynamic_cast<IToolpathProfile*>(pIBaseClass);
+		if (!pIToolpathProfile)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		pIToolpathProfile->ChangeModifier(sNameSpaceName, sValueName, eModifierType, eModificationFactor, dMinValue, dMaxValue);
 
 		if (pJournalEntry.get() != nullptr) {
 			pJournalEntry->writeSuccess();
@@ -30945,6 +31132,10 @@ Lib3MFResult Lib3MF::Impl::Lib3MF_GetProcAddress (const char * pProcName, void *
 		*ppProcAddress = (void*) &lib3mf_writer_assignbinarystream;
 	if (sProcName == "lib3mf_writer_registercustomnamespace") 
 		*ppProcAddress = (void*) &lib3mf_writer_registercustomnamespace;
+	if (sProcName == "lib3mf_writer_setcustomnamespacerequired") 
+		*ppProcAddress = (void*) &lib3mf_writer_setcustomnamespacerequired;
+	if (sProcName == "lib3mf_writer_getcustomnamespacerequired") 
+		*ppProcAddress = (void*) &lib3mf_writer_getcustomnamespacerequired;
 	if (sProcName == "lib3mf_persistentreadersource_getsourcetype") 
 		*ppProcAddress = (void*) &lib3mf_persistentreadersource_getsourcetype;
 	if (sProcName == "lib3mf_persistentreadersource_invalidatesourcedata") 
@@ -30965,6 +31156,10 @@ Lib3MFResult Lib3MF::Impl::Lib3MF_GetProcAddress (const char * pProcName, void *
 		*ppProcAddress = (void*) &lib3mf_reader_addrelationtoread;
 	if (sProcName == "lib3mf_reader_removerelationtoread") 
 		*ppProcAddress = (void*) &lib3mf_reader_removerelationtoread;
+	if (sProcName == "lib3mf_reader_addsupportedcustomnamespace") 
+		*ppProcAddress = (void*) &lib3mf_reader_addsupportedcustomnamespace;
+	if (sProcName == "lib3mf_reader_removesupportedcustomnamespace") 
+		*ppProcAddress = (void*) &lib3mf_reader_removesupportedcustomnamespace;
 	if (sProcName == "lib3mf_reader_setstrictmodeactive") 
 		*ppProcAddress = (void*) &lib3mf_reader_setstrictmodeactive;
 	if (sProcName == "lib3mf_reader_getstrictmodeactive") 
@@ -32027,8 +32222,10 @@ Lib3MFResult Lib3MF::Impl::Lib3MF_GetProcAddress (const char * pProcName, void *
 		*ppProcAddress = (void*) &lib3mf_toolpathprofile_getmodifierinformationbyindex;
 	if (sProcName == "lib3mf_toolpathprofile_getmodifierinformationbyname") 
 		*ppProcAddress = (void*) &lib3mf_toolpathprofile_getmodifierinformationbyname;
-	if (sProcName == "lib3mf_toolpathprofile_setmodifier") 
-		*ppProcAddress = (void*) &lib3mf_toolpathprofile_setmodifier;
+	if (sProcName == "lib3mf_toolpathprofile_addmodifier") 
+		*ppProcAddress = (void*) &lib3mf_toolpathprofile_addmodifier;
+	if (sProcName == "lib3mf_toolpathprofile_changemodifier") 
+		*ppProcAddress = (void*) &lib3mf_toolpathprofile_changemodifier;
 	if (sProcName == "lib3mf_toolpathprofile_removemodifier") 
 		*ppProcAddress = (void*) &lib3mf_toolpathprofile_removemodifier;
 	if (sProcName == "lib3mf_toolpathlayerreader_getlayerdatauuid") 

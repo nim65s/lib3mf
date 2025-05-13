@@ -82,4 +82,15 @@ namespace NMR {
 		m_RelationsToRead.erase(sRelationShipType);
 	}
 
+	void CModelReader::addSupportedCustomNamespace(const std::string& sNameSpace)
+	{
+		m_SupportedCustomNamespaces.insert(sNameSpace);
+	}
+
+	void CModelReader::removeSupportedCustomNamespace(const std::string& sNameSpace)
+	{
+		m_SupportedCustomNamespaces.erase(sNameSpace);
+	}
+
+
 }

@@ -84,7 +84,7 @@ namespace NMR {
 		std::vector<PCustomXMLTree> m_CustomXMLData;
 		std::map<std::pair<std::string, std::string>, std::string> m_CustomSegmentAttributes;
 		std::map<std::string, std::string> m_NameSpaceToPrefixMap;
-		std::map<std::string, std::string> m_PrefixToNameSpaceMap;
+		std::map<std::string, PModelWriter_CustomNameSpace> m_PrefixToNameSpaceMap;
 
 		NMR::CChunkedBinaryStreamWriter * getStreamWriter(std::string & sPath);
 
@@ -96,7 +96,7 @@ namespace NMR {
 
 	public:
 		CModelToolpathLayerWriteData() = delete;
-		CModelToolpathLayerWriteData(CModelToolpath * pModelToolpath, NMR::PModelWriter_3MF pModelWriter, const std::string & sPackagePath, std::map<std::string, std::string> PrefixToNameSpaceMap);
+		CModelToolpathLayerWriteData(CModelToolpath * pModelToolpath, NMR::PModelWriter_3MF pModelWriter, const std::string & sPackagePath, std::map<std::string, PModelWriter_CustomNameSpace> PrefixToNameSpaceMap);
 
 		~CModelToolpathLayerWriteData();
 

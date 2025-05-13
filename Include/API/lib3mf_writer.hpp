@@ -119,6 +119,10 @@ public:
 	void AssignBinaryStream(IBase* pInstance, IBinaryStream* pBinaryStream);
 
 	void RegisterCustomNamespace(const std::string& sPrefix, const std::string& sNameSpace) override;
+	
+	void SetCustomNamespaceRequired(const std::string& sNameSpace, const bool bShallBeRequired) override;
+
+	bool GetCustomNamespaceRequired(const std::string& sNameSpace) override;
 
 };
 

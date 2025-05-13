@@ -620,6 +620,12 @@ namespace Lib3MF {
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_writer_registercustomnamespace", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 Writer_RegisterCustomNamespace (IntPtr Handle, byte[] APrefix, byte[] ANameSpace);
 
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_writer_setcustomnamespacerequired", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Writer_SetCustomNamespaceRequired (IntPtr Handle, byte[] APrefix, Byte AShallBeRequired);
+
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_writer_getcustomnamespacerequired", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Writer_GetCustomNamespaceRequired (IntPtr Handle, byte[] APrefix, out Byte AIsRequired);
+
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_persistentreadersource_getsourcetype", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 PersistentReaderSource_GetSourceType (IntPtr Handle, out Int32 ASourceType);
 
@@ -649,6 +655,12 @@ namespace Lib3MF {
 
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_reader_removerelationtoread", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 Reader_RemoveRelationToRead (IntPtr Handle, byte[] ARelationShipType);
+
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_reader_addsupportedcustomnamespace", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Reader_AddSupportedCustomNamespace (IntPtr Handle, byte[] ANameSpace);
+
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_reader_removesupportedcustomnamespace", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Reader_RemoveSupportedCustomNamespace (IntPtr Handle, byte[] ANameSpace);
 
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_reader_setstrictmodeactive", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 Reader_SetStrictModeActive (IntPtr Handle, Byte AStrictModeActive);
@@ -2243,8 +2255,11 @@ namespace Lib3MF {
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_toolpathprofile_getmodifierinformationbyname", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 ToolpathProfile_GetModifierInformationByName (IntPtr Handle, byte[] ANameSpaceName, byte[] AValueName, out Int32 AModifierType, out Int32 AModificationFactor, out Double AMinValue, out Double AMaxValue);
 
-			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_toolpathprofile_setmodifier", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 ToolpathProfile_SetModifier (IntPtr Handle, byte[] ANameSpaceName, byte[] AValueName, Int32 AModifierType, Int32 AModificationFactor, Double AMinValue, Double AMaxValue);
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_toolpathprofile_addmodifier", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 ToolpathProfile_AddModifier (IntPtr Handle, byte[] ANameSpaceName, byte[] AValueName, Int32 AModifierType, Int32 AModificationFactor, Double AMinValue, Double AMaxValue);
+
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_toolpathprofile_changemodifier", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 ToolpathProfile_ChangeModifier (IntPtr Handle, byte[] ANameSpaceName, byte[] AValueName, Int32 AModifierType, Int32 AModificationFactor, Double AMinValue, Double AMaxValue);
 
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_toolpathprofile_removemodifier", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 ToolpathProfile_RemoveModifier (IntPtr Handle, byte[] ANameSpaceName, byte[] AValueName);
@@ -3838,6 +3853,22 @@ namespace Lib3MF {
 			CheckError(Internal.Lib3MFWrapper.Writer_RegisterCustomNamespace (Handle, bytePrefix, byteNameSpace));
 		}
 
+		public void SetCustomNamespaceRequired (String APrefix, bool AShallBeRequired)
+		{
+			byte[] bytePrefix = Encoding.UTF8.GetBytes(APrefix + char.MinValue);
+
+			CheckError(Internal.Lib3MFWrapper.Writer_SetCustomNamespaceRequired (Handle, bytePrefix, (Byte)( AShallBeRequired ? 1 : 0 )));
+		}
+
+		public bool GetCustomNamespaceRequired (String APrefix)
+		{
+			byte[] bytePrefix = Encoding.UTF8.GetBytes(APrefix + char.MinValue);
+			Byte resultIsRequired = 0;
+
+			CheckError(Internal.Lib3MFWrapper.Writer_GetCustomNamespaceRequired (Handle, bytePrefix, out resultIsRequired));
+			return (resultIsRequired != 0);
+		}
+
 	}
 
 	public class CPersistentReaderSource : CBase
@@ -3924,6 +3955,20 @@ namespace Lib3MF {
 			byte[] byteRelationShipType = Encoding.UTF8.GetBytes(ARelationShipType + char.MinValue);
 
 			CheckError(Internal.Lib3MFWrapper.Reader_RemoveRelationToRead (Handle, byteRelationShipType));
+		}
+
+		public void AddSupportedCustomNamespace (String ANameSpace)
+		{
+			byte[] byteNameSpace = Encoding.UTF8.GetBytes(ANameSpace + char.MinValue);
+
+			CheckError(Internal.Lib3MFWrapper.Reader_AddSupportedCustomNamespace (Handle, byteNameSpace));
+		}
+
+		public void RemoveSupportedCustomNamespace (String ANameSpace)
+		{
+			byte[] byteNameSpace = Encoding.UTF8.GetBytes(ANameSpace + char.MinValue);
+
+			CheckError(Internal.Lib3MFWrapper.Reader_RemoveSupportedCustomNamespace (Handle, byteNameSpace));
 		}
 
 		public void SetStrictModeActive (bool AStrictModeActive)
@@ -9652,14 +9697,24 @@ namespace Lib3MF {
 			AModificationFactor = (eToolpathProfileModificationFactor) (resultModificationFactor);
 		}
 
-		public void SetModifier (String ANameSpaceName, String AValueName, eToolpathProfileModificationType AModifierType, eToolpathProfileModificationFactor AModificationFactor, Double AMinValue, Double AMaxValue)
+		public void AddModifier (String ANameSpaceName, String AValueName, eToolpathProfileModificationType AModifierType, eToolpathProfileModificationFactor AModificationFactor, Double AMinValue, Double AMaxValue)
 		{
 			byte[] byteNameSpaceName = Encoding.UTF8.GetBytes(ANameSpaceName + char.MinValue);
 			byte[] byteValueName = Encoding.UTF8.GetBytes(AValueName + char.MinValue);
 			Int32 enumModifierType = (Int32) AModifierType;
 			Int32 enumModificationFactor = (Int32) AModificationFactor;
 
-			CheckError(Internal.Lib3MFWrapper.ToolpathProfile_SetModifier (Handle, byteNameSpaceName, byteValueName, enumModifierType, enumModificationFactor, AMinValue, AMaxValue));
+			CheckError(Internal.Lib3MFWrapper.ToolpathProfile_AddModifier (Handle, byteNameSpaceName, byteValueName, enumModifierType, enumModificationFactor, AMinValue, AMaxValue));
+		}
+
+		public void ChangeModifier (String ANameSpaceName, String AValueName, eToolpathProfileModificationType AModifierType, eToolpathProfileModificationFactor AModificationFactor, Double AMinValue, Double AMaxValue)
+		{
+			byte[] byteNameSpaceName = Encoding.UTF8.GetBytes(ANameSpaceName + char.MinValue);
+			byte[] byteValueName = Encoding.UTF8.GetBytes(AValueName + char.MinValue);
+			Int32 enumModifierType = (Int32) AModifierType;
+			Int32 enumModificationFactor = (Int32) AModificationFactor;
+
+			CheckError(Internal.Lib3MFWrapper.ToolpathProfile_ChangeModifier (Handle, byteNameSpaceName, byteValueName, enumModifierType, enumModificationFactor, AMinValue, AMaxValue));
 		}
 
 		public void RemoveModifier (String ANameSpaceName, String AValueName)

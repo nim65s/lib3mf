@@ -57,7 +57,7 @@ namespace NMR {
 		// empty on purpose
 	}
 
-	void readProductionAttachmentModels(_In_ PModel pModel, _In_ PModelWarnings pWarnings, _In_ PProgressMonitor pProgressMonitor)
+	void readProductionAttachmentModels(_In_ PModel pModel, _In_ PModelWarnings pWarnings, _In_ PProgressMonitor pProgressMonitor, const std::set<std::string> & supportedCustomNamespaces)
 	{
 		nfUint32 prodAttCount = pModel->getProductionAttachmentCount();
 		for (nfInt32 i = prodAttCount-1; i >=0; i--)
@@ -101,7 +101,7 @@ namespace NMR {
 					PModelReaderNode_ModelBase pXMLNode;
 					pModel->setCurrentPath(sPath);
 
-					pXMLNode = std::make_shared<CModelReaderNode_ModelBase>(pModel.get(), pWarnings, sPath, pProgressMonitor);
+					pXMLNode = std::make_shared<CModelReaderNode_ModelBase>(pModel.get(), pWarnings, sPath, pProgressMonitor, supportedCustomNamespaces);
 					pXMLNode->setIgnoreBuild(true);
 					pXMLNode->setIgnoreMetaData(true);
 					pXMLNode->parseXML(pXMLReader.get());
@@ -130,7 +130,7 @@ namespace NMR {
 		PImportStream pModelStream = extract3MFOPCPackage(pDataSource);
 		
 		// before reading the root model, read the other models in the file
-		readProductionAttachmentModels(model(), warnings(), monitor());
+		readProductionAttachmentModels(model(), warnings(), monitor(), m_SupportedCustomNamespaces);
 
 		monitor()->SetProgressIdentifier(ProgressIdentifier::PROGRESS_READROOTMODEL);
 		monitor()->ReportProgressAndQueryCancelled(true);
@@ -162,7 +162,7 @@ namespace NMR {
 				bHasModel = true;
 
 				model()->setCurrentPath(model()->rootPath());
-				PModelReaderNode_ModelBase pXMLNode = std::make_shared<CModelReaderNode_ModelBase>(model().get(), warnings(), model()->rootPath(), monitor());
+				PModelReaderNode_ModelBase pXMLNode = std::make_shared<CModelReaderNode_ModelBase>(model().get(), warnings(), model()->rootPath(), monitor(), m_SupportedCustomNamespaces);
 				pXMLNode->parseXML(pXMLReader.get());
 
 				if (!pXMLNode->getHasResources())

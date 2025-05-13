@@ -731,6 +731,7 @@ public:
 			case LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA: return "TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA";
 			case LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA: return "TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA";
 			case LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH: return "TOOLPATH_SEGMENTISNOTOFTYPEHATCH";
+			case LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND: return "TOOLPATH_MODIFIERNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -809,6 +810,7 @@ public:
 			case LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA: return "Scaling data needs to match hatch data";
 			case LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA: return "Scaling data needs to match point data";
 			case LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch";
+			case LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND: return "Toolpath modifier not found";
 		}
 		return "unknown error";
 	}
@@ -1159,6 +1161,8 @@ public:
 	inline PBinaryStream CreateBinaryStream(const std::string & sIndexPath, const std::string & sBinaryPath);
 	inline void AssignBinaryStream(classParam<CBase> pInstance, classParam<CBinaryStream> pBinaryStream);
 	inline void RegisterCustomNamespace(const std::string & sPrefix, const std::string & sNameSpace);
+	inline void SetCustomNamespaceRequired(const std::string & sPrefix, const bool bShallBeRequired);
+	inline bool GetCustomNamespaceRequired(const std::string & sPrefix);
 };
 	
 /*************************************************************************************************************************
@@ -1201,6 +1205,8 @@ public:
 	inline void SetProgressCallback(const ProgressCallback pProgressCallback, const Lib3MF_pvoid pUserData);
 	inline void AddRelationToRead(const std::string & sRelationShipType);
 	inline void RemoveRelationToRead(const std::string & sRelationShipType);
+	inline void AddSupportedCustomNamespace(const std::string & sNameSpace);
+	inline void RemoveSupportedCustomNamespace(const std::string & sNameSpace);
 	inline void SetStrictModeActive(const bool bStrictModeActive);
 	inline bool GetStrictModeActive();
 	inline std::string GetWarning(const Lib3MF_uint32 nIndex, Lib3MF_uint32 & nErrorCode);
@@ -3492,7 +3498,8 @@ public:
 	inline bool HasModifier(const std::string & sNameSpaceName, const std::string & sValueName);
 	inline void GetModifierInformationByIndex(const Lib3MF_uint32 nIndex, std::string & sNameSpaceName, std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue);
 	inline void GetModifierInformationByName(const std::string & sNameSpaceName, const std::string & sValueName, eToolpathProfileModificationType & eModifierType, eToolpathProfileModificationFactor & eModificationFactor, Lib3MF_double & dMinValue, Lib3MF_double & dMaxValue);
-	inline void SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue);
+	inline void AddModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue);
+	inline void ChangeModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue);
 	inline void RemoveModifier(const std::string & sNameSpaceName, const std::string & sValueName);
 };
 	
@@ -4620,13 +4627,36 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CWriter::RegisterCustomNamespace - Registers a custom 3MF Namespace. Fails if Prefix is already registered.
+	* CWriter::RegisterCustomNamespace - Registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.
 	* @param[in] sPrefix - Prefix to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
 	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
 	*/
 	void CWriter::RegisterCustomNamespace(const std::string & sPrefix, const std::string & sNameSpace)
 	{
 		CheckError(lib3mf_writer_registercustomnamespace(m_pHandle, sPrefix.c_str(), sNameSpace.c_str()));
+	}
+	
+	/**
+	* CWriter::SetCustomNamespaceRequired - Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	* @param[in] sPrefix - Prefix to change value for. Fails if prefix does not exist.
+	* @param[in] bShallBeRequired - True, if the namespace shall be required. False if not.
+	*/
+	void CWriter::SetCustomNamespaceRequired(const std::string & sPrefix, const bool bShallBeRequired)
+	{
+		CheckError(lib3mf_writer_setcustomnamespacerequired(m_pHandle, sPrefix.c_str(), bShallBeRequired));
+	}
+	
+	/**
+	* CWriter::GetCustomNamespaceRequired - Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	* @param[in] sPrefix - Prefix to return value. Fails if prefix does not exist.
+	* @return Returns true, if the namespace shall be required. False if not. Default is not required.
+	*/
+	bool CWriter::GetCustomNamespaceRequired(const std::string & sPrefix)
+	{
+		bool resultIsRequired = 0;
+		CheckError(lib3mf_writer_getcustomnamespacerequired(m_pHandle, sPrefix.c_str(), &resultIsRequired));
+		
+		return resultIsRequired;
 	}
 	
 	/**
@@ -4736,6 +4766,24 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	void CReader::RemoveRelationToRead(const std::string & sRelationShipType)
 	{
 		CheckError(lib3mf_reader_removerelationtoread(m_pHandle, sRelationShipType.c_str()));
+	}
+	
+	/**
+	* CReader::AddSupportedCustomNamespace - Signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.
+	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	*/
+	void CReader::AddSupportedCustomNamespace(const std::string & sNameSpace)
+	{
+		CheckError(lib3mf_reader_addsupportedcustomnamespace(m_pHandle, sNameSpace.c_str()));
+	}
+	
+	/**
+	* CReader::RemoveSupportedCustomNamespace - Reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.
+	* @param[in] sNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	*/
+	void CReader::RemoveSupportedCustomNamespace(const std::string & sNameSpace)
+	{
+		CheckError(lib3mf_reader_removesupportedcustomnamespace(m_pHandle, sNameSpace.c_str()));
 	}
 	
 	/**
@@ -12255,7 +12303,7 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CToolpathProfile::SetModifier - Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	* CToolpathProfile::AddModifier - Adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
 	* @param[in] sValueName - Parameter key string.
 	* @param[in] eModifierType - Returns the type of the modifier.
@@ -12263,9 +12311,23 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	*/
-	void CToolpathProfile::SetModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
+	void CToolpathProfile::AddModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
 	{
-		CheckError(lib3mf_toolpathprofile_setmodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), eModifierType, eModificationFactor, dMinValue, dMaxValue));
+		CheckError(lib3mf_toolpathprofile_addmodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), eModifierType, eModificationFactor, dMinValue, dMaxValue));
+	}
+	
+	/**
+	* CToolpathProfile::ChangeModifier - Changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Parameter key string.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	*/
+	void CToolpathProfile::ChangeModifier(const std::string & sNameSpaceName, const std::string & sValueName, const eToolpathProfileModificationType eModifierType, const eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
+	{
+		CheckError(lib3mf_toolpathprofile_changemodifier(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), eModifierType, eModificationFactor, dMinValue, dMaxValue));
 	}
 	
 	/**

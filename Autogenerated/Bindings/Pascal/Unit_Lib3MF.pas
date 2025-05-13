@@ -147,6 +147,7 @@ const
 	LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA = 5013;
 	LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA = 5014;
 	LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH = 5015;
+	LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND = 5016;
 
 (*************************************************************************************************************************
  Declaration of enums
@@ -955,7 +956,7 @@ type
 	TLib3MFWriter_AssignBinaryStreamFunc = function(pWriter: TLib3MFHandle; const pInstance: TLib3MFHandle; const pBinaryStream: TLib3MFHandle): TLib3MFResult; cdecl;
 	
 	(**
-	* Registers a custom 3MF Namespace. Fails if Prefix is already registered.
+	* Registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.
 	*
 	* @param[in] pWriter - Writer instance.
 	* @param[in] pPrefix - Prefix to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
@@ -963,6 +964,26 @@ type
 	* @return error code or 0 (success)
 	*)
 	TLib3MFWriter_RegisterCustomNamespaceFunc = function(pWriter: TLib3MFHandle; const pPrefix: PAnsiChar; const pNameSpace: PAnsiChar): TLib3MFResult; cdecl;
+	
+	(**
+	* Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	*
+	* @param[in] pWriter - Writer instance.
+	* @param[in] pPrefix - Prefix to change value for. Fails if prefix does not exist.
+	* @param[in] bShallBeRequired - True, if the namespace shall be required. False if not.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFWriter_SetCustomNamespaceRequiredFunc = function(pWriter: TLib3MFHandle; const pPrefix: PAnsiChar; const bShallBeRequired: Byte): TLib3MFResult; cdecl;
+	
+	(**
+	* Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+	*
+	* @param[in] pWriter - Writer instance.
+	* @param[in] pPrefix - Prefix to return value. Fails if prefix does not exist.
+	* @param[out] pIsRequired - Returns true, if the namespace shall be required. False if not. Default is not required.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFWriter_GetCustomNamespaceRequiredFunc = function(pWriter: TLib3MFHandle; const pPrefix: PAnsiChar; out pIsRequired: Byte): TLib3MFResult; cdecl;
 	
 
 (*************************************************************************************************************************
@@ -1067,6 +1088,24 @@ type
 	* @return error code or 0 (success)
 	*)
 	TLib3MFReader_RemoveRelationToReadFunc = function(pReader: TLib3MFHandle; const pRelationShipType: PAnsiChar): TLib3MFResult; cdecl;
+	
+	(**
+	* Signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.
+	*
+	* @param[in] pReader - Reader instance.
+	* @param[in] pNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	* @return error code or 0 (success)
+	*)
+	TLib3MFReader_AddSupportedCustomNamespaceFunc = function(pReader: TLib3MFHandle; const pNameSpace: PAnsiChar): TLib3MFResult; cdecl;
+	
+	(**
+	* Reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.
+	*
+	* @param[in] pReader - Reader instance.
+	* @param[in] pNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+	* @return error code or 0 (success)
+	*)
+	TLib3MFReader_RemoveSupportedCustomNamespaceFunc = function(pReader: TLib3MFHandle; const pNameSpace: PAnsiChar): TLib3MFResult; cdecl;
 	
 	(**
 	* Activates (deactivates) the strict mode of the reader.
@@ -6917,7 +6956,7 @@ type
 	TLib3MFToolpathProfile_GetModifierInformationByNameFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; out pModifierType: Integer; out pModificationFactor: Integer; out pMinValue: Double; out pMaxValue: Double): TLib3MFResult; cdecl;
 	
 	(**
-	* Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	* Adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 	*
 	* @param[in] pToolpathProfile - ToolpathProfile instance.
 	* @param[in] pNameSpaceName - Name of the Parameter Namespace.
@@ -6928,7 +6967,21 @@ type
 	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 	* @return error code or 0 (success)
 	*)
-	TLib3MFToolpathProfile_SetModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const eModifierType: Integer; const eModificationFactor: Integer; const dMinValue: Double; const dMaxValue: Double): TLib3MFResult; cdecl;
+	TLib3MFToolpathProfile_AddModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const eModifierType: Integer; const eModificationFactor: Integer; const dMinValue: Double; const dMaxValue: Double): TLib3MFResult; cdecl;
+	
+	(**
+	* Changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+	*
+	* @param[in] pToolpathProfile - ToolpathProfile instance.
+	* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] pValueName - Parameter key string.
+	* @param[in] eModifierType - Returns the type of the modifier.
+	* @param[in] eModificationFactor - which type of modification factor to use.
+	* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFToolpathProfile_ChangeModifierFunc = function(pToolpathProfile: TLib3MFHandle; const pNameSpaceName: PAnsiChar; const pValueName: PAnsiChar; const eModifierType: Integer; const eModificationFactor: Integer; const dMinValue: Double; const dMaxValue: Double): TLib3MFResult; cdecl;
 	
 	(**
 	* Removes a modifier, if it exists.
@@ -9534,6 +9587,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		function CreateBinaryStream(const AIndexPath: String; const ABinaryPath: String): TLib3MFBinaryStream;
 		procedure AssignBinaryStream(const AInstance: TLib3MFBase; const ABinaryStream: TLib3MFBinaryStream);
 		procedure RegisterCustomNamespace(const APrefix: String; const ANameSpace: String);
+		procedure SetCustomNamespaceRequired(const APrefix: String; const AShallBeRequired: Boolean);
+		function GetCustomNamespaceRequired(const APrefix: String): Boolean;
 	end;
 
 
@@ -9566,6 +9621,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		procedure SetProgressCallback(const AProgressCallback: PLib3MF_ProgressCallback; const AUserData: Pointer);
 		procedure AddRelationToRead(const ARelationShipType: String);
 		procedure RemoveRelationToRead(const ARelationShipType: String);
+		procedure AddSupportedCustomNamespace(const ANameSpace: String);
+		procedure RemoveSupportedCustomNamespace(const ANameSpace: String);
 		procedure SetStrictModeActive(const AStrictModeActive: Boolean);
 		function GetStrictModeActive(): Boolean;
 		function GetWarning(const AIndex: Cardinal; out AErrorCode: Cardinal): String;
@@ -11307,7 +11364,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		function HasModifier(const ANameSpaceName: String; const AValueName: String): Boolean;
 		procedure GetModifierInformationByIndex(const AIndex: Cardinal; out ANameSpaceName: String; out AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
 		procedure GetModifierInformationByName(const ANameSpaceName: String; const AValueName: String; out AModifierType: TLib3MFToolpathProfileModificationType; out AModificationFactor: TLib3MFToolpathProfileModificationFactor; out AMinValue: Double; out AMaxValue: Double);
-		procedure SetModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
+		procedure AddModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
+		procedure ChangeModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
 		procedure RemoveModifier(const ANameSpaceName: String; const AValueName: String);
 	end;
 
@@ -11692,6 +11750,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFWriter_CreateBinaryStreamFunc: TLib3MFWriter_CreateBinaryStreamFunc;
 		FLib3MFWriter_AssignBinaryStreamFunc: TLib3MFWriter_AssignBinaryStreamFunc;
 		FLib3MFWriter_RegisterCustomNamespaceFunc: TLib3MFWriter_RegisterCustomNamespaceFunc;
+		FLib3MFWriter_SetCustomNamespaceRequiredFunc: TLib3MFWriter_SetCustomNamespaceRequiredFunc;
+		FLib3MFWriter_GetCustomNamespaceRequiredFunc: TLib3MFWriter_GetCustomNamespaceRequiredFunc;
 		FLib3MFPersistentReaderSource_GetSourceTypeFunc: TLib3MFPersistentReaderSource_GetSourceTypeFunc;
 		FLib3MFPersistentReaderSource_InvalidateSourceDataFunc: TLib3MFPersistentReaderSource_InvalidateSourceDataFunc;
 		FLib3MFPersistentReaderSource_SourceDataIsValidFunc: TLib3MFPersistentReaderSource_SourceDataIsValidFunc;
@@ -11702,6 +11762,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFReader_SetProgressCallbackFunc: TLib3MFReader_SetProgressCallbackFunc;
 		FLib3MFReader_AddRelationToReadFunc: TLib3MFReader_AddRelationToReadFunc;
 		FLib3MFReader_RemoveRelationToReadFunc: TLib3MFReader_RemoveRelationToReadFunc;
+		FLib3MFReader_AddSupportedCustomNamespaceFunc: TLib3MFReader_AddSupportedCustomNamespaceFunc;
+		FLib3MFReader_RemoveSupportedCustomNamespaceFunc: TLib3MFReader_RemoveSupportedCustomNamespaceFunc;
 		FLib3MFReader_SetStrictModeActiveFunc: TLib3MFReader_SetStrictModeActiveFunc;
 		FLib3MFReader_GetStrictModeActiveFunc: TLib3MFReader_GetStrictModeActiveFunc;
 		FLib3MFReader_GetWarningFunc: TLib3MFReader_GetWarningFunc;
@@ -12233,7 +12295,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFToolpathProfile_HasModifierFunc: TLib3MFToolpathProfile_HasModifierFunc;
 		FLib3MFToolpathProfile_GetModifierInformationByIndexFunc: TLib3MFToolpathProfile_GetModifierInformationByIndexFunc;
 		FLib3MFToolpathProfile_GetModifierInformationByNameFunc: TLib3MFToolpathProfile_GetModifierInformationByNameFunc;
-		FLib3MFToolpathProfile_SetModifierFunc: TLib3MFToolpathProfile_SetModifierFunc;
+		FLib3MFToolpathProfile_AddModifierFunc: TLib3MFToolpathProfile_AddModifierFunc;
+		FLib3MFToolpathProfile_ChangeModifierFunc: TLib3MFToolpathProfile_ChangeModifierFunc;
 		FLib3MFToolpathProfile_RemoveModifierFunc: TLib3MFToolpathProfile_RemoveModifierFunc;
 		FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc: TLib3MFToolpathLayerReader_GetLayerDataUUIDFunc;
 		FLib3MFToolpathLayerReader_GetCustomDataCountFunc: TLib3MFToolpathLayerReader_GetCustomDataCountFunc;
@@ -12506,6 +12569,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFWriter_CreateBinaryStreamFunc: TLib3MFWriter_CreateBinaryStreamFunc read FLib3MFWriter_CreateBinaryStreamFunc;
 		property Lib3MFWriter_AssignBinaryStreamFunc: TLib3MFWriter_AssignBinaryStreamFunc read FLib3MFWriter_AssignBinaryStreamFunc;
 		property Lib3MFWriter_RegisterCustomNamespaceFunc: TLib3MFWriter_RegisterCustomNamespaceFunc read FLib3MFWriter_RegisterCustomNamespaceFunc;
+		property Lib3MFWriter_SetCustomNamespaceRequiredFunc: TLib3MFWriter_SetCustomNamespaceRequiredFunc read FLib3MFWriter_SetCustomNamespaceRequiredFunc;
+		property Lib3MFWriter_GetCustomNamespaceRequiredFunc: TLib3MFWriter_GetCustomNamespaceRequiredFunc read FLib3MFWriter_GetCustomNamespaceRequiredFunc;
 		property Lib3MFPersistentReaderSource_GetSourceTypeFunc: TLib3MFPersistentReaderSource_GetSourceTypeFunc read FLib3MFPersistentReaderSource_GetSourceTypeFunc;
 		property Lib3MFPersistentReaderSource_InvalidateSourceDataFunc: TLib3MFPersistentReaderSource_InvalidateSourceDataFunc read FLib3MFPersistentReaderSource_InvalidateSourceDataFunc;
 		property Lib3MFPersistentReaderSource_SourceDataIsValidFunc: TLib3MFPersistentReaderSource_SourceDataIsValidFunc read FLib3MFPersistentReaderSource_SourceDataIsValidFunc;
@@ -12516,6 +12581,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFReader_SetProgressCallbackFunc: TLib3MFReader_SetProgressCallbackFunc read FLib3MFReader_SetProgressCallbackFunc;
 		property Lib3MFReader_AddRelationToReadFunc: TLib3MFReader_AddRelationToReadFunc read FLib3MFReader_AddRelationToReadFunc;
 		property Lib3MFReader_RemoveRelationToReadFunc: TLib3MFReader_RemoveRelationToReadFunc read FLib3MFReader_RemoveRelationToReadFunc;
+		property Lib3MFReader_AddSupportedCustomNamespaceFunc: TLib3MFReader_AddSupportedCustomNamespaceFunc read FLib3MFReader_AddSupportedCustomNamespaceFunc;
+		property Lib3MFReader_RemoveSupportedCustomNamespaceFunc: TLib3MFReader_RemoveSupportedCustomNamespaceFunc read FLib3MFReader_RemoveSupportedCustomNamespaceFunc;
 		property Lib3MFReader_SetStrictModeActiveFunc: TLib3MFReader_SetStrictModeActiveFunc read FLib3MFReader_SetStrictModeActiveFunc;
 		property Lib3MFReader_GetStrictModeActiveFunc: TLib3MFReader_GetStrictModeActiveFunc read FLib3MFReader_GetStrictModeActiveFunc;
 		property Lib3MFReader_GetWarningFunc: TLib3MFReader_GetWarningFunc read FLib3MFReader_GetWarningFunc;
@@ -13047,7 +13114,8 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFToolpathProfile_HasModifierFunc: TLib3MFToolpathProfile_HasModifierFunc read FLib3MFToolpathProfile_HasModifierFunc;
 		property Lib3MFToolpathProfile_GetModifierInformationByIndexFunc: TLib3MFToolpathProfile_GetModifierInformationByIndexFunc read FLib3MFToolpathProfile_GetModifierInformationByIndexFunc;
 		property Lib3MFToolpathProfile_GetModifierInformationByNameFunc: TLib3MFToolpathProfile_GetModifierInformationByNameFunc read FLib3MFToolpathProfile_GetModifierInformationByNameFunc;
-		property Lib3MFToolpathProfile_SetModifierFunc: TLib3MFToolpathProfile_SetModifierFunc read FLib3MFToolpathProfile_SetModifierFunc;
+		property Lib3MFToolpathProfile_AddModifierFunc: TLib3MFToolpathProfile_AddModifierFunc read FLib3MFToolpathProfile_AddModifierFunc;
+		property Lib3MFToolpathProfile_ChangeModifierFunc: TLib3MFToolpathProfile_ChangeModifierFunc read FLib3MFToolpathProfile_ChangeModifierFunc;
 		property Lib3MFToolpathProfile_RemoveModifierFunc: TLib3MFToolpathProfile_RemoveModifierFunc read FLib3MFToolpathProfile_RemoveModifierFunc;
 		property Lib3MFToolpathLayerReader_GetLayerDataUUIDFunc: TLib3MFToolpathLayerReader_GetLayerDataUUIDFunc read FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc;
 		property Lib3MFToolpathLayerReader_GetCustomDataCountFunc: TLib3MFToolpathLayerReader_GetCustomDataCountFunc read FLib3MFToolpathLayerReader_GetCustomDataCountFunc;
@@ -15084,6 +15152,7 @@ implementation
 			LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA: ADescription := 'Scaling data needs to match hatch data';
 			LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA: ADescription := 'Scaling data needs to match point data';
 			LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH: ADescription := 'Segment is not of type hatch';
+			LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND: ADescription := 'Toolpath modifier not found';
 			else
 				ADescription := 'unknown';
 		end;
@@ -15347,6 +15416,20 @@ implementation
 		FWrapper.CheckError(Self, FWrapper.Lib3MFWriter_RegisterCustomNamespaceFunc(FHandle, PAnsiChar(APrefix), PAnsiChar(ANameSpace)));
 	end;
 
+	procedure TLib3MFWriter.SetCustomNamespaceRequired(const APrefix: String; const AShallBeRequired: Boolean);
+	begin
+		FWrapper.CheckError(Self, FWrapper.Lib3MFWriter_SetCustomNamespaceRequiredFunc(FHandle, PAnsiChar(APrefix), Ord(AShallBeRequired)));
+	end;
+
+	function TLib3MFWriter.GetCustomNamespaceRequired(const APrefix: String): Boolean;
+	var
+		ResultIsRequired: Byte;
+	begin
+		ResultIsRequired := 0;
+		FWrapper.CheckError(Self, FWrapper.Lib3MFWriter_GetCustomNamespaceRequiredFunc(FHandle, PAnsiChar(APrefix), ResultIsRequired));
+		Result := (ResultIsRequired <> 0);
+	end;
+
 (*************************************************************************************************************************
  Class implementation for PersistentReaderSource
 **************************************************************************************************************************)
@@ -15454,6 +15537,16 @@ implementation
 	procedure TLib3MFReader.RemoveRelationToRead(const ARelationShipType: String);
 	begin
 		FWrapper.CheckError(Self, FWrapper.Lib3MFReader_RemoveRelationToReadFunc(FHandle, PAnsiChar(ARelationShipType)));
+	end;
+
+	procedure TLib3MFReader.AddSupportedCustomNamespace(const ANameSpace: String);
+	begin
+		FWrapper.CheckError(Self, FWrapper.Lib3MFReader_AddSupportedCustomNamespaceFunc(FHandle, PAnsiChar(ANameSpace)));
+	end;
+
+	procedure TLib3MFReader.RemoveSupportedCustomNamespace(const ANameSpace: String);
+	begin
+		FWrapper.CheckError(Self, FWrapper.Lib3MFReader_RemoveSupportedCustomNamespaceFunc(FHandle, PAnsiChar(ANameSpace)));
 	end;
 
 	procedure TLib3MFReader.SetStrictModeActive(const AStrictModeActive: Boolean);
@@ -21893,9 +21986,14 @@ implementation
 		AModificationFactor := convertConstToToolpathProfileModificationFactor(ResultModificationFactor);
 	end;
 
-	procedure TLib3MFToolpathProfile.SetModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
+	procedure TLib3MFToolpathProfile.AddModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
 	begin
-		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_SetModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), convertToolpathProfileModificationTypeToConst(AModifierType), convertToolpathProfileModificationFactorToConst(AModificationFactor), AMinValue, AMaxValue));
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_AddModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), convertToolpathProfileModificationTypeToConst(AModifierType), convertToolpathProfileModificationFactorToConst(AModificationFactor), AMinValue, AMaxValue));
+	end;
+
+	procedure TLib3MFToolpathProfile.ChangeModifier(const ANameSpaceName: String; const AValueName: String; const AModifierType: TLib3MFToolpathProfileModificationType; const AModificationFactor: TLib3MFToolpathProfileModificationFactor; const AMinValue: Double; const AMaxValue: Double);
+	begin
+		FWrapper.CheckError(Self, FWrapper.Lib3MFToolpathProfile_ChangeModifierFunc(FHandle, PAnsiChar(ANameSpaceName), PAnsiChar(AValueName), convertToolpathProfileModificationTypeToConst(AModifierType), convertToolpathProfileModificationFactorToConst(AModificationFactor), AMinValue, AMaxValue));
 	end;
 
 	procedure TLib3MFToolpathProfile.RemoveModifier(const ANameSpaceName: String; const AValueName: String);
@@ -24652,6 +24750,8 @@ implementation
 		FLib3MFWriter_CreateBinaryStreamFunc := LoadFunction('lib3mf_writer_createbinarystream');
 		FLib3MFWriter_AssignBinaryStreamFunc := LoadFunction('lib3mf_writer_assignbinarystream');
 		FLib3MFWriter_RegisterCustomNamespaceFunc := LoadFunction('lib3mf_writer_registercustomnamespace');
+		FLib3MFWriter_SetCustomNamespaceRequiredFunc := LoadFunction('lib3mf_writer_setcustomnamespacerequired');
+		FLib3MFWriter_GetCustomNamespaceRequiredFunc := LoadFunction('lib3mf_writer_getcustomnamespacerequired');
 		FLib3MFPersistentReaderSource_GetSourceTypeFunc := LoadFunction('lib3mf_persistentreadersource_getsourcetype');
 		FLib3MFPersistentReaderSource_InvalidateSourceDataFunc := LoadFunction('lib3mf_persistentreadersource_invalidatesourcedata');
 		FLib3MFPersistentReaderSource_SourceDataIsValidFunc := LoadFunction('lib3mf_persistentreadersource_sourcedataisvalid');
@@ -24662,6 +24762,8 @@ implementation
 		FLib3MFReader_SetProgressCallbackFunc := LoadFunction('lib3mf_reader_setprogresscallback');
 		FLib3MFReader_AddRelationToReadFunc := LoadFunction('lib3mf_reader_addrelationtoread');
 		FLib3MFReader_RemoveRelationToReadFunc := LoadFunction('lib3mf_reader_removerelationtoread');
+		FLib3MFReader_AddSupportedCustomNamespaceFunc := LoadFunction('lib3mf_reader_addsupportedcustomnamespace');
+		FLib3MFReader_RemoveSupportedCustomNamespaceFunc := LoadFunction('lib3mf_reader_removesupportedcustomnamespace');
 		FLib3MFReader_SetStrictModeActiveFunc := LoadFunction('lib3mf_reader_setstrictmodeactive');
 		FLib3MFReader_GetStrictModeActiveFunc := LoadFunction('lib3mf_reader_getstrictmodeactive');
 		FLib3MFReader_GetWarningFunc := LoadFunction('lib3mf_reader_getwarning');
@@ -25193,7 +25295,8 @@ implementation
 		FLib3MFToolpathProfile_HasModifierFunc := LoadFunction('lib3mf_toolpathprofile_hasmodifier');
 		FLib3MFToolpathProfile_GetModifierInformationByIndexFunc := LoadFunction('lib3mf_toolpathprofile_getmodifierinformationbyindex');
 		FLib3MFToolpathProfile_GetModifierInformationByNameFunc := LoadFunction('lib3mf_toolpathprofile_getmodifierinformationbyname');
-		FLib3MFToolpathProfile_SetModifierFunc := LoadFunction('lib3mf_toolpathprofile_setmodifier');
+		FLib3MFToolpathProfile_AddModifierFunc := LoadFunction('lib3mf_toolpathprofile_addmodifier');
+		FLib3MFToolpathProfile_ChangeModifierFunc := LoadFunction('lib3mf_toolpathprofile_changemodifier');
 		FLib3MFToolpathProfile_RemoveModifierFunc := LoadFunction('lib3mf_toolpathprofile_removemodifier');
 		FLib3MFToolpathLayerReader_GetLayerDataUUIDFunc := LoadFunction('lib3mf_toolpathlayerreader_getlayerdatauuid');
 		FLib3MFToolpathLayerReader_GetCustomDataCountFunc := LoadFunction('lib3mf_toolpathlayerreader_getcustomdatacount');
@@ -25517,6 +25620,12 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_writer_registercustomnamespace'), @FLib3MFWriter_RegisterCustomNamespaceFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_writer_setcustomnamespacerequired'), @FLib3MFWriter_SetCustomNamespaceRequiredFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_writer_getcustomnamespacerequired'), @FLib3MFWriter_GetCustomNamespaceRequiredFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_persistentreadersource_getsourcetype'), @FLib3MFPersistentReaderSource_GetSourceTypeFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
@@ -25545,6 +25654,12 @@ implementation
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_reader_removerelationtoread'), @FLib3MFReader_RemoveRelationToReadFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_reader_addsupportedcustomnamespace'), @FLib3MFReader_AddSupportedCustomNamespaceFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_reader_removesupportedcustomnamespace'), @FLib3MFReader_RemoveSupportedCustomNamespaceFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_reader_setstrictmodeactive'), @FLib3MFReader_SetStrictModeActiveFunc);
@@ -27140,7 +27255,10 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_getmodifierinformationbyname'), @FLib3MFToolpathProfile_GetModifierInformationByNameFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_setmodifier'), @FLib3MFToolpathProfile_SetModifierFunc);
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_addmodifier'), @FLib3MFToolpathProfile_AddModifierFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_changemodifier'), @FLib3MFToolpathProfile_ChangeModifierFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_toolpathprofile_removemodifier'), @FLib3MFToolpathProfile_RemoveModifierFunc);

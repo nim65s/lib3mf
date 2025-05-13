@@ -135,6 +135,8 @@ private:
 	static void CreateBinaryStream(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void AssignBinaryStream(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void RegisterCustomNamespace(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void SetCustomNamespaceRequired(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetCustomNamespaceRequired(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:
 	CLib3MFWriter();
@@ -179,6 +181,8 @@ private:
 	static void SetProgressCallback(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void AddRelationToRead(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void RemoveRelationToRead(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void AddSupportedCustomNamespace(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void RemoveSupportedCustomNamespace(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void SetStrictModeActive(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetStrictModeActive(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetWarning(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -2580,7 +2584,8 @@ private:
 	static void HasModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierInformationByIndex(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetModifierInformationByName(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void SetModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void AddModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void ChangeModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void RemoveModifier(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:

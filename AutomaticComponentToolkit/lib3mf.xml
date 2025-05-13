@@ -139,6 +139,8 @@
 		<error name="TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA" code="5013" description="Scaling data needs to match hatch data" />
 		<error name="TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA" code="5014" description="Scaling data needs to match point data" />
 		<error name="TOOLPATH_SEGMENTISNOTOFTYPEHATCH" code="5015" description="Segment is not of type hatch" />
+		<error name="TOOLPATH_MODIFIERNOTFOUND" code="5016" description="Toolpath modifier not found" />
+		
 		
 		
 		
@@ -577,10 +579,21 @@
 			<param name="BinaryStream" type="class" class="BinaryStream" pass="in" description="Binary stream object to use for this layer." />
 		</method>
 		
-		<method name="RegisterCustomNamespace" description = "Registers a custom 3MF Namespace. Fails if Prefix is already registered.">
+		<method name="RegisterCustomNamespace" description = "Registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.">
 			<param name="Prefix" type="string" pass="in" description="Prefix to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number" />
 			<param name="NameSpace" type="string" pass="in" description="Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number" />
 		</method>
+		
+		<method name="SetCustomNamespaceRequired" description = "Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.">
+			<param name="Prefix" type="string" pass="in" description="Prefix to change value for. Fails if prefix does not exist." />
+			<param name="ShallBeRequired" type="bool" pass="in" description="True, if the namespace shall be required. False if not." />
+		</method>
+		
+		<method name="GetCustomNamespaceRequired" description = "Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.">
+			<param name="Prefix" type="string" pass="in" description="Prefix to return value. Fails if prefix does not exist." />
+			<param name="IsRequired" type="bool" pass="return" description="Returns true, if the namespace shall be required. False if not. Default is not required." />
+		</method>
+
 	</class>
 	
 
@@ -625,6 +638,7 @@
 			<param name="UserData" type="pointer" pass="in"
 				description="Userdata that is passed to the callback function" />
 		</method>
+		
 		<method name="SetProgressCallback"
 			description="Set the progress callback for calls to this writer">
 			<param name="ProgressCallback" type="functiontype" class="ProgressCallback" pass="in"
@@ -632,16 +646,27 @@
 			<param name="UserData" type="pointer" pass="in"
 				description="pointer to arbitrary user data that is passed without modification to the callback." />
 		</method>
+		
 		<method name="AddRelationToRead"
 			description="Adds a relationship type which shall be read as attachment in memory while loading">
 			<param name="RelationShipType" type="string" pass="in"
 				description="String of the relationship type" />
 		</method>
+		
 		<method name="RemoveRelationToRead"
 			description="Removes a relationship type which shall be read as attachment in memory while loading">
 			<param name="RelationShipType" type="string" pass="in"
 				description="String of the relationship type" />
 		</method>
+		
+		<method name="AddSupportedCustomNamespace" description = "Signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number" />
+		</method>
+		
+		<method name="RemoveSupportedCustomNamespace" description = "Reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number" />
+		</method>
+		
 		<method name="SetStrictModeActive"
 			description="Activates (deactivates) the strict mode of the reader.">
 			<param name="StrictModeActive" type="bool" pass="in"
@@ -4067,7 +4092,16 @@
 			<param name="MaxValue" type="double" pass="out" description="Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue." />
 		</method>	
 
-		<method name="SetModifier" description="Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.">
+		<method name="AddModifier" description="Adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.">
+			<param name="NameSpaceName" type="string" pass="in" description="Name of the Parameter Namespace." />
+			<param name="ValueName" type="string" pass="in" description="Parameter key string." />
+			<param name="ModifierType" type="enum" class="ToolpathProfileModificationType" pass="in" description="Returns the type of the modifier." />
+			<param name="ModificationFactor" type="enum" class="ToolpathProfileModificationFactor" pass="in" description="which type of modification factor to use." />
+			<param name="MinValue" type="double" pass="in" description="Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue." />
+			<param name="MaxValue" type="double" pass="in" description="Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue." />
+		</method>
+
+		<method name="ChangeModifier" description="Changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.">
 			<param name="NameSpaceName" type="string" pass="in" description="Name of the Parameter Namespace." />
 			<param name="ValueName" type="string" pass="in" description="Parameter key string." />
 			<param name="ModifierType" type="enum" class="ToolpathProfileModificationType" pass="in" description="Returns the type of the modifier." />

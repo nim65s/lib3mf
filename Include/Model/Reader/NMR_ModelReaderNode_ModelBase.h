@@ -43,6 +43,7 @@ namespace NMR {
 		CModel * m_pModel;
 		std::string m_sRequiredExtensions;
 		std::map<std::string, std::string> m_ListedExtensions;
+		std::set<std::string> m_SupportedCustomNamespaces;
 
 		std::string m_sPath;
 		nfBool m_bHasResources;
@@ -63,7 +64,7 @@ namespace NMR {
 		virtual void OnNSAttribute(_In_z_ const nfChar * pAttributeName, _In_z_ const nfChar * pAttributeValue, _In_z_ const nfChar * pNameSpace);
 	public:
 		CModelReaderNode_ModelBase() = delete;
-		CModelReaderNode_ModelBase(_In_ CModel *pModel, _In_ PModelWarnings pWarnings, const std::string sPath, _In_ PProgressMonitor pProgressMonitor);
+		CModelReaderNode_ModelBase(_In_ CModel *pModel, _In_ PModelWarnings pWarnings, const std::string sPath, _In_ PProgressMonitor pProgressMonitor, const std::set<std::string> & supportedCustomNamespaces);
 
 		virtual void parseXML(_In_ CXmlReader * pXMLReader);
 

@@ -43,6 +43,7 @@ This is the class for exporting the 3mf model stream root node.
 
 #include "Common/MeshInformation/NMR_MeshInformation_Properties.h"
 
+#include <set>
 
 namespace NMR {
 
@@ -69,6 +70,7 @@ namespace NMR {
 		nfBool m_bWriteBinaryExtension;
 
 		std::map<std::string, std::pair<std::string, CChunkedBinaryStreamWriter*>> m_BinaryStreamWriters;
+		std::set<std::string> m_RequiredExtensionPrefixes;
 
 		void writeModelMetaData();
 		void writeMetaData(_In_ PModelMetaData pMetaData);
@@ -127,7 +129,7 @@ namespace NMR {
 		void registerStreamWriter(const std::string& sInstanceUUID, const std::string& sPath, CChunkedBinaryStreamWriter* pBinaryStreamWriter);
 		void setWriteBinaryExtension(bool bWriteBinaryExtension);
 
-		void registerCustomNamespace (const std::string & sPrefix, const std::string & sNamespace, bool bFailIfExisting);
+		void registerCustomNamespace (const std::string & sPrefix, const std::string & sNamespace, bool bIsRequiredNamespace, bool bFailIfExisting);
 
 	};
 

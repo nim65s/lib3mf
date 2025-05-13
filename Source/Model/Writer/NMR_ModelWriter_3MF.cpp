@@ -45,6 +45,41 @@ A model writer exports the in memory represenation into a 3MF file.
 
 namespace NMR {
 
+	CModelWriter_CustomNameSpace::CModelWriter_CustomNameSpace(const std::string& sPrefix, const std::string& sNamespace)
+		: m_sPrefix (sPrefix),
+		m_sNamespace (sNamespace),
+		m_bIsRequired (false)
+	{
+
+	}
+
+	CModelWriter_CustomNameSpace::~CModelWriter_CustomNameSpace()
+	{
+
+	}
+
+
+	std::string CModelWriter_CustomNameSpace::getPrefix()
+	{
+		return m_sPrefix;
+	}
+
+	std::string CModelWriter_CustomNameSpace::getNamespace()
+	{
+		return m_sNamespace;
+	}
+
+	bool CModelWriter_CustomNameSpace::getIsRequired()
+	{
+		return m_bIsRequired;
+	}
+
+	void CModelWriter_CustomNameSpace::setIsRequired(bool bValue)
+	{
+		m_bIsRequired = bValue;
+	}
+
+
 	CModelWriter_3MF::CModelWriter_3MF(_In_ PModel pModel) : CModelWriter(pModel)
 	{
 		// empty on purpose
@@ -105,10 +140,11 @@ namespace NMR {
 		CModelWriterNode100_Model ModelNode(pModel, pXMLWriter, monitor(), GetDecimalPrecision(), true);
 		ModelNode.setWriteBinaryExtension(m_bAllowBinaryStreams);
 
-		for (auto iIter : m_CustomNameSpaces) {
-			std::string sPrefix = iIter.first;
-			std::string sNameSpace = iIter.second;
-			ModelNode.registerCustomNamespace(sPrefix, sNameSpace, false);
+		for (auto iIter : m_CustomNameSpacePrefixMap) {
+			std::string sPrefix = iIter.second->getPrefix();
+			std::string sNameSpace = iIter.second->getNamespace ();
+			bool bIsRequired = iIter.second->getIsRequired();
+			ModelNode.registerCustomNamespace(sPrefix, sNameSpace, bIsRequired, false);
 		}
 
 		for (auto iAssignmentIter : m_BinaryWriterAssignmentMap) {
@@ -139,21 +175,43 @@ namespace NMR {
 		if (sNameSpace.empty())
 			throw CNMRException(NMR_ERROR_INVALIDPARAM);
 
-		auto iIter = m_CustomNameSpaces.find(sPrefix);
-		if (iIter != m_CustomNameSpaces.end()) {
-			if (iIter->second != sNameSpace)
+		auto iIter = m_CustomNameSpacePrefixMap.find(sPrefix);
+		if (iIter != m_CustomNameSpacePrefixMap.end()) {
+			if (iIter->second->getNamespace () != sNameSpace)
 				throw CNMRException(NMR_ERROR_NAMESPACEPREFIXALREADYDEFINED);
 
 		}
 		else {
-			m_CustomNameSpaces.insert(std::make_pair (sPrefix, sNameSpace));
+			auto pInstance = std::make_shared<CModelWriter_CustomNameSpace>(sPrefix, sNameSpace);
+
+			m_CustomNameSpacePrefixMap.insert(std::make_pair (sPrefix, pInstance));
 
 		}
 	}
 
-	std::map<std::string, std::string> CModelWriter_3MF::getCustomNamespaceMap()
+	void CModelWriter_3MF::setCustomNameSpaceRequired(const std::string& sPrefix, bool bValue)
 	{
-		return m_CustomNameSpaces;
+		auto iIter = m_CustomNameSpacePrefixMap.find(sPrefix);
+		if (iIter == m_CustomNameSpacePrefixMap.end ())
+			throw CNMRException(NMR_ERROR_NAMESPACEPREFIXNOTFOUND);
+
+		iIter->second->setIsRequired(bValue);
+	}
+
+	bool CModelWriter_3MF::getCustomNameSpaceRequired(const std::string& sPrefix)
+	{
+		auto iIter = m_CustomNameSpacePrefixMap.find(sPrefix);
+		if (iIter == m_CustomNameSpacePrefixMap.end())
+			throw CNMRException(NMR_ERROR_NAMESPACEPREFIXNOTFOUND);
+
+		return iIter->second->getIsRequired();
+	}
+
+
+
+	std::map<std::string, PModelWriter_CustomNameSpace> CModelWriter_3MF::getCustomNamespaceMap()
+	{
+		return m_CustomNameSpacePrefixMap;
 	}
 
 }

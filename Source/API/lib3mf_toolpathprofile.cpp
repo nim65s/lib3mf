@@ -252,9 +252,19 @@ void CToolpathProfile::GetModifierInformationByName(const std::string& sNameSpac
 	dMaxValue = pModifier->getMaximumValue();
 }
 
-void CToolpathProfile::SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
+void CToolpathProfile::AddModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
 {
 	m_pToolpathProfile->addModifier(sNameSpaceName, sValueName, eModifierType, dMinValue, dMaxValue, eModificationFactor);
+}
+
+void CToolpathProfile::ChangeModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue)
+{
+	auto pModifier = m_pToolpathProfile->findModifier(sNameSpaceName, sValueName, false);
+	if (pModifier.get() == nullptr)
+		throw ELib3MFInterfaceException(LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND, "toolpath modifier not found: " + sNameSpaceName + "/" + sValueName);
+
+	m_pToolpathProfile->changeModifier(sNameSpaceName, sValueName, eModifierType, dMinValue, dMaxValue, eModificationFactor);
+
 }
 
 void CToolpathProfile::RemoveModifier(const std::string& sNameSpaceName, const std::string& sValueName)

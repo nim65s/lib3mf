@@ -138,6 +138,15 @@ namespace NMR {
 		throw CNMRException(NMR_ERROR_WRITERDOESNOTSUPPORTNAMESPACES);
 	}
 
+	void CModelWriter::setCustomNameSpaceRequired(const std::string& sNameSpace, bool bValue)
+	{
+		throw CNMRException(NMR_ERROR_WRITERDOESNOTSUPPORTNAMESPACES);
+	}
+
+	bool CModelWriter::getCustomNameSpaceRequired(const std::string& sNameSpace)
+	{
+		throw CNMRException(NMR_ERROR_WRITERDOESNOTSUPPORTNAMESPACES);
+	}
 
 
 }

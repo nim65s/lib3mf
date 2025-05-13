@@ -303,7 +303,7 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_createbinarystream(Lib3MF_Writer pWri
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_assignbinarystream(Lib3MF_Writer pWriter, Lib3MF_Base pInstance, Lib3MF_BinaryStream pBinaryStream);
 
 /**
-* Registers a custom 3MF Namespace. Fails if Prefix is already registered.
+* Registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.
 *
 * @param[in] pWriter - Writer instance.
 * @param[in] pPrefix - Prefix to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
@@ -311,6 +311,26 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_assignbinarystream(Lib3MF_Writer pWri
 * @return error code or 0 (success)
 */
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_registercustomnamespace(Lib3MF_Writer pWriter, const char * pPrefix, const char * pNameSpace);
+
+/**
+* Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+*
+* @param[in] pWriter - Writer instance.
+* @param[in] pPrefix - Prefix to change value for. Fails if prefix does not exist.
+* @param[in] bShallBeRequired - True, if the namespace shall be required. False if not.
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_setcustomnamespacerequired(Lib3MF_Writer pWriter, const char * pPrefix, bool bShallBeRequired);
+
+/**
+* Sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+*
+* @param[in] pWriter - Writer instance.
+* @param[in] pPrefix - Prefix to return value. Fails if prefix does not exist.
+* @param[out] pIsRequired - Returns true, if the namespace shall be required. False if not. Default is not required.
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getcustomnamespacerequired(Lib3MF_Writer pWriter, const char * pPrefix, bool * pIsRequired);
 
 /*************************************************************************************************************************
  Class definition for PersistentReaderSource
@@ -413,6 +433,24 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_addrelationtoread(Lib3MF_Reader pRead
 * @return error code or 0 (success)
 */
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_removerelationtoread(Lib3MF_Reader pReader, const char * pRelationShipType);
+
+/**
+* Signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.
+*
+* @param[in] pReader - Reader instance.
+* @param[in] pNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_addsupportedcustomnamespace(Lib3MF_Reader pReader, const char * pNameSpace);
+
+/**
+* Reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.
+*
+* @param[in] pReader - Reader instance.
+* @param[in] pNameSpace - Namespace to be used. MUST NOT be empty. MUST be alphanumeric, not starting with a number
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_removesupportedcustomnamespace(Lib3MF_Reader pReader, const char * pNameSpace);
 
 /**
 * Activates (deactivates) the strict mode of the reader.
@@ -6153,7 +6191,7 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getmodifierinformationbyinde
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getmodifierinformationbyname(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType * pModifierType, eLib3MFToolpathProfileModificationFactor * pModificationFactor, Lib3MF_double * pMinValue, Lib3MF_double * pMaxValue);
 
 /**
-* Adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+* Adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
 * @param[in] pNameSpaceName - Name of the Parameter Namespace.
@@ -6164,7 +6202,21 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getmodifierinformationbyname
 * @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setmodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_addmodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue);
+
+/**
+* Changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+*
+* @param[in] pToolpathProfile - ToolpathProfile instance.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Parameter key string.
+* @param[in] eModifierType - Returns the type of the modifier.
+* @param[in] eModificationFactor - which type of modification factor to use.
+* @param[in] dMinValue - Desired Value if Factor is equal 0. The corresponding double parameter value MUST be between MinValue and MaxValue.
+* @param[in] dMaxValue - Desired Value if Factor is equal 1. The corresponding double parameter value MUST be between MinValue and MaxValue.
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_changemodifier(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, eLib3MFToolpathProfileModificationType eModifierType, eLib3MFToolpathProfileModificationFactor eModificationFactor, Lib3MF_double dMinValue, Lib3MF_double dMaxValue);
 
 /**
 * Removes a modifier, if it exists.

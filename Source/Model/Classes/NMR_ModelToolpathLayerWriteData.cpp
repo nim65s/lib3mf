@@ -47,7 +47,7 @@ NMR_ModelToolpathLayer.cpp defines the Model Toolpath Layer.
 
 namespace NMR {
 
-	CModelToolpathLayerWriteData::CModelToolpathLayerWriteData(CModelToolpath * pModelToolpath, NMR::PModelWriter_3MF pModelWriter, const std::string & sPackagePath, std::map<std::string, std::string> PrefixToNameSpaceMap)
+	CModelToolpathLayerWriteData::CModelToolpathLayerWriteData(CModelToolpath * pModelToolpath, NMR::PModelWriter_3MF pModelWriter, const std::string & sPackagePath, std::map<std::string, PModelWriter_CustomNameSpace> PrefixToNameSpaceMap)
 		: m_pModelToolpath (pModelToolpath), m_pModelWriter (pModelWriter), m_sPackagePath (sPackagePath), m_PrefixToNameSpaceMap (PrefixToNameSpaceMap),
 		m_nCurrentLaserIndex (0)
 	{
@@ -70,8 +70,10 @@ namespace NMR {
 			throw CNMRException(NMR_ERROR_NAMESPACEPREFIXISRESERVED);
 
 		for (auto iIter : m_PrefixToNameSpaceMap) {
-			m_pXmlWriter->WriteAttributeString(XML_3MF_ATTRIBUTE_XMLNS, iIter.first.c_str (), nullptr, iIter.second.c_str ());
-			m_NameSpaceToPrefixMap.insert(std::make_pair (iIter.second, iIter.first));
+			std::string sPrefix = iIter.second->getPrefix();
+			std::string sNameSpace = iIter.second->getNamespace();
+			m_pXmlWriter->WriteAttributeString(XML_3MF_ATTRIBUTE_XMLNS, sPrefix.c_str (), nullptr, sNameSpace.c_str());
+			m_NameSpaceToPrefixMap.insert(std::make_pair (sNameSpace, sPrefix));
 		}
 
 		m_bWritingHeader = true;

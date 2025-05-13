@@ -1268,9 +1268,11 @@ namespace NMR {
 		m_bWriteBinaryExtension = bWriteBinaryExtension;
 	}
 
-	void CModelWriterNode100_Model::registerCustomNamespace(const std::string& sPrefix, const std::string& sNamespace, bool bFailIfExisting)
+	void CModelWriterNode100_Model::registerCustomNamespace(const std::string& sPrefix, const std::string& sNamespace, bool bIsRequiredNamespace, bool bFailIfExisting)
 	{
 		m_pXMLWriter->RegisterCustomNameSpace(sNamespace, sPrefix, bFailIfExisting);
+		if (bIsRequiredNamespace)
+			m_RequiredExtensionPrefixes.insert(sPrefix);
 	}
 
 	void CModelWriterNode100_Model::writeCustomToolpathXMLNode(PCustomXMLNode pXMLNode, const std::string& sPrefix)

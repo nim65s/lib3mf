@@ -367,6 +367,12 @@ namespace NMR {
 		return iIter->second;
 	}
 
+	void CModelToolpathProfile::changeModifier(const std::string& sNameSpace, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType modifierType, double dMinimum, double dMaximum, Lib3MF::eToolpathProfileModificationFactor modificationFactor)
+	{
+		removeModifier(sNameSpace, sValueName);
+		addModifier(sNameSpace, sValueName, modifierType, dMinimum, dMaximum, modificationFactor);
+	}
+
 	void CModelToolpathProfile::addModifier(const std::string& sNameSpace, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType modifierType, double dMinimum, double dMaximum, Lib3MF::eToolpathProfileModificationFactor modificationFactor)
 	{
 		auto key = std::make_pair(sNameSpace, sValueName);

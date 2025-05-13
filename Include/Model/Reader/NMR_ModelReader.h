@@ -50,6 +50,7 @@ namespace NMR {
 		PImportStream m_pPrintTicketStream;
 		std::string m_sPrintTicketContentType;
 		std::set<std::string> m_RelationsToRead;
+		std::set<std::string> m_SupportedCustomNamespaces;
 
 
 		void readFromMeshImporter(_In_ CMeshImporter * pImporter);
@@ -63,6 +64,9 @@ namespace NMR {
 
 		void addRelationToRead(_In_ std::string sRelationShipType);
 		void removeRelationToRead(_In_ std::string sRelationShipType);
+		void addSupportedCustomNamespace(const std::string& sNameSpace);
+		void removeSupportedCustomNamespace(const std::string& sNameSpace);
+
 	};
 
 	typedef std::shared_ptr <CModelReader> PModelReader;

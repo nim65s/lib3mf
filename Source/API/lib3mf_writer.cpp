@@ -325,3 +325,24 @@ void CWriter::RegisterCustomNamespace(const std::string& sPrefix, const std::str
 
 	m_pWriter->registerCustomNameSpace(sPrefix, sNameSpace, false);
 }
+
+void CWriter::SetCustomNamespaceRequired(const std::string& sPrefix, const bool bShallBeRequired)
+{
+	if (sPrefix.empty())
+		throw ELib3MFInterfaceException(LIB3MF_ERROR_EMPTYNAMESPACEPREFIX);
+	if (!NMR::fnStringIsValidAlphanumericNameString(sPrefix))
+		throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDNAMESPACEPREFIX);
+
+	m_pWriter->setCustomNameSpaceRequired(sPrefix, bShallBeRequired);
+
+}
+
+bool CWriter::GetCustomNamespaceRequired(const std::string& sPrefix)
+{
+	if (sPrefix.empty())
+		throw ELib3MFInterfaceException(LIB3MF_ERROR_EMPTYNAMESPACEPREFIX);
+	if (!NMR::fnStringIsValidAlphanumericNameString(sPrefix))
+		throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDNAMESPACEPREFIX);
+
+	return m_pWriter->getCustomNameSpaceRequired(sPrefix);
+}

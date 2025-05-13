@@ -580,6 +580,7 @@ const LIB3MF_ERROR_TOOLPATH_INVALIDHATCHCOUNT = 5012;
 const LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA = 5013;
 const LIB3MF_ERROR_TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA = 5014;
 const LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH = 5015;
+const LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND = 5016;
 
 // WrappedError is an error that wraps a Lib3MF error.
 type WrappedError struct {
@@ -733,6 +734,8 @@ func errorMessage(errorcode uint32) string {
 		return "Scaling data needs to match point data";
 	case LIB3MF_ERROR_TOOLPATH_SEGMENTISNOTOFTYPEHATCH:
 		return "Segment is not of type hatch";
+	case LIB3MF_ERROR_TOOLPATH_MODIFIERNOTFOUND:
+		return "Toolpath modifier not found";
 	default:
 		return "unknown";
 	}
@@ -1156,13 +1159,32 @@ func (inst Writer) AssignBinaryStream(instance Base, binaryStream BinaryStream) 
 	return nil
 }
 
-// RegisterCustomNamespace registers a custom 3MF Namespace. Fails if Prefix is already registered.
+// RegisterCustomNamespace registers a custom 3MF Namespace. Fails if Prefix is already registered. The namespace will not be required by default.
 func (inst Writer) RegisterCustomNamespace(prefix string, nameSpace string) error {
 	ret := C.CCall_lib3mf_writer_registercustomnamespace(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(prefix)[0])), (*C.char)(unsafe.Pointer(&[]byte(nameSpace)[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
 	return nil
+}
+
+// SetCustomNamespaceRequired sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+func (inst Writer) SetCustomNamespaceRequired(prefix string, shallBeRequired bool) error {
+	ret := C.CCall_lib3mf_writer_setcustomnamespacerequired(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(prefix)[0])), C.bool(shallBeRequired))
+	if ret != 0 {
+		return makeError(uint32(ret))
+	}
+	return nil
+}
+
+// GetCustomNamespaceRequired sets if a custom 3MF Namespace is required. Fails if Namespace has not been registered first.
+func (inst Writer) GetCustomNamespaceRequired(prefix string) (bool, error) {
+	var isRequired C.bool
+	ret := C.CCall_lib3mf_writer_getcustomnamespacerequired(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(prefix)[0])), &isRequired)
+	if ret != 0 {
+		return false, makeError(uint32(ret))
+	}
+	return bool(isRequired), nil
 }
 
 
@@ -1274,6 +1296,24 @@ func (inst Reader) AddRelationToRead(relationShipType string) error {
 // RemoveRelationToRead removes a relationship type which shall be read as attachment in memory while loading.
 func (inst Reader) RemoveRelationToRead(relationShipType string) error {
 	ret := C.CCall_lib3mf_reader_removerelationtoread(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(relationShipType)[0])))
+	if ret != 0 {
+		return makeError(uint32(ret))
+	}
+	return nil
+}
+
+// AddSupportedCustomNamespace signals, that a custom namespace is supported by the consumer. If not properly set, a required namespace will fail reading.
+func (inst Reader) AddSupportedCustomNamespace(nameSpace string) error {
+	ret := C.CCall_lib3mf_reader_addsupportedcustomnamespace(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpace)[0])))
+	if ret != 0 {
+		return makeError(uint32(ret))
+	}
+	return nil
+}
+
+// RemoveSupportedCustomNamespace reverts AddSupportedCustomNamespace. A required namespace of this type will fail reading.
+func (inst Reader) RemoveSupportedCustomNamespace(nameSpace string) error {
+	ret := C.CCall_lib3mf_reader_removesupportedcustomnamespace(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpace)[0])))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}
@@ -8090,9 +8130,18 @@ func (inst ToolpathProfile) GetModifierInformationByName(nameSpaceName string, v
 	return ToolpathProfileModificationType(modifierType), ToolpathProfileModificationFactor(modificationFactor), float64(minValue), float64(maxValue), nil
 }
 
-// SetModifier adds a new modifier. Replaces the modifier, should it already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
-func (inst ToolpathProfile) SetModifier(nameSpaceName string, valueName string, modifierType ToolpathProfileModificationType, modificationFactor ToolpathProfileModificationFactor, minValue float64, maxValue float64) error {
-	ret := C.CCall_lib3mf_toolpathprofile_setmodifier(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.eLib3MFToolpathProfileModificationType(modifierType), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), C.double(minValue), C.double(maxValue))
+// AddModifier adds a new modifier. Fails, should a modifier already exist with the same name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+func (inst ToolpathProfile) AddModifier(nameSpaceName string, valueName string, modifierType ToolpathProfileModificationType, modificationFactor ToolpathProfileModificationFactor, minValue float64, maxValue float64) error {
+	ret := C.CCall_lib3mf_toolpathprofile_addmodifier(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.eLib3MFToolpathProfileModificationType(modifierType), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), C.double(minValue), C.double(maxValue))
+	if ret != 0 {
+		return makeError(uint32(ret))
+	}
+	return nil
+}
+
+// ChangeModifier changes an existing modifier. Fails, should no modifier exist with this name. Fails if no Parameter exists with this name/namespace. Fails if the parameter does not have a Double value attached.
+func (inst ToolpathProfile) ChangeModifier(nameSpaceName string, valueName string, modifierType ToolpathProfileModificationType, modificationFactor ToolpathProfileModificationFactor, minValue float64, maxValue float64) error {
+	ret := C.CCall_lib3mf_toolpathprofile_changemodifier(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(nameSpaceName)[0])), (*C.char)(unsafe.Pointer(&[]byte(valueName)[0])), C.eLib3MFToolpathProfileModificationType(modifierType), C.eLib3MFToolpathProfileModificationFactor(modificationFactor), C.double(minValue), C.double(maxValue))
 	if ret != 0 {
 		return makeError(uint32(ret))
 	}

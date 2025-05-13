@@ -134,6 +134,7 @@ class ErrorCodes(enum.IntEnum):
 	TOOLPATH_SCALINGDATANEEDSTOMATCHHATCHDATA = 5013
 	TOOLPATH_SCALINGDATANEEDSTOMATCHPOINTDATA = 5014
 	TOOLPATH_SEGMENTISNOTOFTYPEHATCH = 5015
+	TOOLPATH_MODIFIERNOTFOUND = 5016
 
 '''Definition of Function Table
 '''
@@ -182,6 +183,8 @@ class FunctionTable:
 	lib3mf_writer_createbinarystream = None
 	lib3mf_writer_assignbinarystream = None
 	lib3mf_writer_registercustomnamespace = None
+	lib3mf_writer_setcustomnamespacerequired = None
+	lib3mf_writer_getcustomnamespacerequired = None
 	lib3mf_persistentreadersource_getsourcetype = None
 	lib3mf_persistentreadersource_invalidatesourcedata = None
 	lib3mf_persistentreadersource_sourcedataisvalid = None
@@ -192,6 +195,8 @@ class FunctionTable:
 	lib3mf_reader_setprogresscallback = None
 	lib3mf_reader_addrelationtoread = None
 	lib3mf_reader_removerelationtoread = None
+	lib3mf_reader_addsupportedcustomnamespace = None
+	lib3mf_reader_removesupportedcustomnamespace = None
 	lib3mf_reader_setstrictmodeactive = None
 	lib3mf_reader_getstrictmodeactive = None
 	lib3mf_reader_getwarning = None
@@ -723,7 +728,8 @@ class FunctionTable:
 	lib3mf_toolpathprofile_hasmodifier = None
 	lib3mf_toolpathprofile_getmodifierinformationbyindex = None
 	lib3mf_toolpathprofile_getmodifierinformationbyname = None
-	lib3mf_toolpathprofile_setmodifier = None
+	lib3mf_toolpathprofile_addmodifier = None
+	lib3mf_toolpathprofile_changemodifier = None
 	lib3mf_toolpathprofile_removemodifier = None
 	lib3mf_toolpathlayerreader_getlayerdatauuid = None
 	lib3mf_toolpathlayerreader_getcustomdatacount = None
@@ -1700,6 +1706,18 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p)
 			self.lib.lib3mf_writer_registercustomnamespace = methodType(int(methodAddress.value))
 			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_writer_setcustomnamespacerequired")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_bool)
+			self.lib.lib3mf_writer_setcustomnamespacerequired = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_writer_getcustomnamespacerequired")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_bool))
+			self.lib.lib3mf_writer_getcustomnamespacerequired = methodType(int(methodAddress.value))
+			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_persistentreadersource_getsourcetype")), methodAddress)
 			if err != 0:
 				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
@@ -1759,6 +1777,18 @@ class Wrapper:
 				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p)
 			self.lib.lib3mf_reader_removerelationtoread = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_reader_addsupportedcustomnamespace")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p)
+			self.lib.lib3mf_reader_addsupportedcustomnamespace = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_reader_removesupportedcustomnamespace")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p)
+			self.lib.lib3mf_reader_removesupportedcustomnamespace = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_reader_setstrictmodeactive")), methodAddress)
 			if err != 0:
@@ -4946,11 +4976,17 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double))
 			self.lib.lib3mf_toolpathprofile_getmodifierinformationbyname = methodType(int(methodAddress.value))
 			
-			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_toolpathprofile_setmodifier")), methodAddress)
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_toolpathprofile_addmodifier")), methodAddress)
 			if err != 0:
 				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ToolpathProfileModificationType, ToolpathProfileModificationFactor, ctypes.c_double, ctypes.c_double)
-			self.lib.lib3mf_toolpathprofile_setmodifier = methodType(int(methodAddress.value))
+			self.lib.lib3mf_toolpathprofile_addmodifier = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_toolpathprofile_changemodifier")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ToolpathProfileModificationType, ToolpathProfileModificationFactor, ctypes.c_double, ctypes.c_double)
+			self.lib.lib3mf_toolpathprofile_changemodifier = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_toolpathprofile_removemodifier")), methodAddress)
 			if err != 0:
@@ -6397,6 +6433,12 @@ class Wrapper:
 			self.lib.lib3mf_writer_registercustomnamespace.restype = ctypes.c_int32
 			self.lib.lib3mf_writer_registercustomnamespace.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 			
+			self.lib.lib3mf_writer_setcustomnamespacerequired.restype = ctypes.c_int32
+			self.lib.lib3mf_writer_setcustomnamespacerequired.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_bool]
+			
+			self.lib.lib3mf_writer_getcustomnamespacerequired.restype = ctypes.c_int32
+			self.lib.lib3mf_writer_getcustomnamespacerequired.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_bool)]
+			
 			self.lib.lib3mf_persistentreadersource_getsourcetype.restype = ctypes.c_int32
 			self.lib.lib3mf_persistentreadersource_getsourcetype.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int32)]
 			
@@ -6426,6 +6468,12 @@ class Wrapper:
 			
 			self.lib.lib3mf_reader_removerelationtoread.restype = ctypes.c_int32
 			self.lib.lib3mf_reader_removerelationtoread.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+			
+			self.lib.lib3mf_reader_addsupportedcustomnamespace.restype = ctypes.c_int32
+			self.lib.lib3mf_reader_addsupportedcustomnamespace.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+			
+			self.lib.lib3mf_reader_removesupportedcustomnamespace.restype = ctypes.c_int32
+			self.lib.lib3mf_reader_removesupportedcustomnamespace.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
 			
 			self.lib.lib3mf_reader_setstrictmodeactive.restype = ctypes.c_int32
 			self.lib.lib3mf_reader_setstrictmodeactive.argtypes = [ctypes.c_void_p, ctypes.c_bool]
@@ -8020,8 +8068,11 @@ class Wrapper:
 			self.lib.lib3mf_toolpathprofile_getmodifierinformationbyname.restype = ctypes.c_int32
 			self.lib.lib3mf_toolpathprofile_getmodifierinformationbyname.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double)]
 			
-			self.lib.lib3mf_toolpathprofile_setmodifier.restype = ctypes.c_int32
-			self.lib.lib3mf_toolpathprofile_setmodifier.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ToolpathProfileModificationType, ToolpathProfileModificationFactor, ctypes.c_double, ctypes.c_double]
+			self.lib.lib3mf_toolpathprofile_addmodifier.restype = ctypes.c_int32
+			self.lib.lib3mf_toolpathprofile_addmodifier.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ToolpathProfileModificationType, ToolpathProfileModificationFactor, ctypes.c_double, ctypes.c_double]
+			
+			self.lib.lib3mf_toolpathprofile_changemodifier.restype = ctypes.c_int32
+			self.lib.lib3mf_toolpathprofile_changemodifier.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ToolpathProfileModificationType, ToolpathProfileModificationFactor, ctypes.c_double, ctypes.c_double]
 			
 			self.lib.lib3mf_toolpathprofile_removemodifier.restype = ctypes.c_int32
 			self.lib.lib3mf_toolpathprofile_removemodifier.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
@@ -9351,6 +9402,19 @@ class Writer(Base):
 		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_writer_registercustomnamespace(self._handle, pPrefix, pNameSpace))
 		
 	
+	def SetCustomNamespaceRequired(self, Prefix, ShallBeRequired):
+		pPrefix = ctypes.c_char_p(str.encode(Prefix))
+		bShallBeRequired = ctypes.c_bool(ShallBeRequired)
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_writer_setcustomnamespacerequired(self._handle, pPrefix, bShallBeRequired))
+		
+	
+	def GetCustomNamespaceRequired(self, Prefix):
+		pPrefix = ctypes.c_char_p(str.encode(Prefix))
+		pIsRequired = ctypes.c_bool()
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_writer_getcustomnamespacerequired(self._handle, pPrefix, pIsRequired))
+		
+		return pIsRequired.value
+	
 
 
 ''' Class Implementation for PersistentReaderSource
@@ -9420,6 +9484,16 @@ class Reader(Base):
 	def RemoveRelationToRead(self, RelationShipType):
 		pRelationShipType = ctypes.c_char_p(str.encode(RelationShipType))
 		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_reader_removerelationtoread(self._handle, pRelationShipType))
+		
+	
+	def AddSupportedCustomNamespace(self, NameSpace):
+		pNameSpace = ctypes.c_char_p(str.encode(NameSpace))
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_reader_addsupportedcustomnamespace(self._handle, pNameSpace))
+		
+	
+	def RemoveSupportedCustomNamespace(self, NameSpace):
+		pNameSpace = ctypes.c_char_p(str.encode(NameSpace))
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_reader_removesupportedcustomnamespace(self._handle, pNameSpace))
 		
 	
 	def SetStrictModeActive(self, StrictModeActive):
@@ -14721,12 +14795,20 @@ class ToolpathProfile(Base):
 		
 		return ToolpathProfileModificationType(pModifierType.value), ToolpathProfileModificationFactor(pModificationFactor.value), pMinValue.value, pMaxValue.value
 	
-	def SetModifier(self, NameSpaceName, ValueName, ModifierType, ModificationFactor, MinValue, MaxValue):
+	def AddModifier(self, NameSpaceName, ValueName, ModifierType, ModificationFactor, MinValue, MaxValue):
 		pNameSpaceName = ctypes.c_char_p(str.encode(NameSpaceName))
 		pValueName = ctypes.c_char_p(str.encode(ValueName))
 		dMinValue = ctypes.c_double(MinValue)
 		dMaxValue = ctypes.c_double(MaxValue)
-		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_toolpathprofile_setmodifier(self._handle, pNameSpaceName, pValueName, ModifierType, ModificationFactor, dMinValue, dMaxValue))
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_toolpathprofile_addmodifier(self._handle, pNameSpaceName, pValueName, ModifierType, ModificationFactor, dMinValue, dMaxValue))
+		
+	
+	def ChangeModifier(self, NameSpaceName, ValueName, ModifierType, ModificationFactor, MinValue, MaxValue):
+		pNameSpaceName = ctypes.c_char_p(str.encode(NameSpaceName))
+		pValueName = ctypes.c_char_p(str.encode(ValueName))
+		dMinValue = ctypes.c_double(MinValue)
+		dMaxValue = ctypes.c_double(MaxValue)
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_toolpathprofile_changemodifier(self._handle, pNameSpaceName, pValueName, ModifierType, ModificationFactor, dMinValue, dMaxValue))
 		
 	
 	def RemoveModifier(self, NameSpaceName, ValueName):

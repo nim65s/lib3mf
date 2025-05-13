@@ -40,6 +40,28 @@ A model writer exports the in memory represenation into a 3MF file.
 
 namespace NMR {
 
+	class CModelWriter_CustomNameSpace {
+	private:
+		std::string m_sPrefix;
+		std::string m_sNamespace;
+		bool m_bIsRequired;
+
+	public:
+
+		CModelWriter_CustomNameSpace(const std::string & sPrefix, const std::string & sNamespace);
+
+		virtual ~CModelWriter_CustomNameSpace();
+
+
+		std::string getPrefix ();
+		std::string getNamespace ();
+		bool getIsRequired ();
+		void setIsRequired(bool bValue);
+
+	};
+
+	typedef std::shared_ptr<CModelWriter_CustomNameSpace> PModelWriter_CustomNameSpace;
+
 	class CModelWriter_3MF : public CModelWriter {
 	protected:
 
@@ -58,7 +80,8 @@ namespace NMR {
 		virtual void releasePackage() = 0;
 
 		// Namespace prefix mapping
-		std::map<std::string, std::string> m_CustomNameSpaces;
+		std::map<std::string, PModelWriter_CustomNameSpace> m_CustomNameSpacePrefixMap;
+
 	public:
 		CModelWriter_3MF() = delete;
 		CModelWriter_3MF(_In_ PModel pModel);
@@ -68,7 +91,12 @@ namespace NMR {
 		void addAdditionalAttachment(_In_ std::string sPath, _In_ PImportStream pStream, _In_ std::string sRelationShipType);
 
 		void registerCustomNameSpace(const std::string& sPrefix, const std::string& sNameSpace, bool bFailIfExisting) override;
-		std::map<std::string, std::string> getCustomNamespaceMap();
+
+		void setCustomNameSpaceRequired(const std::string& sPrefix, bool bValue) override;
+
+		bool getCustomNameSpaceRequired(const std::string& sPrefix) override;
+
+		std::map<std::string, PModelWriter_CustomNameSpace> getCustomNamespaceMap();
 
 	};
 

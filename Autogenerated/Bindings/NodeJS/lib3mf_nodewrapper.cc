@@ -2224,6 +2224,8 @@ void CLib3MFWriter::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "CreateBinaryStream", CreateBinaryStream);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "AssignBinaryStream", AssignBinaryStream);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "RegisterCustomNamespace", RegisterCustomNamespace);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "SetCustomNamespaceRequired", SetCustomNamespaceRequired);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetCustomNamespaceRequired", GetCustomNamespaceRequired);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
 }
@@ -2680,6 +2682,62 @@ void CLib3MFWriter::RegisterCustomNamespace(const FunctionCallbackInfo<Value>& a
 		}
 }
 
+
+void CLib3MFWriter::SetCustomNamespaceRequired(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsString()) {
+            throw std::runtime_error("Expected string parameter 0 (Prefix)");
+        }
+        if (!args[1]->IsBoolean()) {
+            throw std::runtime_error("Expected bool parameter 1 (ShallBeRequired)");
+        }
+        v8::String::Utf8Value sutf8Prefix(isolate, args[0]);
+        std::string sPrefix = *sutf8Prefix;
+        bool bShallBeRequired = args[1]->BooleanValue(isolate->GetCurrentContext()).ToChecked();
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method SetCustomNamespaceRequired.");
+        if (wrapperTable->m_Writer_SetCustomNamespaceRequired == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method Writer::SetCustomNamespaceRequired.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_Writer_SetCustomNamespaceRequired(instanceHandle, sPrefix.c_str(), bShallBeRequired);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLib3MFWriter::GetCustomNamespaceRequired(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsString()) {
+            throw std::runtime_error("Expected string parameter 0 (Prefix)");
+        }
+        v8::String::Utf8Value sutf8Prefix(isolate, args[0]);
+        std::string sPrefix = *sutf8Prefix;
+        bool bReturnIsRequired = false;
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetCustomNamespaceRequired.");
+        if (wrapperTable->m_Writer_GetCustomNamespaceRequired == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method Writer::GetCustomNamespaceRequired.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_Writer_GetCustomNamespaceRequired(instanceHandle, sPrefix.c_str(), &bReturnIsRequired);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(Boolean::New(isolate, bReturnIsRequired));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
 /*************************************************************************************************************************
  Class CLib3MFPersistentReaderSource Implementation
 **************************************************************************************************************************/
@@ -2832,6 +2890,8 @@ void CLib3MFReader::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "SetProgressCallback", SetProgressCallback);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "AddRelationToRead", AddRelationToRead);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "RemoveRelationToRead", RemoveRelationToRead);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "AddSupportedCustomNamespace", AddSupportedCustomNamespace);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "RemoveSupportedCustomNamespace", RemoveSupportedCustomNamespace);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "SetStrictModeActive", SetStrictModeActive);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetStrictModeActive", GetStrictModeActive);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetWarning", GetWarning);
@@ -3044,6 +3104,56 @@ void CLib3MFReader::RemoveRelationToRead(const FunctionCallbackInfo<Value>& args
             throw std::runtime_error("Could not call Lib3MF method Reader::RemoveRelationToRead.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
         Lib3MFResult errorCode = wrapperTable->m_Reader_RemoveRelationToRead(instanceHandle, sRelationShipType.c_str());
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLib3MFReader::AddSupportedCustomNamespace(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsString()) {
+            throw std::runtime_error("Expected string parameter 0 (NameSpace)");
+        }
+        v8::String::Utf8Value sutf8NameSpace(isolate, args[0]);
+        std::string sNameSpace = *sutf8NameSpace;
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method AddSupportedCustomNamespace.");
+        if (wrapperTable->m_Reader_AddSupportedCustomNamespace == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method Reader::AddSupportedCustomNamespace.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_Reader_AddSupportedCustomNamespace(instanceHandle, sNameSpace.c_str());
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLib3MFReader::RemoveSupportedCustomNamespace(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsString()) {
+            throw std::runtime_error("Expected string parameter 0 (NameSpace)");
+        }
+        v8::String::Utf8Value sutf8NameSpace(isolate, args[0]);
+        std::string sNameSpace = *sutf8NameSpace;
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method RemoveSupportedCustomNamespace.");
+        if (wrapperTable->m_Reader_RemoveSupportedCustomNamespace == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method Reader::RemoveSupportedCustomNamespace.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_Reader_RemoveSupportedCustomNamespace(instanceHandle, sNameSpace.c_str());
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
@@ -22850,7 +22960,8 @@ void CLib3MFToolpathProfile::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "HasModifier", HasModifier);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierInformationByIndex", GetModifierInformationByIndex);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetModifierInformationByName", GetModifierInformationByName);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "SetModifier", SetModifier);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "AddModifier", AddModifier);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "ChangeModifier", ChangeModifier);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "RemoveModifier", RemoveModifier);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
@@ -23762,7 +23873,7 @@ void CLib3MFToolpathProfile::GetModifierInformationByName(const FunctionCallback
 }
 
 
-void CLib3MFToolpathProfile::SetModifier(const FunctionCallbackInfo<Value>& args) 
+void CLib3MFToolpathProfile::AddModifier(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
@@ -23795,11 +23906,57 @@ void CLib3MFToolpathProfile::SetModifier(const FunctionCallbackInfo<Value>& args
         double dMaxValue = (double) args[5]->NumberValue(isolate->GetCurrentContext()).ToChecked();
         sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for Lib3MF method SetModifier.");
-        if (wrapperTable->m_ToolpathProfile_SetModifier == nullptr)
-            throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::SetModifier.");
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method AddModifier.");
+        if (wrapperTable->m_ToolpathProfile_AddModifier == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::AddModifier.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
-        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_SetModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), (eLib3MFToolpathProfileModificationType) eModifierType, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, dMinValue, dMaxValue);
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_AddModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), (eLib3MFToolpathProfileModificationType) eModifierType, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, dMinValue, dMaxValue);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLib3MFToolpathProfile::ChangeModifier(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsString()) {
+            throw std::runtime_error("Expected string parameter 0 (NameSpaceName)");
+        }
+        if (!args[1]->IsString()) {
+            throw std::runtime_error("Expected string parameter 1 (ValueName)");
+        }
+        if (!args[2]->IsUint32()) {
+            throw std::runtime_error("Expected enum parameter 2 (ModifierType)");
+        }
+        if (!args[3]->IsUint32()) {
+            throw std::runtime_error("Expected enum parameter 3 (ModificationFactor)");
+        }
+        if (!args[4]->IsNumber()) {
+            throw std::runtime_error("Expected double parameter 4 (MinValue)");
+        }
+        if (!args[5]->IsNumber()) {
+            throw std::runtime_error("Expected double parameter 5 (MaxValue)");
+        }
+        v8::String::Utf8Value sutf8NameSpaceName(isolate, args[0]);
+        std::string sNameSpaceName = *sutf8NameSpaceName;
+        v8::String::Utf8Value sutf8ValueName(isolate, args[1]);
+        std::string sValueName = *sutf8ValueName;
+        unsigned int eModifierType = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int eModificationFactor = (unsigned int) args[3]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        double dMinValue = (double) args[4]->NumberValue(isolate->GetCurrentContext()).ToChecked();
+        double dMaxValue = (double) args[5]->NumberValue(isolate->GetCurrentContext()).ToChecked();
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method ChangeModifier.");
+        if (wrapperTable->m_ToolpathProfile_ChangeModifier == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method ToolpathProfile::ChangeModifier.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_ToolpathProfile_ChangeModifier(instanceHandle, sNameSpaceName.c_str(), sValueName.c_str(), (eLib3MFToolpathProfileModificationType) eModifierType, (eLib3MFToolpathProfileModificationFactor) eModificationFactor, dMinValue, dMaxValue);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {

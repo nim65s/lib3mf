@@ -461,6 +461,9 @@ NMR_ErrorConst.h defines all error code constants.
 // Unsupported compression method
 #define NMR_ERROR_UNSUPPORTEDCOMPRESSIONMETHOD 0x1088
 
+// Namespace prefix not found
+#define NMR_ERROR_NAMESPACEPREFIXNOTFOUND 1089
+
 /*-------------------------------------------------------------------
 Core framework error codes (0x2XXX)
 -------------------------------------------------------------------*/

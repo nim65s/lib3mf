@@ -74,6 +74,10 @@ namespace NMR {
 
 		virtual void registerCustomNameSpace(const std::string & sPrefix, const std::string & sNameSpace, bool bFailIfExisting);
 
+		virtual void setCustomNameSpaceRequired(const std::string& sNameSpace, bool bValue);
+
+		virtual bool getCustomNameSpaceRequired(const std::string& sNameSpace);
+
 	};
 
 	typedef std::shared_ptr <CModelWriter> PModelWriter;

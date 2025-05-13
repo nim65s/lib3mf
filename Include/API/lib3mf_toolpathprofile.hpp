@@ -121,7 +121,9 @@ public:
 
 	void GetModifierInformationByName(const std::string& sNameSpaceName, const std::string& sValueName, Lib3MF::eToolpathProfileModificationType& eModifierType, Lib3MF::eToolpathProfileModificationFactor& eModificationFactor, Lib3MF_double& dMinValue, Lib3MF_double& dMaxValue) override;
 
-	void SetModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) override;
+	void AddModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) override;
+
+	void ChangeModifier(const std::string& sNameSpaceName, const std::string& sValueName, const Lib3MF::eToolpathProfileModificationType eModifierType, const Lib3MF::eToolpathProfileModificationFactor eModificationFactor, const Lib3MF_double dMinValue, const Lib3MF_double dMaxValue) override;
 
 	void RemoveModifier(const std::string& sNameSpaceName, const std::string& sValueName) override;
 
