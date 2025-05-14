@@ -226,6 +226,16 @@ namespace NMR {
 			}
 		}
 
+		for (auto sPrefix : m_RequiredExtensionPrefixes) {
+            if(!sPrefix.empty())
+                {
+					if (!sRequiredExtensions.empty())
+						sRequiredExtensions += " ";
+
+					sRequiredExtensions += sPrefix;
+                }
+		}
+
 		if (sRequiredExtensions.size() > 0)
 			writeConstStringAttribute(XML_3MF_ATTRIBUTE_REQUIREDEXTENSIONS, sRequiredExtensions.c_str());
 
