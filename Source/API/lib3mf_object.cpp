@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CObject
 #include "lib3mf_metadatagroup.hpp"
 #include "lib3mf_slicestack.hpp"
 #include "lib3mf_attachment.hpp"
+#include "lib3mf_utils.hpp"
 
 // Include custom headers here.
 #include "Model/Classes/NMR_ModelMeshObject.h" 
@@ -267,4 +268,26 @@ Lib3MF::sBox CObject::GetOutbox()
 	
 	return s;
 }
+
+Lib3MF::sBox CObject::GetOutboxWithTransform(const Lib3MF::sTransform Transform)
+{
+	NMR::NOUTBOX3 oOutbox;
+	NMR::fnOutboxInitialize(oOutbox);
+
+	auto transformMatrix = TransformToMatrix(Transform);
+	object()->extendOutbox(oOutbox, transformMatrix);
+
+	sBox s;
+	s.m_MinCoordinate[0] = oOutbox.m_min.m_fields[0];
+	s.m_MinCoordinate[1] = oOutbox.m_min.m_fields[1];
+	s.m_MinCoordinate[2] = oOutbox.m_min.m_fields[2];
+
+	s.m_MaxCoordinate[0] = oOutbox.m_max.m_fields[0];
+	s.m_MaxCoordinate[1] = oOutbox.m_max.m_fields[1];
+	s.m_MaxCoordinate[2] = oOutbox.m_max.m_fields[2];
+	
+	return s;
+
+}
+
 

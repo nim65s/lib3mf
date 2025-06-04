@@ -1690,13 +1690,23 @@ typedef Lib3MFResult (*PLib3MFObject_GetThumbnailAttachmentPtr) (Lib3MF_Object p
 typedef Lib3MFResult (*PLib3MFObject_ClearThumbnailAttachmentPtr) (Lib3MF_Object pObject);
 
 /**
-* Returns the outbox of a build item
+* Returns the outbox of the object
 *
 * @param[in] pObject - Object instance.
-* @param[out] pOutbox - Outbox of this build item
+* @param[out] pOutbox - Outbox of this object
 * @return error code or 0 (success)
 */
 typedef Lib3MFResult (*PLib3MFObject_GetOutboxPtr) (Lib3MF_Object pObject, sLib3MFBox * pOutbox);
+
+/**
+* Returns the outbox of the object with an applied transform
+*
+* @param[in] pObject - Object instance.
+* @param[in] pTransform - transformation matrix to use.
+* @param[out] pOutbox - Outbox of this object with a transform.
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFObject_GetOutboxWithTransformPtr) (Lib3MF_Object pObject, const sLib3MFTransform * pTransform, sLib3MFBox * pOutbox);
 
 /**
 * Retrieves an object's uuid string (see production extension specification)
@@ -8881,6 +8891,7 @@ typedef struct {
 	PLib3MFObject_GetThumbnailAttachmentPtr m_Object_GetThumbnailAttachment;
 	PLib3MFObject_ClearThumbnailAttachmentPtr m_Object_ClearThumbnailAttachment;
 	PLib3MFObject_GetOutboxPtr m_Object_GetOutbox;
+	PLib3MFObject_GetOutboxWithTransformPtr m_Object_GetOutboxWithTransform;
 	PLib3MFObject_GetUUIDPtr m_Object_GetUUID;
 	PLib3MFObject_SetUUIDPtr m_Object_SetUUID;
 	PLib3MFObject_GetMetaDataGroupPtr m_Object_GetMetaDataGroup;
@@ -10021,6 +10032,9 @@ Lib3MFResult CCall_lib3mf_object_clearthumbnailattachment(Lib3MFHandle libraryHa
 
 
 Lib3MFResult CCall_lib3mf_object_getoutbox(Lib3MFHandle libraryHandle, Lib3MF_Object pObject, sLib3MFBox * pOutbox);
+
+
+Lib3MFResult CCall_lib3mf_object_getoutboxwithtransform(Lib3MFHandle libraryHandle, Lib3MF_Object pObject, const sLib3MFTransform * pTransform, sLib3MFBox * pOutbox);
 
 
 Lib3MFResult CCall_lib3mf_object_getuuid(Lib3MFHandle libraryHandle, Lib3MF_Object pObject, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);

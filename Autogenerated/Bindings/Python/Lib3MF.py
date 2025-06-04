@@ -317,6 +317,7 @@ class FunctionTable:
 	lib3mf_object_getthumbnailattachment = None
 	lib3mf_object_clearthumbnailattachment = None
 	lib3mf_object_getoutbox = None
+	lib3mf_object_getoutboxwithtransform = None
 	lib3mf_object_getuuid = None
 	lib3mf_object_setuuid = None
 	lib3mf_object_getmetadatagroup = None
@@ -2509,6 +2510,12 @@ class Wrapper:
 				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(Box))
 			self.lib.lib3mf_object_getoutbox = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_object_getoutboxwithtransform")), methodAddress)
+			if err != 0:
+				raise ELib3MFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(Transform), ctypes.POINTER(Box))
+			self.lib.lib3mf_object_getoutboxwithtransform = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("lib3mf_object_getuuid")), methodAddress)
 			if err != 0:
@@ -6835,6 +6842,9 @@ class Wrapper:
 			self.lib.lib3mf_object_getoutbox.restype = ctypes.c_int32
 			self.lib.lib3mf_object_getoutbox.argtypes = [ctypes.c_void_p, ctypes.POINTER(Box)]
 			
+			self.lib.lib3mf_object_getoutboxwithtransform.restype = ctypes.c_int32
+			self.lib.lib3mf_object_getoutboxwithtransform.argtypes = [ctypes.c_void_p, ctypes.POINTER(Transform), ctypes.POINTER(Box)]
+			
 			self.lib.lib3mf_object_getuuid.restype = ctypes.c_int32
 			self.lib.lib3mf_object_getuuid.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_bool), ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
@@ -10622,6 +10632,12 @@ class Object(Resource):
 	def GetOutbox(self):
 		pOutbox = Box()
 		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_object_getoutbox(self._handle, pOutbox))
+		
+		return pOutbox
+	
+	def GetOutboxWithTransform(self, Transform):
+		pOutbox = Box()
+		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_object_getoutboxwithtransform(self._handle, Transform, pOutbox))
 		
 		return pOutbox
 	

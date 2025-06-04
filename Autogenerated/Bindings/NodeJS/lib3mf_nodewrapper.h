@@ -711,6 +711,7 @@ private:
 	static void GetThumbnailAttachment(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void ClearThumbnailAttachment(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetOutbox(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetOutboxWithTransform(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void SetUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetMetaDataGroup(const v8::FunctionCallbackInfo<v8::Value>& args);

@@ -1022,6 +1022,9 @@ namespace Lib3MF {
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_object_getoutbox", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 Object_GetOutbox (IntPtr Handle, out InternalBox AOutbox);
 
+			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_object_getoutboxwithtransform", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Object_GetOutboxWithTransform (IntPtr Handle, InternalTransform ATransform, out InternalBox AOutbox);
+
 			[DllImport("lib3mf.dll", EntryPoint = "lib3mf_object_getuuid", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 Object_GetUUID (IntPtr Handle, out Byte AHasUUID, UInt32 sizeUUID, out UInt32 neededUUID, IntPtr dataUUID);
 
@@ -5211,6 +5214,15 @@ namespace Lib3MF {
 			Internal.InternalBox intresultOutbox;
 
 			CheckError(Internal.Lib3MFWrapper.Object_GetOutbox (Handle, out intresultOutbox));
+			return Internal.Lib3MFWrapper.convertInternalToStruct_Box (intresultOutbox);
+		}
+
+		public sBox GetOutboxWithTransform (sTransform ATransform)
+		{
+			Internal.InternalTransform intTransform = Internal.Lib3MFWrapper.convertStructToInternal_Transform (ATransform);
+			Internal.InternalBox intresultOutbox;
+
+			CheckError(Internal.Lib3MFWrapper.Object_GetOutboxWithTransform (Handle, intTransform, out intresultOutbox));
 			return Internal.Lib3MFWrapper.convertInternalToStruct_Box (intresultOutbox);
 		}
 

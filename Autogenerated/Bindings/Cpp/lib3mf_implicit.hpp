@@ -1711,6 +1711,7 @@ public:
 	inline PAttachment GetThumbnailAttachment();
 	inline void ClearThumbnailAttachment();
 	inline sBox GetOutbox();
+	inline sBox GetOutboxWithTransform(const sTransform & Transform);
 	inline std::string GetUUID(bool & bHasUUID);
 	inline void SetUUID(const std::string & sUUID);
 	inline PMetaDataGroup GetMetaDataGroup();
@@ -6401,13 +6402,26 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CObject::GetOutbox - Returns the outbox of a build item
-	* @return Outbox of this build item
+	* CObject::GetOutbox - Returns the outbox of the object
+	* @return Outbox of this object
 	*/
 	sBox CObject::GetOutbox()
 	{
 		sBox resultOutbox;
 		CheckError(lib3mf_object_getoutbox(m_pHandle, &resultOutbox));
+		
+		return resultOutbox;
+	}
+	
+	/**
+	* CObject::GetOutboxWithTransform - Returns the outbox of the object with an applied transform
+	* @param[in] Transform - transformation matrix to use.
+	* @return Outbox of this object with a transform.
+	*/
+	sBox CObject::GetOutboxWithTransform(const sTransform & Transform)
+	{
+		sBox resultOutbox;
+		CheckError(lib3mf_object_getoutboxwithtransform(m_pHandle, &Transform, &resultOutbox));
 		
 		return resultOutbox;
 	}

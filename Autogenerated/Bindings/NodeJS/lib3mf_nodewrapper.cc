@@ -7304,6 +7304,7 @@ void CLib3MFObject::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetThumbnailAttachment", GetThumbnailAttachment);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "ClearThumbnailAttachment", ClearThumbnailAttachment);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetOutbox", GetOutbox);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetOutboxWithTransform", GetOutboxWithTransform);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetUUID", GetUUID);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "SetUUID", SetUUID);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetMetaDataGroup", GetMetaDataGroup);
@@ -7668,6 +7669,32 @@ void CLib3MFObject::GetOutbox(const FunctionCallbackInfo<Value>& args)
             throw std::runtime_error("Could not call Lib3MF method Object::GetOutbox.");
         Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
         Lib3MFResult errorCode = wrapperTable->m_Object_GetOutbox(instanceHandle, &sReturnOutbox);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(convertLib3MFBoxToObject(isolate, sReturnOutbox));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLib3MFObject::GetOutboxWithTransform(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsObject()) {
+            throw std::runtime_error("Expected struct parameter 0 (Transform)");
+        }
+        sLib3MFTransform sTransform = convertObjectToLib3MFTransform(isolate, args[0]);
+        sLib3MFBox sReturnOutbox;
+        sLib3MFDynamicWrapperTable * wrapperTable = CLib3MFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for Lib3MF method GetOutboxWithTransform.");
+        if (wrapperTable->m_Object_GetOutboxWithTransform == nullptr)
+            throw std::runtime_error("Could not call Lib3MF method Object::GetOutboxWithTransform.");
+        Lib3MFHandle instanceHandle = CLib3MFBaseClass::getHandle(args.Holder());
+        Lib3MFResult errorCode = wrapperTable->m_Object_GetOutboxWithTransform(instanceHandle, &sTransform, &sReturnOutbox);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         args.GetReturnValue().Set(convertLib3MFBoxToObject(isolate, sReturnOutbox));
 

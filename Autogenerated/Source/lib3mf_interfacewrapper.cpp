@@ -6257,6 +6257,39 @@ Lib3MFResult lib3mf_object_getoutbox(Lib3MF_Object pObject, sLib3MFBox * pOutbox
 	}
 }
 
+Lib3MFResult lib3mf_object_getoutboxwithtransform(Lib3MF_Object pObject, const sLib3MFTransform * pTransform, sLib3MFBox * pOutbox)
+{
+	IBase* pIBaseClass = (IBase *)pObject;
+
+	PLib3MFInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginClassMethod(pObject, "Object", "GetOutboxWithTransform");
+		}
+		if (pOutbox == nullptr)
+		throw ELib3MFInterfaceException (LIB3MF_ERROR_INVALIDPARAM);
+		IObject* pIObject = dynamic_cast<IObject*>(pIBaseClass);
+		if (!pIObject)
+			throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDCAST);
+		
+		*pOutbox = pIObject->GetOutboxWithTransform(*pTransform);
+
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->writeSuccess();
+		}
+		return LIB3MF_SUCCESS;
+	}
+	catch (ELib3MFInterfaceException & Exception) {
+		return handleLib3MFException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
 Lib3MFResult lib3mf_object_getuuid(Lib3MF_Object pObject, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pObject;
@@ -31400,6 +31433,8 @@ Lib3MFResult Lib3MF::Impl::Lib3MF_GetProcAddress (const char * pProcName, void *
 		*ppProcAddress = (void*) &lib3mf_object_clearthumbnailattachment;
 	if (sProcName == "lib3mf_object_getoutbox") 
 		*ppProcAddress = (void*) &lib3mf_object_getoutbox;
+	if (sProcName == "lib3mf_object_getoutboxwithtransform") 
+		*ppProcAddress = (void*) &lib3mf_object_getoutboxwithtransform;
 	if (sProcName == "lib3mf_object_getuuid") 
 		*ppProcAddress = (void*) &lib3mf_object_getuuid;
 	if (sProcName == "lib3mf_object_setuuid") 

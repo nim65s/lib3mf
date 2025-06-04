@@ -1703,13 +1703,23 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getthumbnailattachment(Lib3MF_Object 
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_clearthumbnailattachment(Lib3MF_Object pObject);
 
 /**
-* Returns the outbox of a build item
+* Returns the outbox of the object
 *
 * @param[in] pObject - Object instance.
-* @param[out] pOutbox - Outbox of this build item
+* @param[out] pOutbox - Outbox of this object
 * @return error code or 0 (success)
 */
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getoutbox(Lib3MF_Object pObject, Lib3MF::sBox * pOutbox);
+
+/**
+* Returns the outbox of the object with an applied transform
+*
+* @param[in] pObject - Object instance.
+* @param[in] pTransform - transformation matrix to use.
+* @param[out] pOutbox - Outbox of this object with a transform.
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getoutboxwithtransform(Lib3MF_Object pObject, const Lib3MF::sTransform * pTransform, Lib3MF::sBox * pOutbox);
 
 /**
 * Retrieves an object's uuid string (see production extension specification)

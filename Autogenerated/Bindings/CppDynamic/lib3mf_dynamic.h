@@ -1690,13 +1690,23 @@ typedef Lib3MFResult (*PLib3MFObject_GetThumbnailAttachmentPtr) (Lib3MF_Object p
 typedef Lib3MFResult (*PLib3MFObject_ClearThumbnailAttachmentPtr) (Lib3MF_Object pObject);
 
 /**
-* Returns the outbox of a build item
+* Returns the outbox of the object
 *
 * @param[in] pObject - Object instance.
-* @param[out] pOutbox - Outbox of this build item
+* @param[out] pOutbox - Outbox of this object
 * @return error code or 0 (success)
 */
 typedef Lib3MFResult (*PLib3MFObject_GetOutboxPtr) (Lib3MF_Object pObject, Lib3MF::sBox * pOutbox);
+
+/**
+* Returns the outbox of the object with an applied transform
+*
+* @param[in] pObject - Object instance.
+* @param[in] pTransform - transformation matrix to use.
+* @param[out] pOutbox - Outbox of this object with a transform.
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFObject_GetOutboxWithTransformPtr) (Lib3MF_Object pObject, const Lib3MF::sTransform * pTransform, Lib3MF::sBox * pOutbox);
 
 /**
 * Retrieves an object's uuid string (see production extension specification)
@@ -8881,6 +8891,7 @@ typedef struct {
 	PLib3MFObject_GetThumbnailAttachmentPtr m_Object_GetThumbnailAttachment;
 	PLib3MFObject_ClearThumbnailAttachmentPtr m_Object_ClearThumbnailAttachment;
 	PLib3MFObject_GetOutboxPtr m_Object_GetOutbox;
+	PLib3MFObject_GetOutboxWithTransformPtr m_Object_GetOutboxWithTransform;
 	PLib3MFObject_GetUUIDPtr m_Object_GetUUID;
 	PLib3MFObject_SetUUIDPtr m_Object_SetUUID;
 	PLib3MFObject_GetMetaDataGroupPtr m_Object_GetMetaDataGroup;

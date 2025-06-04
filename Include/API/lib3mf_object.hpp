@@ -124,7 +124,9 @@ public:
 
 	void AssignSliceStack(ISliceStack* pSliceStackInstance);
 
-	Lib3MF::sBox GetOutbox();
+	Lib3MF::sBox GetOutbox() override;
+
+	Lib3MF::sBox GetOutboxWithTransform(const Lib3MF::sTransform Transform) override;
 
 };
 

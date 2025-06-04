@@ -2862,10 +2862,20 @@ func (inst Object) ClearThumbnailAttachment() error {
 	return nil
 }
 
-// GetOutbox returns the outbox of a build item.
+// GetOutbox returns the outbox of the object.
 func (inst Object) GetOutbox() (Box, error) {
 	var outbox C.sLib3MFBox
 	ret := C.CCall_lib3mf_object_getoutbox(inst.wrapperRef.LibraryHandle, inst.Ref, &outbox)
+	if ret != 0 {
+		return Box{}, makeError(uint32(ret))
+	}
+	return *(*Box)(unsafe.Pointer(&outbox)), nil
+}
+
+// GetOutboxWithTransform returns the outbox of the object with an applied transform.
+func (inst Object) GetOutboxWithTransform(transform Transform) (Box, error) {
+	var outbox C.sLib3MFBox
+	ret := C.CCall_lib3mf_object_getoutboxwithtransform(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.sLib3MFTransform)(unsafe.Pointer(&transform)), &outbox)
 	if ret != 0 {
 		return Box{}, makeError(uint32(ret))
 	}

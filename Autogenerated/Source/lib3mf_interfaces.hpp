@@ -1999,10 +1999,17 @@ public:
 	virtual void ClearThumbnailAttachment() = 0;
 
 	/**
-	* IObject::GetOutbox - Returns the outbox of a build item
-	* @return Outbox of this build item
+	* IObject::GetOutbox - Returns the outbox of the object
+	* @return Outbox of this object
 	*/
 	virtual Lib3MF::sBox GetOutbox() = 0;
+
+	/**
+	* IObject::GetOutboxWithTransform - Returns the outbox of the object with an applied transform
+	* @param[in] Transform - transformation matrix to use.
+	* @return Outbox of this object with a transform.
+	*/
+	virtual Lib3MF::sBox GetOutboxWithTransform(const Lib3MF::sTransform Transform) = 0;
 
 	/**
 	* IObject::GetUUID - Retrieves an object's uuid string (see production extension specification)

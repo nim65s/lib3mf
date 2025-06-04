@@ -1301,9 +1301,15 @@
 		<method name="ClearThumbnailAttachment"
 			description="Clears the attachment. The attachment instance is not removed from the package.">
 		</method>
-		<method name="GetOutbox" description="Returns the outbox of a build item">
+		<method name="GetOutbox" description="Returns the outbox of the object">
 			<param name="Outbox" type="struct" class="Box" pass="return"
-				description="Outbox of this build item" />
+				description="Outbox of this object" />
+		</method>
+		<method name="GetOutboxWithTransform" description="Returns the outbox of the object with an applied transform">
+			<param name="Transform" type="struct" class="Transform" pass="in"
+				description="transformation matrix to use." />
+			<param name="Outbox" type="struct" class="Box" pass="return"
+				description="Outbox of this object with a transform." />
 		</method>
 		<method name="GetUUID"
 			description="Retrieves an object's uuid string (see production extension specification)">

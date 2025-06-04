@@ -1735,6 +1735,7 @@ public:
 	inline PAttachment GetThumbnailAttachment();
 	inline void ClearThumbnailAttachment();
 	inline sBox GetOutbox();
+	inline sBox GetOutboxWithTransform(const sTransform & Transform);
 	inline std::string GetUUID(bool & bHasUUID);
 	inline void SetUUID(const std::string & sUUID);
 	inline PMetaDataGroup GetMetaDataGroup();
@@ -4524,6 +4525,7 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		pWrapperTable->m_Object_GetThumbnailAttachment = nullptr;
 		pWrapperTable->m_Object_ClearThumbnailAttachment = nullptr;
 		pWrapperTable->m_Object_GetOutbox = nullptr;
+		pWrapperTable->m_Object_GetOutboxWithTransform = nullptr;
 		pWrapperTable->m_Object_GetUUID = nullptr;
 		pWrapperTable->m_Object_SetUUID = nullptr;
 		pWrapperTable->m_Object_GetMetaDataGroup = nullptr;
@@ -6653,6 +6655,15 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Object_GetOutbox == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Object_GetOutboxWithTransform = (PLib3MFObject_GetOutboxWithTransformPtr) GetProcAddress(hLibrary, "lib3mf_object_getoutboxwithtransform");
+		#else // _WIN32
+		pWrapperTable->m_Object_GetOutboxWithTransform = (PLib3MFObject_GetOutboxWithTransformPtr) dlsym(hLibrary, "lib3mf_object_getoutboxwithtransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Object_GetOutboxWithTransform == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -13157,6 +13168,10 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		if ( (eLookupError != 0) || (pWrapperTable->m_Object_GetOutbox == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("lib3mf_object_getoutboxwithtransform", (void**)&(pWrapperTable->m_Object_GetOutboxWithTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Object_GetOutboxWithTransform == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("lib3mf_object_getuuid", (void**)&(pWrapperTable->m_Object_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Object_GetUUID == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17826,13 +17841,26 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CObject::GetOutbox - Returns the outbox of a build item
-	* @return Outbox of this build item
+	* CObject::GetOutbox - Returns the outbox of the object
+	* @return Outbox of this object
 	*/
 	sBox CObject::GetOutbox()
 	{
 		sBox resultOutbox;
 		CheckError(m_pWrapper->m_WrapperTable.m_Object_GetOutbox(m_pHandle, &resultOutbox));
+		
+		return resultOutbox;
+	}
+	
+	/**
+	* CObject::GetOutboxWithTransform - Returns the outbox of the object with an applied transform
+	* @param[in] Transform - transformation matrix to use.
+	* @return Outbox of this object with a transform.
+	*/
+	sBox CObject::GetOutboxWithTransform(const sTransform & Transform)
+	{
+		sBox resultOutbox;
+		CheckError(m_pWrapper->m_WrapperTable.m_Object_GetOutboxWithTransform(m_pHandle, &Transform, &resultOutbox));
 		
 		return resultOutbox;
 	}

@@ -207,6 +207,7 @@ Lib3MFResult InitLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_Object_GetThumbnailAttachment = NULL;
 	pWrapperTable->m_Object_ClearThumbnailAttachment = NULL;
 	pWrapperTable->m_Object_GetOutbox = NULL;
+	pWrapperTable->m_Object_GetOutboxWithTransform = NULL;
 	pWrapperTable->m_Object_GetUUID = NULL;
 	pWrapperTable->m_Object_SetUUID = NULL;
 	pWrapperTable->m_Object_GetMetaDataGroup = NULL;
@@ -2340,6 +2341,15 @@ Lib3MFResult LoadLib3MFWrapperTable(sLib3MFDynamicWrapperTable * pWrapperTable, 
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_Object_GetOutbox == NULL)
+		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Object_GetOutboxWithTransform = (PLib3MFObject_GetOutboxWithTransformPtr) GetProcAddress(hLibrary, "lib3mf_object_getoutboxwithtransform");
+	#else // _WIN32
+	pWrapperTable->m_Object_GetOutboxWithTransform = (PLib3MFObject_GetOutboxWithTransformPtr) dlsym(hLibrary, "lib3mf_object_getoutboxwithtransform");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Object_GetOutboxWithTransform == NULL)
 		return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

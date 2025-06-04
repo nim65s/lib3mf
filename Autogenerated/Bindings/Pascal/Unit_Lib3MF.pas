@@ -2382,13 +2382,23 @@ type
 	TLib3MFObject_ClearThumbnailAttachmentFunc = function(pObject: TLib3MFHandle): TLib3MFResult; cdecl;
 	
 	(**
-	* Returns the outbox of a build item
+	* Returns the outbox of the object
 	*
 	* @param[in] pObject - Object instance.
-	* @param[out] pOutbox - Outbox of this build item
+	* @param[out] pOutbox - Outbox of this object
 	* @return error code or 0 (success)
 	*)
 	TLib3MFObject_GetOutboxFunc = function(pObject: TLib3MFHandle; pOutbox: PLib3MFBox): TLib3MFResult; cdecl;
+	
+	(**
+	* Returns the outbox of the object with an applied transform
+	*
+	* @param[in] pObject - Object instance.
+	* @param[in] pTransform - transformation matrix to use.
+	* @param[out] pOutbox - Outbox of this object with a transform.
+	* @return error code or 0 (success)
+	*)
+	TLib3MFObject_GetOutboxWithTransformFunc = function(pObject: TLib3MFHandle; const pTransform: PLib3MFTransform; pOutbox: PLib3MFBox): TLib3MFResult; cdecl;
 	
 	(**
 	* Retrieves an object's uuid string (see production extension specification)
@@ -10007,6 +10017,7 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		function GetThumbnailAttachment(): TLib3MFAttachment;
 		procedure ClearThumbnailAttachment();
 		function GetOutbox(): TLib3MFBox;
+		function GetOutboxWithTransform(const ATransform: TLib3MFTransform): TLib3MFBox;
 		function GetUUID(out AHasUUID: Boolean): String;
 		procedure SetUUID(const AUUID: String);
 		function GetMetaDataGroup(): TLib3MFMetaDataGroup;
@@ -11884,6 +11895,7 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		FLib3MFObject_GetThumbnailAttachmentFunc: TLib3MFObject_GetThumbnailAttachmentFunc;
 		FLib3MFObject_ClearThumbnailAttachmentFunc: TLib3MFObject_ClearThumbnailAttachmentFunc;
 		FLib3MFObject_GetOutboxFunc: TLib3MFObject_GetOutboxFunc;
+		FLib3MFObject_GetOutboxWithTransformFunc: TLib3MFObject_GetOutboxWithTransformFunc;
 		FLib3MFObject_GetUUIDFunc: TLib3MFObject_GetUUIDFunc;
 		FLib3MFObject_SetUUIDFunc: TLib3MFObject_SetUUIDFunc;
 		FLib3MFObject_GetMetaDataGroupFunc: TLib3MFObject_GetMetaDataGroupFunc;
@@ -12703,6 +12715,7 @@ TLib3MFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: P
 		property Lib3MFObject_GetThumbnailAttachmentFunc: TLib3MFObject_GetThumbnailAttachmentFunc read FLib3MFObject_GetThumbnailAttachmentFunc;
 		property Lib3MFObject_ClearThumbnailAttachmentFunc: TLib3MFObject_ClearThumbnailAttachmentFunc read FLib3MFObject_ClearThumbnailAttachmentFunc;
 		property Lib3MFObject_GetOutboxFunc: TLib3MFObject_GetOutboxFunc read FLib3MFObject_GetOutboxFunc;
+		property Lib3MFObject_GetOutboxWithTransformFunc: TLib3MFObject_GetOutboxWithTransformFunc read FLib3MFObject_GetOutboxWithTransformFunc;
 		property Lib3MFObject_GetUUIDFunc: TLib3MFObject_GetUUIDFunc read FLib3MFObject_GetUUIDFunc;
 		property Lib3MFObject_SetUUIDFunc: TLib3MFObject_SetUUIDFunc read FLib3MFObject_SetUUIDFunc;
 		property Lib3MFObject_GetMetaDataGroupFunc: TLib3MFObject_GetMetaDataGroupFunc read FLib3MFObject_GetMetaDataGroupFunc;
@@ -16965,6 +16978,11 @@ implementation
 	function TLib3MFObject.GetOutbox(): TLib3MFBox;
 	begin
 		FWrapper.CheckError(Self, FWrapper.Lib3MFObject_GetOutboxFunc(FHandle, @Result));
+	end;
+
+	function TLib3MFObject.GetOutboxWithTransform(const ATransform: TLib3MFTransform): TLib3MFBox;
+	begin
+		FWrapper.CheckError(Self, FWrapper.Lib3MFObject_GetOutboxWithTransformFunc(FHandle, @ATransform, @Result));
 	end;
 
 	function TLib3MFObject.GetUUID(out AHasUUID: Boolean): String;
@@ -24884,6 +24902,7 @@ implementation
 		FLib3MFObject_GetThumbnailAttachmentFunc := LoadFunction('lib3mf_object_getthumbnailattachment');
 		FLib3MFObject_ClearThumbnailAttachmentFunc := LoadFunction('lib3mf_object_clearthumbnailattachment');
 		FLib3MFObject_GetOutboxFunc := LoadFunction('lib3mf_object_getoutbox');
+		FLib3MFObject_GetOutboxWithTransformFunc := LoadFunction('lib3mf_object_getoutboxwithtransform');
 		FLib3MFObject_GetUUIDFunc := LoadFunction('lib3mf_object_getuuid');
 		FLib3MFObject_SetUUIDFunc := LoadFunction('lib3mf_object_setuuid');
 		FLib3MFObject_GetMetaDataGroupFunc := LoadFunction('lib3mf_object_getmetadatagroup');
@@ -26020,6 +26039,9 @@ implementation
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_object_getoutbox'), @FLib3MFObject_GetOutboxFunc);
+		if AResult <> LIB3MF_SUCCESS then
+			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('lib3mf_object_getoutboxwithtransform'), @FLib3MFObject_GetOutboxWithTransformFunc);
 		if AResult <> LIB3MF_SUCCESS then
 			raise ELib3MFException.CreateCustomMessage(LIB3MF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('lib3mf_object_getuuid'), @FLib3MFObject_GetUUIDFunc);
