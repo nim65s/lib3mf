@@ -197,7 +197,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019.bat
+      - run: ./cmake/GenerateVS2022.bat
       - run: cmake --build . --config Release
         working-directory: ./build
       - run: ctest -V
@@ -232,7 +232,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019.bat
+      - run: ./cmake/GenerateVS2022.bat
       - run: cmake --build . --config Debug
         working-directory: ./build
       - run: ctest -V
@@ -425,13 +425,13 @@ jobs:
           unzip lib3mf_sdk.zip/lib3mf_sdk.zip
       - name: Build CppDynamic
         run: |
-          ./Examples/CppDynamic/GenerateVS2019.bat
+          ./Examples/CppDynamic/GenerateVS2022.bat
           cd Examples/CppDynamic/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../Files/Helix.3mf
       - name: Build Cpp
         run: |
-          ./Examples/Cpp/GenerateVS2019.bat
+          ./Examples/Cpp/GenerateVS2022.bat
           cd Examples/Cpp/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../Files/Helix.3mf
@@ -452,13 +452,13 @@ jobs:
           unzip lib3mf-${{ env.LIB3MF_VERSION }}-Windows.zip/lib3mf-${{ env.LIB3MF_VERSION }}-Windows.zip
       - name: Build CppDynamic - CPack (Windows)
         run: | 
-          ./SDK/CPackExamples/CppDynamic/GenerateVS2019.bat
+          ./SDK/CPackExamples/CppDynamic/GenerateVS2022.bat
           cd SDK/CPackExamples/CppDynamic/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../../Examples/Files/Helix.3mf
       - name: Build Cpp - CPack (Windows)
         run: |
-          ./SDK/CPackExamples/Cpp/GenerateVS2019.bat
+          ./SDK/CPackExamples/Cpp/GenerateVS2022.bat
           cd SDK/CPackExamples/Cpp/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../../Examples/Files/Helix.3mf
