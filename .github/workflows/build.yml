@@ -257,7 +257,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019_32bit.bat
+      - run: ./cmake/GenerateVS2022_32bit.bat
       - run: cmake --build . --config Release
         working-directory: ./build_32bit
       - run: ctest -V
