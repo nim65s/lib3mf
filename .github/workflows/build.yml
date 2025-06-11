@@ -189,7 +189,7 @@ jobs:
           verbose: true # optional (default = false)
           
   build-windows-release:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     env:
       LIB3MF_VERSION: ${{ needs.set-lib3mf-version.outputs.lib3mf-version }}
@@ -226,7 +226,7 @@ jobs:
           path: build/${{ env.ARTIFACT_NAME }}
 
   build-windows-debug:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - uses: actions/checkout@v4
@@ -251,7 +251,7 @@ jobs:
           name: lib3mf.debug.lib
           path: build/Debug/lib3mf.lib
   build-windows-32bit:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - uses: actions/checkout@v4
@@ -273,7 +273,7 @@ jobs:
           name: lib3mf_32bit.lib
           path: build_32bit/Release/lib3mf.lib
   build-mingw-w64:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - run: choco install mingw -y
@@ -410,7 +410,7 @@ jobs:
           ./create_cube
 
   deploy-windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version, assemble-sdk]
     env:
       LIB3MF_VERSION: ${{ needs.set-lib3mf-version.outputs.lib3mf-version }}
