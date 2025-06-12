@@ -189,7 +189,7 @@ jobs:
           verbose: true # optional (default = false)
           
   build-windows-release:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     env:
       LIB3MF_VERSION: ${{ needs.set-lib3mf-version.outputs.lib3mf-version }}
@@ -197,7 +197,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019.bat
+      - run: ./cmake/GenerateVS2022.bat
       - run: cmake --build . --config Release
         working-directory: ./build
       - run: ctest -V
@@ -226,13 +226,13 @@ jobs:
           path: build/${{ env.ARTIFACT_NAME }}
 
   build-windows-debug:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019.bat
+      - run: ./cmake/GenerateVS2022.bat
       - run: cmake --build . --config Debug
         working-directory: ./build
       - run: ctest -V
@@ -251,13 +251,13 @@ jobs:
           name: lib3mf.debug.lib
           path: build/Debug/lib3mf.lib
   build-windows-32bit:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - run: ./cmake/GenerateVS2019_32bit.bat
+      - run: ./cmake/GenerateVS2022_32bit.bat
       - run: cmake --build . --config Release
         working-directory: ./build_32bit
       - run: ctest -V
@@ -273,7 +273,7 @@ jobs:
           name: lib3mf_32bit.lib
           path: build_32bit/Release/lib3mf.lib
   build-mingw-w64:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version]
     steps:
       - run: choco install mingw -y
@@ -410,7 +410,7 @@ jobs:
           ./create_cube
 
   deploy-windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs: [set-lib3mf-version, assemble-sdk]
     env:
       LIB3MF_VERSION: ${{ needs.set-lib3mf-version.outputs.lib3mf-version }}
@@ -425,13 +425,13 @@ jobs:
           unzip lib3mf_sdk.zip/lib3mf_sdk.zip
       - name: Build CppDynamic
         run: |
-          ./Examples/CppDynamic/GenerateVS2019.bat
+          ./Examples/CppDynamic/GenerateVS2022.bat
           cd Examples/CppDynamic/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../Files/Helix.3mf
       - name: Build Cpp
         run: |
-          ./Examples/Cpp/GenerateVS2019.bat
+          ./Examples/Cpp/GenerateVS2022.bat
           cd Examples/Cpp/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../Files/Helix.3mf
@@ -452,13 +452,13 @@ jobs:
           unzip lib3mf-${{ env.LIB3MF_VERSION }}-Windows.zip/lib3mf-${{ env.LIB3MF_VERSION }}-Windows.zip
       - name: Build CppDynamic - CPack (Windows)
         run: | 
-          ./SDK/CPackExamples/CppDynamic/GenerateVS2019.bat
+          ./SDK/CPackExamples/CppDynamic/GenerateVS2022.bat
           cd SDK/CPackExamples/CppDynamic/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../../Examples/Files/Helix.3mf
       - name: Build Cpp - CPack (Windows)
         run: |
-          ./SDK/CPackExamples/Cpp/GenerateVS2019.bat
+          ./SDK/CPackExamples/Cpp/GenerateVS2022.bat
           cd SDK/CPackExamples/Cpp/build
           cmake --build . --config Release
           ./Release/Example_ExtractInfo.exe ../../../Examples/Files/Helix.3mf
