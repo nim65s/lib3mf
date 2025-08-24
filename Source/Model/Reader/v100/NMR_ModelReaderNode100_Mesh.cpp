@@ -49,8 +49,8 @@ namespace NMR {
 	CModelReaderNode100_Mesh::CModelReaderNode100_Mesh(_In_ CModel * pModel, PModelMeshObject pMesh, _In_ PModelWarnings pWarnings,
 		_In_ PProgressMonitor pProgressMonitor, _In_ PPackageResourceID pObjectLevelPropertyID, _In_ ModelResourceIndex nDefaultPropertyIndex)
 		: CModelReaderNode(pWarnings, pProgressMonitor),
-		 m_pModel(pModel),
-		 m_pMesh(pMesh)
+		 m_pMesh(pMesh),
+		 m_pModel(pModel)
 	{
 		__NMRASSERT(pMesh);
 		__NMRASSERT(pModel);

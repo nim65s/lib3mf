@@ -98,7 +98,7 @@ IImplicitNode * CNodeIterator::GetCurrent()
     auto pNode = implicitNodeFromModelImplicitNode(pModelNode); 
     if (!pNode)
         throw ELib3MFInterfaceException(LIB3MF_ERROR_INVALIDPARAM);
-	return pNode;
+    return pNode;
 }
 
 //  enum class eImplicitNodeType : Lib3MF_int32 {

@@ -1341,13 +1341,11 @@ namespace Lib3MF
         reader->SetStrictModeActive(true);
         reader->ReadFromFile(InFolder + "template.3mf");
 
-        auto sourceModelFunctionCount = sourceModel->GetFunctions()->Count();
         auto const targetModel = wrapper->CreateModel();
         auto targetReader = targetModel->QueryReader("3mf");
         targetReader->SetStrictModeActive(true);
 
         targetReader->ReadFromFile(InFolder + "Cube.3mf");
-        auto previousTargetFunctionCount = targetModel->GetFunctions()->Count();
 
         EXPECT_NO_THROW(targetModel->MergeFromModel(sourceModel.get()));
 
