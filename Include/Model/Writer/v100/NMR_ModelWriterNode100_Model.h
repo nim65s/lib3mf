@@ -97,6 +97,8 @@ namespace NMR {
 		void writeImplicitFunctions();
 		void writeVolumeData();
 
+		void detectRequiredExtensions();
+
 		
 
 		void writeObjects();

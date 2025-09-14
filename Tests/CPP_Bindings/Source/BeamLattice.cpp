@@ -546,6 +546,82 @@ namespace Lib3MF
 		}
 	}
 
+	TEST_F(BeamLattice, BallsNamespaceCompliance)
+	{
+		// Create a model with beams and balls
+		beamLattice->SetMinLength(1.0);
+		beamLattice->SetBallOptions(eBeamLatticeBallMode::Mixed, 1.2);
+
+		sBeam beam;
+		beam.m_Radii[0] = 1.0;
+		beam.m_Radii[1] = 1.0;
+		beam.m_Indices[0] = 0;
+		beam.m_Indices[1] = 1;
+		beamLattice->AddBeam(beam);
+
+		sBall ball;
+		ball.m_Index = 0;
+		ball.m_Radius = 1.5;
+		beamLattice->AddBall(ball);
+
+		// Write to buffer
+		auto writer = model->QueryWriter("3mf");
+		std::vector<Lib3MF_uint8> buffer;
+		writer->WriteToBuffer(buffer);
+
+		// Write to a temporary file and extract to examine the XML content
+		std::string tempFile = "/tmp/test_namespace.3mf";
+		std::ofstream outFile(tempFile, std::ios::binary);
+		outFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+		outFile.close();
+
+		// Extract and read the 3D model XML
+		system("cd /tmp && unzip -q test_namespace.3mf 3D/3dmodel.model && cat 3D/3dmodel.model > extracted_model.xml");
+		
+		std::ifstream xmlFile("/tmp/extracted_model.xml");
+		std::string xmlContent((std::istreambuf_iterator<char>(xmlFile)), std::istreambuf_iterator<char>());
+		xmlFile.close();
+		
+		// Debug: Print the actual XML content
+		std::cout << "Generated XML content:\n" << xmlContent << std::endl;
+		
+		// Verify that b2: namespace is declared for balls
+		ASSERT_TRUE(xmlContent.find("xmlns:b2=\"http://schemas.microsoft.com/3dmanufacturing/beamlattice/balls/2020/07\"") != std::string::npos)
+			<< "b2: namespace declaration not found";
+		
+		// Verify that balls elements use b2: namespace
+		ASSERT_TRUE(xmlContent.find("<b2:balls>") != std::string::npos)
+			<< "b2:balls element not found";
+		ASSERT_TRUE(xmlContent.find("<b2:ball ") != std::string::npos)
+			<< "b2:ball element not found";
+		
+		// Verify that beam elements still use b: namespace
+		ASSERT_TRUE(xmlContent.find("<b:beams>") != std::string::npos)
+			<< "b:beams element not found";
+		ASSERT_TRUE(xmlContent.find("<b:beam ") != std::string::npos)
+			<< "b:beam element not found";
+
+		// Verify the file can be read back correctly
+		auto readModel = wrapper->CreateModel();
+		auto reader = readModel->QueryReader("3mf");
+		reader->ReadFromBuffer(buffer);
+
+		auto meshObjects = readModel->GetMeshObjects();
+		bool foundBalls = false;
+		while (meshObjects->MoveNext()) {
+			auto meshObject = meshObjects->GetCurrentMeshObject();
+			auto readBeamLattice = meshObject->BeamLattice();
+			if (readBeamLattice->GetBallCount() > 0) {
+				foundBalls = true;
+				ASSERT_EQ(readBeamLattice->GetBallCount(), 1);
+				auto readBall = readBeamLattice->GetBall(0);
+				ASSERT_EQ(readBall.m_Index, ball.m_Index);
+				ASSERT_DOUBLE_EQ(readBall.m_Radius, ball.m_Radius);
+			}
+		}
+		ASSERT_TRUE(foundBalls) << "No balls found in read model";
+	}
+
 	TEST_F(BeamLattice, Read_Box_Simple)
 	{
 		std::string fName("Box_Simple.3mf");
@@ -663,6 +739,77 @@ namespace Lib3MF
 	TEST_P(BeamLattice_Attributes_Negative, Read)
 	{
 		Read_Attributes_Negative(GetParam());
+	}
+
+	TEST_F(BeamLattice, LegacyBallsNamespaceBackwardCompatibility)
+	{
+		// This test simulates an older 3MF where balls were written with the main beamlattice namespace (b:)
+		// We construct a minimal 3MF package in-memory and ensure the reader still parses balls.
+
+		std::string legacyModelXML =
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			"<model unit=\"millimeter\" xml:lang=\"en-US\" xmlns=\"http://schemas.microsoft.com/3dmanufacturing/core/2015/02\" "
+			"xmlns:b=\"http://schemas.microsoft.com/3dmanufacturing/beamlattice/2017/02\" requiredextensions=\"b\">\n"
+			"  <resources>\n"
+			"    <object id=\"1\" type=\"model\">\n"
+			"      <mesh>\n"
+			"        <vertices>\n"
+			"          <vertex x=\"0\" y=\"0\" z=\"0\"/>\n"
+			"          <vertex x=\"10\" y=\"0\" z=\"0\"/>\n"
+			"        </vertices>\n"
+			"        <triangles/>\n"
+			"        <b:beamlattice mingap=\"0.0\" minlength=\"0.5\" clippingmode=\"none\" representationmode=\"mesh\">\n"
+			"          <b:beams>\n"
+			"            <b:beam v1=\"0\" v2=\"1\" r1=\"0.5\" r2=\"0.5\" cap1=\"sphere\" cap2=\"sphere\"/>\n"
+			"          </b:beams>\n"
+			"          <b:balls>\n"
+			"            <b:ball vindex=\"0\" r=\"1.2\"/>\n"
+			"          </b:balls>\n"
+			"        </b:beamlattice>\n"
+			"      </mesh>\n"
+			"    </object>\n"
+			"  </resources>\n"
+			"  <build><item objectid=\"1\"/></build>\n"
+			"</model>\n";
+
+		// Build a simple zip (3MF) archive in memory: we will write to temp file
+		std::string tempLegacy = "/tmp/legacy_balls.3mf";
+		{
+			// Create temporary staging directory structure
+			system("rm -rf /tmp/legacy3mf && mkdir -p /tmp/legacy3mf/3D");
+			std::ofstream modelFile("/tmp/legacy3mf/3D/3dmodel.model", std::ios::binary);
+			modelFile << legacyModelXML;
+			modelFile.close();
+			// Create [Content_Types].xml minimal
+			std::ofstream contentTypes("/tmp/legacy3mf/[Content_Types].xml", std::ios::binary);
+			contentTypes << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+			contentTypes << "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">";
+			contentTypes << "<Default Extension=\"model\" ContentType=\"application/vnd.ms-package.3dmanufacturing-3dmodel+xml\"/>";
+			contentTypes << "</Types>\n";
+			contentTypes.close();
+			// Zip it
+			system((std::string("cd /tmp/legacy3mf && zip -q \"") + tempLegacy + std::string("\" [Content_Types].xml 3D/3dmodel.model")).c_str());
+		}
+
+		auto model = wrapper->CreateModel();
+		auto reader = model->QueryReader("3mf");
+		reader->ReadFromFile(tempLegacy);
+		ASSERT_LT(reader->GetWarningCount(), 5u); // Allow some warnings but should not error
+
+		auto meshObjects = model->GetMeshObjects();
+		bool foundBall = false;
+		while (meshObjects->MoveNext()) {
+			auto meshObject = meshObjects->GetCurrentMeshObject();
+			auto bl = meshObject->BeamLattice();
+			if (bl->GetBallCount() > 0) {
+				foundBall = true;
+				ASSERT_EQ(bl->GetBallCount(), 1u);
+				auto ball = bl->GetBall(0);
+				ASSERT_EQ(static_cast<unsigned int>(ball.m_Index), 0u);
+				ASSERT_NEAR(ball.m_Radius, 1.2, 1e-6);
+			}
+		}
+		ASSERT_TRUE(foundBall) << "Legacy b:balls namespace not parsed";
 	}
 
 }
