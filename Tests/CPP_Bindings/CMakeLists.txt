@@ -78,7 +78,15 @@ endif()
 
 set_target_properties(${TESTNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
-add_test(${TESTNAME} ${CMAKE_CURRENT_BINARY_DIR}/${TESTNAME})
+# Enable fine-grained GoogleTest discovery instead of one monolithic test entry
+include(GoogleTest)
+gtest_discover_tests(
+	${TESTNAME}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	DISCOVERY_TIMEOUT 60
+	# Avoid re-running discovery on every build unless sources change
+	PROPERTIES VS_TEST_CATEGORY "CPP_Bindings"
+)
 
 find_program(VALGRIND "valgrind")
 if(VALGRIND)
