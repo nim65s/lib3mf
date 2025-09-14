@@ -52,7 +52,7 @@
         {
             "name": "linux-base",
             "displayName": "Linux Base (Ninja)",
-            "description": "Base preset for Linux/Debian using Ninja.",
+            "description": "Base preset for Linux using Ninja.",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "condition": {
