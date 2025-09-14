@@ -78,6 +78,7 @@ namespace NMR {
 		m_bWriteMaterialExtension = true;
 		m_bWriteProductionExtension = true;
 		m_bWriteBeamLatticeExtension = true;
+		m_bWriteBeamLatticeBallsExtension = false;
 		m_bWriteSliceExtension = true;
 		m_bWriteSecureContentExtension = true;
 		m_bWriteTriangleSetExtension = true;
@@ -155,6 +156,16 @@ namespace NMR {
 				if (sRequiredExtensions.size() > 0)
 					sRequiredExtensions = sRequiredExtensions + " ";
 				sRequiredExtensions = sRequiredExtensions + XML_3MF_NAMESPACEPREFIX_BEAMLATTICE;
+			}
+		}
+
+		if (m_bWriteBeamLatticeBallsExtension) {
+			writeConstPrefixedStringAttribute(XML_3MF_ATTRIBUTE_XMLNS, XML_3MF_NAMESPACEPREFIX_BEAMLATTICEBALLS, XML_3MF_NAMESPACE_BEAMLATTICEBALLSSPEC);
+
+			if (m_pModel->RequireExtension(XML_3MF_NAMESPACE_BEAMLATTICEBALLSSPEC)) {
+				if (sRequiredExtensions.size() > 0)
+					sRequiredExtensions = sRequiredExtensions + " ";
+				sRequiredExtensions = sRequiredExtensions + XML_3MF_NAMESPACEPREFIX_BEAMLATTICEBALLS;
 			}
 		}
 
@@ -609,11 +620,22 @@ namespace NMR {
 
 		if(pMeshObject)
 		{
+			// Check if this mesh has balls that require the balls namespace
+			CMesh * pMesh = pMeshObject->getMesh();
+			if (pMesh) {
+				nfUint32 nBallCount = pMesh->getBallCount();
+				eModelBeamLatticeBallMode eBallMode = pMesh->getBeamLatticeBallMode();
+
+				if (nBallCount > 0 || eBallMode != eModelBeamLatticeBallMode::MODELBEAMLATTICEBALLMODE_NONE) {
+					m_bWriteBeamLatticeBallsExtension = true;
+				}
+			}
+
 			CModelWriterNode100_Mesh ModelWriter_Mesh(
 				pMeshObject, m_pXMLWriter, m_pProgressMonitor,
 				m_pPropertyIndexMapping, m_nDecimalPrecision,
 				m_bWriteMaterialExtension, m_bWriteBeamLatticeExtension,
-				m_bWriteVolumetricExtension, m_bWriteTriangleSetExtension);
+				m_bWriteBeamLatticeBallsExtension, m_bWriteVolumetricExtension, m_bWriteTriangleSetExtension);
 
 			ModelWriter_Mesh.writeToXML();
 		}
