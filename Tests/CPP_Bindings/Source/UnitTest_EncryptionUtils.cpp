@@ -135,7 +135,7 @@ void EncryptionCallbacks::cleanup() {
 	CRYPTO_cleanup_all_ex_data();
 #else
 	// OpenSSL >= 1.1.0 performs automatic cleanup; these functions are removed
-	(void)0;
+	// No cleanup required for OpenSSL >= 1.1.0
 #endif
 }
 
