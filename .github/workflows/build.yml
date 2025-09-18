@@ -773,11 +773,12 @@ jobs:
             fi
         
             # Compare MUSTPASS and MUSTFAIL counts
-            if [ "$LATEST_MUSTPASS" != "$SECOND_LATEST_MUSTPASS" ] || [ "$LATEST_MUSTFAIL" != "$SECOND_LATEST_MUSTFAIL" ]; then
-              echo "MUSTPASS or MUSTFAIL counts have changed"
+            # Allow improvements: pass if latest >= second latest for both metrics; fail only on regression
+            if [ "$LATEST_MUSTPASS" -lt "$SECOND_LATEST_MUSTPASS" ] || [ "$LATEST_MUSTFAIL" -lt "$SECOND_LATEST_MUSTFAIL" ]; then
+              echo "MUSTPASS or MUSTFAIL counts have regressed"
               exit 1
             else
-              echo "MUSTPASS and MUSTFAIL counts are consistent"
+              echo "MUSTPASS and MUSTFAIL counts have improved or stayed the same"
             fi
         
 
@@ -967,11 +968,12 @@ jobs:
           echo "Latest release MUSTFAIL: ${LATEST_RELEASE_MUSTFAIL} / ${LATEST_TOTAL_RELEASE_MUSTFAIL}"
 
           # Compare MUSTPASS and MUSTFAIL counts
-          if [ "$LATEST_COMMIT_MUSTPASS" != "$LATEST_RELEASE_MUSTPASS" ] || [ "$LATEST_COMMIT_MUSTFAIL" != "$LATEST_RELEASE_MUSTFAIL" ]; then
-            echo "MUSTPASS or MUSTFAIL counts have changed"
+          # Allow improvements: pass if latest commit >= latest release for both metrics; fail only on regression
+          if [ "$LATEST_COMMIT_MUSTPASS" -lt "$LATEST_RELEASE_MUSTPASS" ] || [ "$LATEST_COMMIT_MUSTFAIL" -lt "$LATEST_RELEASE_MUSTFAIL" ]; then
+            echo "MUSTPASS or MUSTFAIL counts have regressed"
             exit 1
           else
-            echo "MUSTPASS and MUSTFAIL counts are consistent"
+            echo "MUSTPASS and MUSTFAIL counts have improved or stayed the same"
           fi
 
           # Compare the total seconds
