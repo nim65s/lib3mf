@@ -45,7 +45,7 @@ namespace NMR
     NMR::CModelReaderNode_LevelSet::CModelReaderNode_LevelSet(
        CModel * pModel, PModelLevelSetObject levelSet,
        PModelWarnings pWarnings,  PProgressMonitor pProgressMonitor)
-        : CModelReaderNode(pWarnings, pProgressMonitor), m_pLevelSet(std::move(levelSet)), m_parentModel(pModel)
+        : CModelReaderNode(pWarnings, pProgressMonitor), m_parentModel(pModel), m_pLevelSet(std::move(levelSet))
     {
         
     }
