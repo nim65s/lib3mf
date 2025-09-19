@@ -636,6 +636,23 @@ jobs:
         run: |
           cd test_suites && /usr/bin/time -v python integration_test.py 2>&1 | tee latest_sdk_test.log
 
+      - name: List MUSTPASS failures and MUSTFAIL passes (latest release)
+        run: |
+          echo "MUSTPASS that failed (latest release):"
+          grep -E 'MUSTPASS file ".*" does not work' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_mp_failed.txt || true
+          cat test_suites/latest_mp_failed.txt || true
+          echo "\nMUSTFAIL that passed (latest release):"
+          grep -E 'MUSTFAIL file ".*" works' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_mf_passed.txt || true
+          cat test_suites/latest_mf_passed.txt || true
+          {
+            echo "### Latest release detailed results";
+            echo "MUSTPASS failed: $(wc -l < test_suites/latest_mp_failed.txt 2>/dev/null || echo 0)";
+            sed 's/^/- /' test_suites/latest_mp_failed.txt 2>/dev/null || true;
+            echo;
+            echo "MUSTFAIL passed: $(wc -l < test_suites/latest_mf_passed.txt 2>/dev/null || echo 0)";
+            sed 's/^/- /' test_suites/latest_mf_passed.txt 2>/dev/null || true;
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Print results (Checks the total python script execution time)
         run: |
           LATEST_TIME=$(grep "Elapsed (wall clock) time" test_suites/latest_sdk_test.log | awk '{print $8}')
@@ -743,6 +760,36 @@ jobs:
 
       - name: Compare results (Checks the total python script execution time and must pass/fail counts)
         run: |
+            # Extract detailed lists from logs for diffing
+            grep -E 'MUSTPASS file ".*" does not work' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_mp_failed.txt || true
+            grep -E 'MUSTFAIL file ".*" works' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_mf_passed.txt || true
+            grep -E 'MUSTPASS file ".*" does not work' test_suites/second_latest_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/second_latest_mp_failed.txt || true
+            grep -E 'MUSTFAIL file ".*" works' test_suites/second_latest_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/second_latest_mf_passed.txt || true
+
+            echo "=== Latest MUSTPASS failed:"; cat test_suites/latest_mp_failed.txt || true
+            echo "=== Second Latest MUSTPASS failed:"; cat test_suites/second_latest_mp_failed.txt || true
+            echo "=== Latest MUSTFAIL passed:"; cat test_suites/latest_mf_passed.txt || true
+            echo "=== Second Latest MUSTFAIL passed:"; cat test_suites/second_latest_mf_passed.txt || true
+
+            # Compute regressions and improvements
+            comm -23 test_suites/latest_mp_failed.txt test_suites/second_latest_mp_failed.txt > test_suites/regressions_mp_now_failing.txt || true
+            comm -23 test_suites/latest_mf_passed.txt test_suites/second_latest_mf_passed.txt > test_suites/regressions_mf_now_passing.txt || true
+            comm -13 test_suites/latest_mp_failed.txt test_suites/second_latest_mp_failed.txt > test_suites/improvements_mp_fixed.txt || true
+            comm -13 test_suites/latest_mf_passed.txt test_suites/second_latest_mf_passed.txt > test_suites/improvements_mf_fixed.txt || true
+
+            echo "=== Regressions - MUSTPASS now failing:"; cat test_suites/regressions_mp_now_failing.txt || true
+            echo "=== Regressions - MUSTFAIL now passing:"; cat test_suites/regressions_mf_now_passing.txt || true
+            echo "=== Improvements - MUSTPASS fixed:"; cat test_suites/improvements_mp_fixed.txt || true
+            echo "=== Improvements - MUSTFAIL fixed:"; cat test_suites/improvements_mf_fixed.txt || true
+
+            {
+              echo "### Last two releases - detailed diffs";
+              echo "#### Regressions - MUSTPASS now failing"; sed 's/^/- /' test_suites/regressions_mp_now_failing.txt 2>/dev/null || true; echo;
+              echo "#### Regressions - MUSTFAIL now passing"; sed 's/^/- /' test_suites/regressions_mf_now_passing.txt 2>/dev/null || true; echo;
+              echo "#### Improvements - MUSTPASS fixed"; sed 's/^/- /' test_suites/improvements_mp_fixed.txt 2>/dev/null || true; echo;
+              echo "#### Improvements - MUSTFAIL fixed"; sed 's/^/- /' test_suites/improvements_mf_fixed.txt 2>/dev/null || true; echo;
+            } >> "$GITHUB_STEP_SUMMARY"
+
             LATEST_TIME=$(grep "Elapsed (wall clock) time" test_suites/latest_sdk_test.log | awk '{print $8}')
             SECOND_LATEST_TIME=$(grep "Elapsed (wall clock) time" test_suites/second_latest_sdk_test.log | awk '{print $8}')
             LATEST_TOTAL_SECONDS=$(echo $LATEST_TIME | awk -F: '{ print ($1 * 60) + $2 }')
@@ -776,6 +823,7 @@ jobs:
             # Allow improvements: pass if latest >= second latest for both metrics; fail only on regression
             if [ "$LATEST_MUSTPASS" -lt "$SECOND_LATEST_MUSTPASS" ] || [ "$LATEST_MUSTFAIL" -lt "$SECOND_LATEST_MUSTFAIL" ]; then
               echo "MUSTPASS or MUSTFAIL counts have regressed"
+              echo "Regressions detected. See lists above and job summary for files."
               exit 1
             else
               echo "MUSTPASS and MUSTFAIL counts have improved or stayed the same"
@@ -831,6 +879,23 @@ jobs:
       - name: Run integration tests
         run: |
           cd test_suites && /usr/bin/time -v python integration_test.py 2>&1 | tee latest_sdk_test.log
+
+      - name: List MUSTPASS failures and MUSTFAIL passes (latest commit)
+        run: |
+          echo "MUSTPASS that failed (latest commit):"
+          grep -E 'MUSTPASS file ".*" does not work' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_commit_mp_failed.txt || true
+          cat test_suites/latest_commit_mp_failed.txt || true
+          echo "\nMUSTFAIL that passed (latest commit):"
+          grep -E 'MUSTFAIL file ".*" works' test_suites/latest_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_commit_mf_passed.txt || true
+          cat test_suites/latest_commit_mf_passed.txt || true
+          {
+            echo "### Latest commit detailed results";
+            echo "MUSTPASS failed: $(wc -l < test_suites/latest_commit_mp_failed.txt 2>/dev/null || echo 0)";
+            sed 's/^/- /' test_suites/latest_commit_mp_failed.txt 2>/dev/null || true;
+            echo;
+            echo "MUSTFAIL passed: $(wc -l < test_suites/latest_commit_mf_passed.txt 2>/dev/null || echo 0)";
+            sed 's/^/- /' test_suites/latest_commit_mf_passed.txt 2>/dev/null || true;
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Print results (Checks the total python script execution time)
         run: |
@@ -945,6 +1010,17 @@ jobs:
       - name: Compare results (Checks the total python script execution time)
         id: compare_results
         run: |
+          # Extract detailed lists from logs for diffing
+          grep -E 'MUSTPASS file ".*" does not work' test_suites/latest_commit_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_commit_mp_failed.txt || true
+          grep -E 'MUSTFAIL file ".*" works' test_suites/latest_commit_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_commit_mf_passed.txt || true
+          grep -E 'MUSTPASS file ".*" does not work' test_suites/latest_release_sdk_test.log | sed -n 's/.*MUSTPASS file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_release_mp_failed.txt || true
+          grep -E 'MUSTFAIL file ".*" works' test_suites/latest_release_sdk_test.log | sed -n 's/.*MUSTFAIL file "\([^"]*\)".*/\1/p' | sort -u > test_suites/latest_release_mf_passed.txt || true
+
+          echo "=== Latest commit MUSTPASS failed:"; cat test_suites/latest_commit_mp_failed.txt || true
+          echo "=== Latest release MUSTPASS failed:"; cat test_suites/latest_release_mp_failed.txt || true
+          echo "=== Latest commit MUSTFAIL passed:"; cat test_suites/latest_commit_mf_passed.txt || true
+          echo "=== Latest release MUSTFAIL passed:"; cat test_suites/latest_release_mf_passed.txt || true
+
           LATEST_COMMIT_TIME=$(grep "Elapsed (wall clock) time" test_suites/latest_commit_sdk_test.log | awk '{print $8}')
           LATEST_RELEASE_TIME=$(grep "Elapsed (wall clock) time" test_suites/latest_release_sdk_test.log | awk '{print $8}')
           LATEST_COMMIT_TOTAL_SECONDS=$(echo $LATEST_COMMIT_TIME | awk -F: '{ print ($1 * 60) + $2 }')
@@ -971,6 +1047,16 @@ jobs:
           # Allow improvements: pass if latest commit >= latest release for both metrics; fail only on regression
           if [ "$LATEST_COMMIT_MUSTPASS" -lt "$LATEST_RELEASE_MUSTPASS" ] || [ "$LATEST_COMMIT_MUSTFAIL" -lt "$LATEST_RELEASE_MUSTFAIL" ]; then
             echo "MUSTPASS or MUSTFAIL counts have regressed"
+            # Highlight exactly which files changed outcome
+            comm -23 test_suites/latest_commit_mp_failed.txt test_suites/latest_release_mp_failed.txt > test_suites/regressions_commit_mp_now_failing.txt || true
+            comm -23 test_suites/latest_commit_mf_passed.txt test_suites/latest_release_mf_passed.txt > test_suites/regressions_commit_mf_now_passing.txt || true
+            echo "=== Regressions (commit vs release) - MUSTPASS now failing:"; cat test_suites/regressions_commit_mp_now_failing.txt || true
+            echo "=== Regressions (commit vs release) - MUSTFAIL now passing:"; cat test_suites/regressions_commit_mf_now_passing.txt || true
+            {
+              echo "### Latest commit vs latest release - regressions";
+              echo "#### MUSTPASS now failing"; sed 's/^/- /' test_suites/regressions_commit_mp_now_failing.txt 2>/dev/null || true; echo;
+              echo "#### MUSTFAIL now passing"; sed 's/^/- /' test_suites/regressions_commit_mf_now_passing.txt 2>/dev/null || true; echo;
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           else
             echo "MUSTPASS and MUSTFAIL counts have improved or stayed the same"
