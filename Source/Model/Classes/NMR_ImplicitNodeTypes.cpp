@@ -355,7 +355,7 @@ namespace NMR
                           Out{{"distance", eImplicitPortType::Scalar}}},
                   }}},
                 {eImplicitNodeType::UnsignedMesh,
-                 {"mesh",
+                 {"unsignedmesh",
                   {
                       InputOutputRule{
                           Lib3MF::eImplicitNodeConfiguration::Default,
