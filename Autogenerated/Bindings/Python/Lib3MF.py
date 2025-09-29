@@ -8228,7 +8228,7 @@ class MeshObject(Object):
 	
 	def GetTriangleProperties(self, Index, Property = None):
 		nIndex = ctypes.c_uint32(Index)
-		pProperty = TriangleProperties(Property if Property else TriangleProperties())
+		pProperty = Property if Property is not None else TriangleProperties()
 		self._wrapper.checkError(self, self._wrapper.lib.lib3mf_meshobject_gettriangleproperties(self._handle, nIndex, pProperty))
 		
 		return pProperty
