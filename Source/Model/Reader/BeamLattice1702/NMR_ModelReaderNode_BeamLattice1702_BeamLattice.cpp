@@ -93,7 +93,7 @@ namespace NMR {
 	void CModelReaderNode_BeamLattice1702_BeamLattice::validateBallOptions(_In_ PModelWarnings pWarnings)
 	{
 		if (m_pMesh->getBeamLatticeBallMode() != eModelBeamLatticeBallMode::MODELBEAMLATTICEBALLMODE_NONE) {
-			if (m_pMesh->getDefaultBallRadius() <= 0 && m_pMesh->getDefaultBallRadius() >= XML_3MF_MAXIMUMCOORDINATEVALUE) {
+			if (m_pMesh->getDefaultBallRadius() <= 0 || m_pMesh->getDefaultBallRadius() >= XML_3MF_MAXIMUMCOORDINATEVALUE) {
 				pWarnings->addException(CNMRException(NMR_ERROR_BEAMLATTICEINVALIDATTRIBUTE), mrwInvalidOptionalValue);
 			}
 		}
@@ -177,7 +177,11 @@ namespace NMR {
 				m_dDefaultBallRadius = dValue;
 				m_pMesh->setDefaultBallRadius(dValue);
 			}
+			else
+				m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
 		}
+		else
+			m_pWarnings->addException(CNMRException(NMR_ERROR_NAMESPACE_INVALID_ATTRIBUTE), mrwInvalidOptionalValue);
 	}
 	
 	void CModelReaderNode_BeamLattice1702_BeamLattice::OnNSChildElement(_In_z_ const nfChar * pChildName, _In_z_ const nfChar * pNameSpace, _In_ CXmlReader * pXMLReader)
