@@ -32,8 +32,7 @@ Vulometric.cpp: Defines Unittests for the Volumetric extension
 
 #include "UnitTest_Utilities.h"
 #include "lib3mf_implicit.hpp"
-
-#include <zip.h>
+#include "ZipBuffer.h"
 
 #include <algorithm>
 
@@ -41,6 +40,7 @@ namespace Lib3MF
 {
     namespace helper
     {
+
         PImplicitFunction createGyroidFunction(CModel& model)
         {
             PImplicitFunction gyroidFunction = model.AddImplicitFunction();
@@ -1109,43 +1109,7 @@ namespace Lib3MF
         std::vector<Lib3MF_uint8> buffer;
         writer->WriteToBuffer(buffer);
 
-        zip_error_t zipError;
-        zip_source_t* zipSource =
-            zip_source_buffer_create(buffer.data(), buffer.size(), 0, &zipError);
-        if(zipSource == nullptr)
-        {
-            FAIL() << "Failed to create zip source: "
-                   << zip_error_strerror(&zipError);
-        }
-
-        zip_t* archive = zip_open_from_source(zipSource, ZIP_RDONLY, &zipError);
-        if(archive == nullptr)
-        {
-            zip_source_free(zipSource);
-            FAIL() << "Failed to open zip archive: "
-                   << zip_error_strerror(&zipError);
-        }
-
-        std::string modelPath = "/3D/3dmodel.model";
-        if(!modelPath.empty() && modelPath.front() == '/')
-        {
-            modelPath.erase(modelPath.begin());
-        }
-
-        zip_stat_t entryStat;
-        zip_stat_init(&entryStat);
-        ASSERT_EQ(zip_stat(archive, modelPath.c_str(), ZIP_FL_ENC_GUESS, &entryStat), 0);
-
-        zip_file_t* modelFile = zip_fopen(archive, modelPath.c_str(), ZIP_FL_ENC_GUESS);
-        ASSERT_NE(modelFile, nullptr);
-
-        std::string xml(static_cast<size_t>(entryStat.size), '\0');
-        zip_int64_t const bytesRead =
-            zip_fread(modelFile, xml.data(), entryStat.size);
-        ASSERT_EQ(bytesRead, static_cast<zip_int64_t>(entryStat.size));
-
-        zip_fclose(modelFile);
-        zip_close(archive);
+        std::string const xml = helper::extractZipEntryFromBuffer(buffer, "3D/3dmodel.model");
 
         auto volumeDataPos = xml.find("<v:volumedata");
         if(volumeDataPos == std::string::npos)
